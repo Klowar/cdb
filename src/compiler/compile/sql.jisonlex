@@ -1,11 +1,11 @@
 name                [A-Za-z][A-Za-z0-9_]*
 int_num             [0-9]+|[0-9]+"."[0-9]* |"."[0-9]*
 approx_num          [0-9]+[eE][+-]?[0-9]+|[0-9]+"."[0-9]*[eE][+-]?[0-9]+|"."[0-9]*[eE][+-]?[0-9]+
-strings             '[^\'\n]*'
+strings             ['\w']
 white_space         [ \t\r]+
 comment             "--".*$	
 comparators         "="|"<>"|"<"|">"|"<="|">="
-special_symbols     "*"|","|";"|"."
+special_symbols     "*"|","|";"|"."|"("|")"
 
 %%
 
@@ -102,7 +102,7 @@ special_symbols     "*"|","|";"|"."
 "WORK"		        return 'WORK';
 {white_space}       /* ignore white spaces */
 {comment}           /* ignore comments */
-{special_symbols}+  return yytext;
+{special_symbols}   return yytext;
 {comparators}       return 'COMPARISON';
 {name}+             return 'NAME';
 {int_num}           return 'INTNUM';
