@@ -1,16 +1,23 @@
 import * as parser from '../src/compiler/sql';
 import * as scope from './sqope';
 
-parser.parser.yy.scope = scope;
 
 describe("Parser.parse", function select() {
 
-    it("all table delete", function all_column_select() {
-        parser.parse('DELETE FROM t1;', scope);
+    beforeEach(function setup() {
+        parser.parser.yy.ast = new scope.ast();
     });
 
-    it("conditional table delete", function conditional_named_column_select() {
-        parser.parse('DELETE FROM t1 WHERE name > 0;', scope);
+    afterEach(function cleanup() {
+        parser.parser.yy = {};
+    });
+
+    it("all table delete", function all_column_delete() {
+        parser.parse('DELETE FROM t1;');
+    });
+
+    it("conditional table delete", function conditional_table_delete() {
+        parser.parse('DELETE FROM t1 WHERE name > 0;');
     });
 
 });
