@@ -33,6 +33,7 @@ special_symbols     "*"|","|";"|"."|"("|")"|"="
 "CREATE"		    return 'CREATE';
 "CURRENT"		    return 'CURRENT';
 "CURSOR"		    return 'CURSOR';
+"(DATE)?TIME"       return 'DATETIME';
 "DECIMAL"		    return 'DECIMAL';
 "DECLARE"		    return 'DECLARE';
 "DEFAULT"		    return 'DEFAULT';

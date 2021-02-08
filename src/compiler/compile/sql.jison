@@ -10,8 +10,8 @@
 %%
 
 sql_list:
-		sql ';'	{ yy.scope.end_sql() }
-	|	sql_list sql ';' { yy.scope.end_sql() }
+		sql ';'
+	|	sql_list sql ';'
 	;
 
 
@@ -20,7 +20,13 @@ sql:		schema
 	;
 	
 schema:
-		CREATE SCHEMA AUTHORIZATION user opt_schema_element_list
+		CREATE SCHEMA AUTHORIZATION user opt_schema_element_list { 
+			{ 
+				const a = new yy.scope.createStatement();
+				a.setSchema(yytext);
+				yy.ast.add(a); 
+			}
+		}
 	;
 
 opt_schema_element_list:
@@ -40,7 +46,12 @@ schema_element:
 	;
 
 base_table_def:
-		CREATE TABLE table '(' base_table_element_commalist ')'
+		CREATE TABLE table '(' base_table_element_commalist ')' {
+			{
+				const a = new yy.scope.createStatement();
+				yy.ast.setStatement(a);
+			}
+		}
 	;
 
 base_table_element_commalist:
@@ -183,15 +194,46 @@ sql:		manipulative_statement
 manipulative_statement:
 		close_statement
 	|	commit_statement
-	|	delete_statement_positioned
-	|	delete_statement_searched
+	|	delete_statement_positioned { 
+			{
+				const a = new yy.scope.deleteStatement();
+				yy.ast.setStatement(a);
+			}
+		}
+	|	delete_statement_searched { 
+			{
+				const a = new yy.scope.deleteStatement();
+				yy.ast.setStatement(a);
+			}
+		}
 	|	fetch_statement
-	|	insert_statement
+	|	insert_statement {
+			{
+				const a = new yy.scope.insertStatement();
+				yy.ast.setStatement(a);
+			}
+		}
 	|	open_statement
 	|	rollback_statement
-	|	select_statement
-	|	update_statement_positioned
-	|	update_statement_searched
+	|	select_statement { 
+			{
+				console.log(select_statement);
+				const a = new yy.scope.selectStatement();
+				yy.ast.setStatement(a);
+			}
+		}
+	|	update_statement_positioned {
+			{
+				const a = new yy.scope.updateStatement();
+				yy.ast.setStatement(a);
+			}
+		}
+	|	update_statement_searched {
+			{
+				const a = new yy.scope.updateStatement();
+				yy.ast.setStatement(a);
+			}
+		}
 	;
 
 close_statement:
@@ -250,7 +292,12 @@ select_statement:
 
 opt_all_distinct:
 		/* empty */
-	|	ALL
+	|	ALL {
+			{
+				const a = new yy.scope.identifier({ name: 'all', alias: '*' });
+				yy.ast.statement.addColumn(a);
+			}
+		}
 	|	DISTINCT
 	;
 
@@ -306,7 +353,12 @@ query_spec:
 
 selection:
 		scalar_exp_commalist
-	|	'*'
+	|	'*' {
+			{
+				const a = new yy.scope.identifier({ name: 'all', alias: '*' });
+				yy.ast.statement.addColumn(a);
+			}
+		}
 	;
 
 table_exp:
@@ -477,8 +529,18 @@ table:
 	;
 
 column_ref:
-		NAME
-	|	NAME '.' NAME	/* needs semantics */
+		NAME {
+			{
+				const a = new yy.scope.identifier({ name: $1 });
+				yy.ast.statement.addColumn(a);
+			}
+		}
+	|	NAME '.' NAME	{
+			{
+				const a = new yy.scope.identifier({ name: $2, scope: $1 });
+				yy.ast.statement.addColumn(a);
+			}
+		}
 	|	NAME '.' NAME '.' NAME
 	;
 

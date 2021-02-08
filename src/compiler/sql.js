@@ -83,8 +83,80 @@ performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* actio
 
 var $0 = $$.length - 1;
 switch (yystate) {
-case 1: case 2:
- yy.scope.end_sql() 
+case 8:
+ 
+			{ 
+				const a = new yy.scope.createStatement();
+				a.setSchema(yytext);
+				yy.ast.add(a); 
+			}
+		
+break;
+case 16:
+
+			{
+				const a = new yy.scope.createStatement();
+				yy.ast.setStatement(a);
+			}
+		
+break;
+case 74: case 75:
+ 
+			{
+				const a = new yy.scope.deleteStatement();
+				yy.ast.setStatement(a);
+			}
+		
+break;
+case 77:
+
+			{
+				const a = new yy.scope.insertStatement();
+				yy.ast.setStatement(a);
+			}
+		
+break;
+case 80:
+ 
+			{
+				console.log(select_statement);
+				const a = new yy.scope.selectStatement();
+				yy.ast.setStatement(a);
+			}
+		
+break;
+case 81: case 82:
+
+			{
+				const a = new yy.scope.updateStatement();
+				yy.ast.setStatement(a);
+			}
+		
+break;
+case 100: case 121:
+
+			{
+				const a = new yy.scope.identifier({ name: 'all', alias: '*' });
+				yy.ast.statement.addColumn(a);
+			}
+		
+break;
+case 197:
+
+			{
+				console.log("column_ref", $$[$0]);
+				const a = new yy.scope.identifier({ name: $$[$0] });
+				yy.ast.statement.addColumn(a);
+			}
+		
+break;
+case 198:
+
+			{
+				const a = new yy.scope.identifier({ name: $$[$0-1], scope: $$[$0-2] });
+				yy.ast.statement.addColumn(a);
+			}
+		
 break;
 }
 },
