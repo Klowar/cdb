@@ -62,8 +62,8 @@ alter_target:
     ;
 
 select_statement:
-        select_keyword identifier FROM select_target
-    |   select_keyword identifier FROM select_target condition_clause
+        select_keyword multi_identifier FROM select_target
+    |   select_keyword multi_identifier FROM select_target condition_clause
     ;
 
 select_keyword:
@@ -76,8 +76,8 @@ select_target:
     ;
 
 insert_statement:
-        insert_keyword insert_target VALUES '(' identifier ')'
-    |   insert_keyword insert_target '(' identifier ')' VALUES '(' identifier ')'
+        insert_keyword insert_target VALUES '(' multi_literal ')'
+    |   insert_keyword insert_target '(' multi_identifier ')' VALUES '(' multi_literal ')'
     ;
 
 insert_keyword:
@@ -103,7 +103,8 @@ update_target:
     ;
 
 delete_statement:
-        delete_keyword FROM delete_target condition_clause
+        delete_keyword FROM delete_target
+    |   delete_keyword FROM delete_target condition_clause
     ;
 
 delete_keyword:
@@ -135,14 +136,19 @@ unary_expression:
     |   '-' NAME
     ;
 
+multi_identifier:
+        multi_identifier ',' identifier
+    |   identifier
+    ;
+
 identifier:
-        identifier ','
-    |   ddl_identifier
+        ddl_identifier
     |   dml_identifier
     |   NAME
     ;
 
 dml_identifier:
+        '*'
     |   alias_identifier
     |   dml_identifier '.' NAME
     |   NAME '.' NAME
@@ -171,9 +177,14 @@ type:
     |   DATETIME
     ;
 
+multi_literal:
+        multi_literal ',' literal
+    |   literal
+    ;
+
 literal:
         STRING
     |   INTNUM
     ;
-
+// ../../node_modules/.bin/jison compile/sql2.jison compile/sql.jisonlex 
 %%
