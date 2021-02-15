@@ -136,8 +136,26 @@ delete_target:
     ;
 
 condition_clause:
-        WHERE identifier COMPARISON identifier
-    |   WHERE identifier COMPARISON literal
+        WHERE identifier COMPARISON identifier {
+            {
+                const a = new yy.scope.identifier({ name: $2 });
+                const b = new yy.scope.identifier({ name: $4 });
+                const expression = new yy.scope.binaryExpression({
+                    lParam: a, rParam: b, operator: $3
+                });
+                yy.ast.statement.setWhere(expression);
+            }
+        }
+    |   WHERE identifier COMPARISON literal {
+            {
+                const a = new yy.scope.identifier({ name: $2 });
+                const b = new yy.scope.literal($4);
+                const expression = new yy.scope.binaryExpression({
+                    lParam: a, rParam: b, operator: $3
+                });
+                yy.ast.statement.setWhere(expression);
+            }
+        }
     ;
 
 expression:

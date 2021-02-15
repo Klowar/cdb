@@ -95,7 +95,7 @@ case 31:
 
         {
             const a = new yy.scope.insertStatement();
-				yy.ast.setStatement(a);
+            yy.ast.setStatement(a);
         }
     
 break;
@@ -112,6 +112,30 @@ case 39:
             {
                 const a = new yy.scope.deleteStatement();
 				yy.ast.setStatement(a);
+            }
+        
+break;
+case 41:
+
+            {
+                const a = new yy.scope.identifier({ name: $$[$0-2] });
+                const b = new yy.scope.identifier({ name: $$[$0] });
+                const expression = new yy.scope.binaryExpression({
+                    lParam: a, rParam: b, operator: $$[$0-1]
+                });
+                yy.ast.statement.setWhere(expression);
+            }
+        
+break;
+case 42:
+
+            {
+                const a = new yy.scope.identifier({ name: $$[$0-2] });
+                const b = new yy.scope.literal($$[$0]);
+                const expression = new yy.scope.binaryExpression({
+                    lParam: a, rParam: b, operator: $$[$0-1]
+                });
+                yy.ast.statement.setWhere(expression);
             }
         
 break;
