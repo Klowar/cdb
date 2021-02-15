@@ -67,7 +67,12 @@ select_statement:
     ;
 
 select_keyword:
-        SELECT
+        SELECT {
+            {
+                const a = new yy.scope.selectStatement();
+				yy.ast.setStatement(a);
+            }
+        }
     |   FETCH
     ;
 
@@ -82,7 +87,12 @@ insert_statement:
 
 insert_keyword:
         INSERT
-    |   INSERT INTO
+    |   INSERT INTO {
+        {
+            const a = new yy.scope.insertStatement();
+            yy.ast.setStatement(a);
+        }
+    }
     ;
 
 insert_target:
@@ -95,7 +105,12 @@ update_statement:
     ;
 
 update_keyword:
-        UPDATE
+        UPDATE {
+            {
+                const a = new yy.scope.updateStatement();
+				yy.ast.setStatement(a);
+            }
+        }
     ;
 
 update_target:
@@ -108,7 +123,12 @@ delete_statement:
     ;
 
 delete_keyword:
-        DELETE
+        DELETE {
+            {
+                const a = new yy.scope.deleteStatement();
+				yy.ast.setStatement(a);
+            }
+        }
     ;
 
 delete_target:
@@ -144,18 +164,32 @@ multi_identifier:
 identifier:
         ddl_identifier
     |   dml_identifier
-    |   NAME
     ;
 
 dml_identifier:
-        '*'
+        '*' {
+            {
+                const a = new yy.scope.identifier({ name: 'all', alias: '*' });
+				yy.ast.statement.addColumn(a);
+            }
+        }
     |   alias_identifier
     |   dml_identifier '.' NAME
-    |   NAME '.' NAME
+    |   NAME {
+            {
+                const a = new yy.scope.identifier({ name: $1 });
+				yy.ast.statement.addColumn(a);
+            }
+        }
     ;
 
 alias_identifier:
-        NAME AS NAME
+        NAME AS NAME {
+            {
+                const a = new yy.scope.identifier({ name: $1, alias: $2 });
+				yy.ast.statement.addColumn(a);
+            }
+        }
     ;
 
 ddl_identifier:
