@@ -13,7 +13,7 @@ describe("Parser.parse", function select() {
     });
 
     afterEach(function cleanup() {
-        console.dir(parser.parser.yy.ast);
+        // console.dir(parser.parser.yy.ast.statement);
     });
     
     it("all column select", function all_column_select() {

@@ -13,7 +13,7 @@ describe("Parser.parse", function select() {
     });
 
     afterEach(function cleanup() {
-        console.dir(parser.parser.yy.ast);
+        console.dir(parser.parser.yy.ast.statement);
     });
 
     it("all integers insert", function all_integers_insert() {
