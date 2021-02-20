@@ -83,83 +83,134 @@ performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* actio
 
 var $0 = $$.length - 1;
 switch (yystate) {
-case 25:
+case 2:
 
             {
-                const a = new yy.scope.selectStatement();
-				yy.ast.setStatement(a);
+                yy.ast.setStatement($$[$0-1]);
             }
         
 break;
-case 31:
-
-        {
-            const a = new yy.scope.insertStatement();
-            yy.ast.setStatement(a);
-        }
-    
-break;
-case 35:
-
+case 23:
+ 
             {
-                const a = new yy.scope.updateStatement();
-				yy.ast.setStatement(a);
+                this.$ = new yy.scope.selectStatement();
+                this.$.setColumns($$[$0-2]);
+                this.$.setTarget($$[$0]);
             }
         
 break;
-case 39:
-
+case 24:
+ 
             {
-                const a = new yy.scope.deleteStatement();
-				yy.ast.setStatement(a);
+                this.$ = new yy.scope.selectStatement();
+                this.$.setColumns($$[$0-3]);
+                this.$.setTarget($$[$0-1]);
+                this.$.setWhere($$[$0]);
             }
         
 break;
-case 41:
+case 28:
 
             {
-                const a = new yy.scope.identifier({ name: $$[$0-2] });
-                const b = new yy.scope.identifier({ name: $$[$0] });
-                const expression = new yy.scope.binaryExpression({
-                    lParam: a, rParam: b, operator: $$[$0-1]
+                this.$ = new yy.scope.insertStatement();
+                this.$.setTarget($$[$0-4]);
+                this.$.setValues($$[$0-1]);
+            }
+        
+break;
+case 29:
+
+            {
+                this.$ = new yy.scope.insertStatement();
+                this.$.setTarget($$[$0-7]);
+                this.$.setColumns($$[$0-5]);
+                this.$.setValues($$[$0-1]);
+            }
+        
+break;
+case 33:
+
+            {
+                this.$ = new yy.scope.updateStatement();
+                this.$.setTarget($$[$0-2]);
+            }
+        
+break;
+case 34:
+
+            {
+                this.$ = new yy.scope.updateStatement();
+                this.$.setTarget($$[$0-3]);
+                this.$.setWhere($$[$0]);
+            }
+        
+break;
+case 37:
+
+            {
+                this.$ = new yy.scope.deleteStatement();
+                this.$.setTarget($$[$0]);
+            }
+        
+break;
+case 38:
+
+            {
+                this.$ = new yy.scope.deleteStatement();
+                this.$.setTarget($$[$0-1]);
+                this.$.setWhere($$[$0]);
+            }
+        
+break;
+case 41: case 42:
+
+            {
+                this.$ = new yy.scope.binaryExpression({
+                    lParam: $$[$0-2], rParam: $$[$0], operator: $$[$0-1]
                 });
-                yy.ast.statement.setWhere(expression);
             }
         
 break;
-case 42:
+case 50: case 69:
 
             {
-                const a = new yy.scope.identifier({ name: $$[$0-2] });
-                const b = new yy.scope.literal($$[$0]);
-                const expression = new yy.scope.binaryExpression({
-                    lParam: a, rParam: b, operator: $$[$0-1]
-                });
-                yy.ast.statement.setWhere(expression);
+                this.$ = Array.isArray($$[$0-2]) ? $$[$0-2] : [$$[$0-2]];
+                this.$.push($$[$0]);
             }
         
 break;
 case 54:
 
             {
-                const a = new yy.scope.identifier({ name: 'all', alias: '*' });
-				yy.ast.statement.addColumn(a);
+                this.$ = new yy.scope.identifier({ name: 'all', alias: '*' });
+            }
+        
+break;
+case 56:
+
+            {
+                this.$ = new yy.scope.identifier({ name: $$[$0], scope: $$[$0-2] })
             }
         
 break;
 case 57:
 
             {
-                const a = new yy.scope.identifier({ name: $$[$0] });
-				yy.ast.statement.addColumn(a);
+                this.$ = new yy.scope.identifier({ name: $$[$0] });
             }
         
 break;
 case 58:
 
             {
-                const a = new yy.scope.identifier({ name: $$[$0-2], alias: $$[$0-1] });
-				yy.ast.statement.addColumn(a);
+                this.$ = new yy.scope.identifier({ name: $$[$0-2], alias: $$[$0] });
+            }
+        
+break;
+case 71: case 72:
+
+            {
+                this.$ = new yy.scope.literal($$[$0]);
             }
         
 break;

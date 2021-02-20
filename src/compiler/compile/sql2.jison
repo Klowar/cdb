@@ -11,7 +11,11 @@
 
 sql: 
         sql ';'
-    |   statements ';'
+    |   statements ';' {
+            {
+                yy.ast.setStatement($1);
+            }
+        }
     ;
 
 statements:
@@ -62,17 +66,25 @@ alter_target:
     ;
 
 select_statement:
-        select_keyword multi_identifier FROM select_target
-    |   select_keyword multi_identifier FROM select_target condition_clause
+        select_keyword multi_identifier FROM select_target { 
+            {
+                $$ = new yy.scope.selectStatement();
+                $$.setColumns($2);
+                $$.setTarget($4);
+            }
+        }
+    |   select_keyword multi_identifier FROM select_target condition_clause { 
+            {
+                $$ = new yy.scope.selectStatement();
+                $$.setColumns($2);
+                $$.setTarget($4);
+                $$.setWhere($5);
+            }
+        }
     ;
 
 select_keyword:
-        SELECT {
-            {
-                const a = new yy.scope.selectStatement();
-				yy.ast.setStatement(a);
-            }
-        }
+        SELECT
     |   FETCH
     ;
 
@@ -81,18 +93,26 @@ select_target:
     ;
 
 insert_statement:
-        insert_keyword insert_target VALUES '(' multi_literal ')'
-    |   insert_keyword insert_target '(' multi_identifier ')' VALUES '(' multi_literal ')'
+        insert_keyword insert_target VALUES '(' multi_literal ')' {
+            {
+                $$ = new yy.scope.insertStatement();
+                $$.setTarget($2);
+                $$.setValues($5);
+            }
+        }
+    |   insert_keyword insert_target '(' multi_identifier ')' VALUES '(' multi_literal ')' {
+            {
+                $$ = new yy.scope.insertStatement();
+                $$.setTarget($2);
+                $$.setColumns($4);
+                $$.setValues($8);
+            }
+        }
     ;
 
 insert_keyword:
         INSERT
-    |   INSERT INTO {
-        {
-            const a = new yy.scope.insertStatement();
-            yy.ast.setStatement(a);
-        }
-    }
+    |   INSERT INTO
     ;
 
 insert_target:
@@ -100,17 +120,23 @@ insert_target:
     ;
 
 update_statement:
-        update_keyword update_target SET expression
-    |   update_keyword update_target SET expression condition_clause
+        update_keyword update_target SET expression {
+            {
+                $$ = new yy.scope.updateStatement();
+                $$.setTarget($2);
+            }
+        }
+    |   update_keyword update_target SET expression condition_clause {
+            {
+                $$ = new yy.scope.updateStatement();
+                $$.setTarget($2);
+                $$.setWhere($5);
+            }
+        }
     ;
 
 update_keyword:
-        UPDATE {
-            {
-                const a = new yy.scope.updateStatement();
-				yy.ast.setStatement(a);
-            }
-        }
+        UPDATE
     ;
 
 update_target:
@@ -118,17 +144,23 @@ update_target:
     ;
 
 delete_statement:
-        delete_keyword FROM delete_target
-    |   delete_keyword FROM delete_target condition_clause
+        delete_keyword FROM delete_target {
+            {
+                $$ = new yy.scope.deleteStatement();
+                $$.setTarget($3);
+            }
+        }
+    |   delete_keyword FROM delete_target condition_clause {
+            {
+                $$ = new yy.scope.deleteStatement();
+                $$.setTarget($3);
+                $$.setWhere($4);
+            }
+        }
     ;
 
 delete_keyword:
-        DELETE {
-            {
-                const a = new yy.scope.deleteStatement();
-				yy.ast.setStatement(a);
-            }
-        }
+        DELETE
     ;
 
 delete_target:
@@ -138,22 +170,16 @@ delete_target:
 condition_clause:
         WHERE identifier COMPARISON identifier {
             {
-                const a = new yy.scope.identifier({ name: $2 });
-                const b = new yy.scope.identifier({ name: $4 });
-                const expression = new yy.scope.binaryExpression({
-                    lParam: a, rParam: b, operator: $3
+                $$ = new yy.scope.binaryExpression({
+                    lParam: $2, rParam: $4, operator: $3
                 });
-                yy.ast.statement.setWhere(expression);
             }
         }
     |   WHERE identifier COMPARISON literal {
             {
-                const a = new yy.scope.identifier({ name: $2 });
-                const b = new yy.scope.literal($4);
-                const expression = new yy.scope.binaryExpression({
-                    lParam: a, rParam: b, operator: $3
+                $$ = new yy.scope.binaryExpression({
+                    lParam: $2, rParam: $4, operator: $3
                 });
-                yy.ast.statement.setWhere(expression);
             }
         }
     ;
@@ -175,7 +201,12 @@ unary_expression:
     ;
 
 multi_identifier:
-        multi_identifier ',' identifier
+        multi_identifier ',' identifier {
+            {
+                $$ = Array.isArray($1) ? $1 : [$1];
+                $$.push($3);
+            }
+        }
     |   identifier
     ;
 
@@ -187,16 +218,18 @@ identifier:
 dml_identifier:
         '*' {
             {
-                const a = new yy.scope.identifier({ name: 'all', alias: '*' });
-				yy.ast.statement.addColumn(a);
+                $$ = new yy.scope.identifier({ name: 'all', alias: '*' });
             }
         }
     |   alias_identifier
-    |   dml_identifier '.' NAME
+    |   dml_identifier '.' NAME {
+            {
+                $$ = new yy.scope.identifier({ name: $3, scope: $1 })
+            }
+        }
     |   NAME {
             {
-                const a = new yy.scope.identifier({ name: $1 });
-				yy.ast.statement.addColumn(a);
+                $$ = new yy.scope.identifier({ name: $1 });
             }
         }
     ;
@@ -204,8 +237,7 @@ dml_identifier:
 alias_identifier:
         NAME AS NAME {
             {
-                const a = new yy.scope.identifier({ name: $1, alias: $2 });
-				yy.ast.statement.addColumn(a);
+                $$ = new yy.scope.identifier({ name: $1, alias: $3 });
             }
         }
     ;
@@ -230,13 +262,26 @@ type:
     ;
 
 multi_literal:
-        multi_literal ',' literal
+        multi_literal ',' literal {
+            {
+                $$ = Array.isArray($1) ? $1 : [$1];
+                $$.push($3);
+            }
+        }
     |   literal
     ;
 
 literal:
-        STRING
-    |   INTNUM
+        STRING {
+            {
+                $$ = new yy.scope.literal($1);
+            }
+        }
+    |   INTNUM {
+            {
+                $$ = new yy.scope.literal($1);
+            }
+        }
     ;
 // ../../node_modules/.bin/jison compile/sql2.jison compile/sql.jisonlex 
 %%
