@@ -8,15 +8,19 @@ function literal(value: string | number) {
 
 // Column names, table names and other named things
 identifier.prototype = Object.create(null);
-function identifier(obj: { name: string, alias?: string }) {
+function identifier(obj: { name: string, alias?: string, scope?: typeof identifier }) {
     this.name = obj.name;
     this.alias = obj.alias;
+    this.scope = obj.scope;
 }
 identifier.prototype.setName = function(name) {
     this.name = name;
 }
 identifier.prototype.setAlias = function(alias) {
     this.alias = alias;
+}
+identifier.prototype.setScope = function(scope) {
+    this.scope = scope;
 }
 
 // Root of query
@@ -57,15 +61,19 @@ unaryExpression.prototype.setParam = function(param) {
 
 // a > b ... etc
 binaryExpression.prototype = Object.create(expression);
-function binaryExpression(obj: { lParam: string | number, rParam: string | number }) {
+function binaryExpression(obj: { lParam: typeof literal | typeof identifier, rParam: typeof literal | typeof identifier, operator: string }) {
     this.lParam = obj.lParam;
     this.rParam = obj.rParam;
+    this.operator = obj.operator;
 }
-binaryExpression.prototype.setLParam = function(lParam: string | number) {
+binaryExpression.prototype.setLParam = function(lParam: typeof literal | typeof identifier) {
     this.lParam = lParam;
 }
-binaryExpression.prototype.setRParam = function(rParam: string | number) {
+binaryExpression.prototype.setRParam = function(rParam: typeof literal | typeof identifier) {
     this.rParam = rParam;
+}
+binaryExpression.prototype.setOperator = function(operator: string) {
+    this.operator = operator;
 }
 
 const STATEMENTS = {
@@ -83,80 +91,74 @@ const STATEMENTS = {
 };
 const DEFAULT_SCHEMA = 'default';
 // Select, insert, update base
-statement.prototype = Object.create(null);
 function statement(obj: { type: string }) {
     this.type = obj.type;
     this.target = null
     this.schema = DEFAULT_SCHEMA;
 }
-statement.prototype.setTarget = function(target) {
-    this.target = target;
-}
-statement.prototype.setSchema = function(schema) {
-    this.schema = schema;
-}
-statement.prototype.setType = function() {
-    throw Error("Not allowed to change statement type");
+statement.prototype = {
+    setTarget: function(target) {
+        this.target = target;
+    },
+    setSchema: function(schema) {
+        this.schema = schema;
+    },
+    setType: function() {
+        throw Error("Not allowed to change statement type");
+    }
 }
 
 // DDL
 
-createStatement.prototype = Object.create(statement);
-function createStatement() {
-    this.type = STATEMENTS.DDL.CREATE;
-    this.schema = DEFAULT_SCHEMA;
-    this.target = null;
-}
+createStatement.prototype = new statement({ type: STATEMENTS.DDL.CREATE });
+function createStatement() {}
 
-alterStatement.prototype = Object.create(statement);
-function alterStatement() {
-    this.type = STATEMENTS.DDL.ALTER;
-    this.schema = DEFAULT_SCHEMA;
-    this.target = null;
-}
+alterStatement.prototype = new statement({ type: STATEMENTS.DDL.ALTER })
+function alterStatement() {}
 
-dropStatement.prototype = Object.create(statement);
-function dropStatement() {
-    this.type = STATEMENTS.DDL.DROP;
-    this.schema = DEFAULT_SCHEMA;
-    this.target = null;
-}
+dropStatement.prototype = new statement({ type: STATEMENTS.DDL.DROP })
+function dropStatement() {}
 
 // DML
 
-selectStatement.prototype = Object.create(statement);
+selectStatement.prototype = new statement({ type: STATEMENTS.DML.SELECT });
 function selectStatement() {
-    this.type = STATEMENTS.DML.SELECT;
     this.where = null;
-    this.target = null;
     this.columns = [];
 }
 selectStatement.prototype.setWhere = function(where) {
     this.where = where;
 }
 selectStatement.prototype.addColumn = function(elem) {
-    this.resultSet.push(elem);
+    this.columns.push(elem);
+}
+selectStatement.prototype.setColumns = function(columns) {
+    this.columns = columns;
 }
 
 
-insertStatement.prototype = Object.create(statement);
+insertStatement.prototype = new statement({ type: STATEMENTS.DML.INSERT });
 function insertStatement() {
-    this.type = STATEMENTS.DML.INSERT;
     this.values = [];
-    this.target = null;
     this.columns = [];
 }
 insertStatement.prototype.addValue = function(value) {
     this.values.push(value);
 }
+insertStatement.prototype.setValues = function(values) {
+    this.values = values;
+}
 insertStatement.prototype.addColumn = function(column) {
     this.columns.push(column);
 }
+insertStatement.prototype.setColumns = function(columns) {
+    this.columns = columns;
+}
 
 
-updateStatement.prototype = Object.create(statement);
+
+updateStatement.prototype = new statement({ type: STATEMENTS.DML.UPDATE });
 function updateStatement() {
-    this.type = STATEMENTS.DML.UPDATE;
     this.where = null;
     this.values = [];
     this.columns = [];
@@ -170,11 +172,13 @@ updateStatement.prototype.addValue = function(value) {
 updateStatement.prototype.addColumn = function(column) {
     this.columns.push(column);
 }
+updateStatement.prototype.setColumns = function(columns) {
+    this.columns = columns;
+}
 
 
-deleteStatement.prototype = Object.create(statement);
+deleteStatement.prototype = new statement({ type: STATEMENTS.DML.DELETE })
 function deleteStatement() {
-    this.type = STATEMENTS.DML.DELETE;
     this.where = null;
     this.columns = [];
 }
@@ -183,6 +187,9 @@ deleteStatement.prototype.setWhere = function(where) {
 }
 deleteStatement.prototype.addColumn = function(column) {
     this.columns.push(column);
+}
+deleteStatement.prototype.setColumns = function(columns) {
+    this.columns = columns;
 }
 
 
