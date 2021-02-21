@@ -36,8 +36,19 @@ dml:
     ;
 
 create_statement:
-        create_keyword create_target NAME
-    |   create_keyword create_target NAME '(' identifier ')'
+        create_keyword create_target simple_name_identifier {
+            {
+                $$ = new yy.scope.createStatement();
+                $$.setTarget($3);
+            }
+        }
+    |   create_keyword create_target simple_name_identifier '(' multi_identifier ')' {
+            {
+                $$ = new yy.scope.createStatement();
+                $$.setTarget($3);
+                $$.setColumns($5);
+            }
+        }
     ;
 
 create_keyword:
@@ -52,7 +63,13 @@ create_target:
     ;
 
 alter_statement:
-        alter_keyword alter_target NAME SET expression
+        alter_keyword alter_target simple_name_identifier SET multi_expression {
+            {
+                $$ = new yy.scope.alterStatement();
+                $$.setTarget($3);
+                $$.setExpressions($5);
+            }
+        }
     ;
 
 alter_keyword:
@@ -168,14 +185,14 @@ delete_target:
     ;
 
 condition_clause:
-        WHERE identifier COMPARISON identifier {
+        WHERE simple_name_identifier COMPARISON simple_name_identifier {
             {
                 $$ = new yy.scope.binaryExpression({
                     lParam: $2, rParam: $4, operator: $3
                 });
             }
         }
-    |   WHERE identifier COMPARISON literal {
+    |   WHERE simple_name_identifier COMPARISON literal {
             {
                 $$ = new yy.scope.binaryExpression({
                     lParam: $2, rParam: $4, operator: $3
@@ -185,19 +202,34 @@ condition_clause:
     ;
 
 expression:
-        expression ','
-    |   unary_expression
+        unary_expression
     |   binary_expression
     ;
 
 binary_expression:
-        NAME '=' literal
+        simple_name_identifier '=' literal {
+            {
+                $$ = new yy.scope.binaryExpression({
+                    lParam: $1, rParam: $3, operator: $2
+                });
+            }
+        }
     ;
 
 unary_expression:
         NOT NAME
     |   '!' NAME
     |   '-' NAME
+    ;
+
+multi_expression:
+        multi_expression ',' expression {
+            {
+                $$ = Array.isArray($1) ? $1 : [$1];
+                $$.push($3);
+            }
+        }
+    |   expression
     ;
 
 multi_identifier:
@@ -215,6 +247,14 @@ identifier:
     |   dml_identifier
     ;
 
+simple_name_identifier:
+        NAME {
+            {
+                $$ = new yy.scope.identifier({ name: $1 });
+            }
+        }
+    ;
+
 dml_identifier:
         '*' {
             {
@@ -222,16 +262,12 @@ dml_identifier:
             }
         }
     |   alias_identifier
-    |   dml_identifier '.' NAME {
+    |   dml_identifier '.' simple_name_identifier {
             {
                 $$ = new yy.scope.identifier({ name: $3, scope: $1 })
             }
         }
-    |   NAME {
-            {
-                $$ = new yy.scope.identifier({ name: $1 });
-            }
-        }
+    |   simple_name_identifier
     ;
 
 alias_identifier:
@@ -243,8 +279,16 @@ alias_identifier:
     ;
 
 ddl_identifier:
-        NAME type
-    |   NAME type constraint
+        NAME type {
+            {
+                $$ = new yy.scope.typedIdentifier({ name: $1, type: $2 })
+            }
+        }
+    |   NAME type constraint {
+            {
+                $$ = new yy.scope.typedIdentifier({ name: $1, type: $2 });
+            }
+        }
     ;
 
 constraint:

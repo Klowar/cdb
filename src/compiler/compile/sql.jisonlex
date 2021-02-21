@@ -24,7 +24,7 @@ special_symbols     "*"|","|";"|"."|"("|")"|"="
 "BETWEEN"		    return 'BETWEEN';
 "BY"		        return 'BY';
 "C"		            return 'C';
-"CHAR(ACTE)?"	    return 'CHARACTER';
+"CHARACTER"	        return 'CHARACTER';
 "CHECK"		        return 'CHECK';
 "CLOSE"		        return 'CLOSE';
 "COBOL"		        return 'COBOL';
@@ -33,7 +33,8 @@ special_symbols     "*"|","|";"|"."|"("|")"|"="
 "CREATE"		    return 'CREATE';
 "CURRENT"		    return 'CURRENT';
 "CURSOR"		    return 'CURSOR';
-"(DATE)?TIME"       return 'DATETIME';
+"DATETIME"          return 'DATETIME';
+"TIME"              return 'TIME';
 "DECIMAL"		    return 'DECIMAL';
 "DECLARE"		    return 'DECLARE';
 "DEFAULT"		    return 'DEFAULT';
@@ -50,14 +51,13 @@ special_symbols     "*"|","|";"|"."|"("|")"|"="
 "FORTRAN"		    return 'FORTRAN';
 "FOUND"		        return 'FOUND';
 "FROM"		        return 'FROM';
-"GO[ \t]*TO"        return 'GOTO';
 "GRANT"		        return 'GRANT';
 "GROUP"		        return 'GROUP';
 "HAVING"		    return 'HAVING';
 "IN"		        return 'IN';
 "INDICATOR"	        return 'INDICATOR';
 "INSERT"            return 'INSERT';
-"INT(EGE)?"	        return 'INTEGER';
+"INTEGER"	        return 'INTEGER';
 "INTO"		        return 'INTO';
 "IS"		        return 'IS';
 "KEY"		        return 'KEY';
