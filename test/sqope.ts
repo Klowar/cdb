@@ -8,7 +8,7 @@ function literal(value: string | number) {
 
 // Column names, table names and other named things
 identifier.prototype = Object.create(null);
-function identifier(obj: { name: string, alias?: string, scope?: typeof identifier }) {
+function identifier(obj?: { name: string, alias?: string, scope?: typeof identifier }) {
     this.name = obj.name;
     this.alias = obj.alias;
     this.scope = obj.scope;
@@ -21,6 +21,18 @@ identifier.prototype.setAlias = function(alias) {
 }
 identifier.prototype.setScope = function(scope) {
     this.scope = scope;
+}
+
+typedIdentifier.prototype = Object.create(null);
+function typedIdentifier(obj?: { name: string, type: string }) {
+    this.name = obj.name;
+    this.type = obj.type;
+}
+typedIdentifier.prototype.setName = function(name) {
+    this.name = name;
+}
+typedIdentifier.prototype.setType = function(type) {
+    this.type = type;
 }
 
 // Root of query
@@ -111,10 +123,20 @@ statement.prototype = {
 // DDL
 
 createStatement.prototype = new statement({ type: STATEMENTS.DDL.CREATE });
-function createStatement() {}
+function createStatement() {
+    this.columns = [];
+}
+createStatement.prototype.setColumns = function(columns) {
+    this.columns = columns;
+}
 
 alterStatement.prototype = new statement({ type: STATEMENTS.DDL.ALTER })
-function alterStatement() {}
+function alterStatement() {
+    this.expressions = [];
+}
+alterStatement.prototype.setExpressions = function(expressions) {
+    this.expressions = expressions;
+}
 
 dropStatement.prototype = new statement({ type: STATEMENTS.DDL.DROP })
 function dropStatement() {}
@@ -198,6 +220,7 @@ export default function scope() {
     this.literal = literal;
     this.ast_root = ast_root;
     this.identifier = identifier;
+    this.typedIdentifier = typedIdentifier;
     // Expressions
     this.unaryExpression = unaryExpression
     this.binaryExpression = binaryExpression;
@@ -206,4 +229,8 @@ export default function scope() {
     this.insertStatement = insertStatement;
     this.updateStatement = updateStatement;
     this.deleteStatement = deleteStatement;
+    // DDL Statements
+    this.dropStatement = dropStatement;
+    this.alterStatement = alterStatement;
+    this.createStatement = createStatement;
 }
