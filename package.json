@@ -7,6 +7,9 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "clean": "rm -rf build",
+    "build": "tsc",
+    "start": "node build/index.js",
     "test": "mocha --require ts-node/register 'test/**/*.ts'",
     "compile": "node_modules/.bin/jison compile/sql.jison compile/sql.jisonlex"
   },
