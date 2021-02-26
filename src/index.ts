@@ -12,4 +12,4 @@ const entityConfig = existsSync(ENTITY_CONFIG_PATH)
 
 initDb(entityConfig, cdb.enitityMap);
 
-getServer().listen(9999, "localhost")
+getServer().getPhysicalServer().listen(9999, "localhost")
