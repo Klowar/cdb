@@ -2,7 +2,7 @@ name                [A-Za-z][A-Za-z0-9_]*
 int_num             [0-9]+|[0-9]+"."[0-9]* |"."[0-9]*
 approx_num          [0-9]+[eE][+-]?[0-9]+|[0-9]+"."[0-9]*[eE][+-]?[0-9]+|"."[0-9]*[eE][+-]?[0-9]+
 strings             ['\w']
-white_space         [ \t\r]+
+white_space         [ \t\r\n]+
 comment             "--".*$	
 comparators         "=="|"<>"|"<"|">"|"<="|">="
 special_symbols     "*"|","|";"|"."|"("|")"|"="
