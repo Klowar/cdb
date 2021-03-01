@@ -1,8 +1,8 @@
-import { DatabaseEntity } from './entity';
+import { entityManager } from '../entity/manager';
 import { memoryManager } from './memory';
 
 
 export function engine() {
     this.memoryManager = new memoryManager();
-    this.enitityMap = new Map<number, DatabaseEntity>();
+    this.entityManager = new entityManager();
 }

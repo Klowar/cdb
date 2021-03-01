@@ -1,15 +1,13 @@
-import { existsSync } from 'fs';
 import { engine } from './core/engine';
-import { initDb } from './core/entity';
-import { getServer } from './net/server';
+import { server } from './net/server';
 
 const ENTITY_CONFIG_PATH = "./meta.json";
 const cdb = new engine();
+const serv = new server();
 
-const entityConfig = existsSync(ENTITY_CONFIG_PATH)
-                    ? require(ENTITY_CONFIG_PATH) 
-                    : {};
+// const entityConfig = existsSync(ENTITY_CONFIG_PATH)
+//                     ? require(ENTITY_CONFIG_PATH) 
+//                     : {};
 
-initDb(entityConfig, cdb.enitityMap);
-
-getServer().getPhysicalServer().listen(9999, "localhost")
+serv.addListener("connect", console.log);
+serv.getPhysicalServer().listen(9999, "localhost");
