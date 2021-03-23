@@ -1,4 +1,4 @@
-import { VirtualFile } from '../storage/virtual_file';
+import { VirtualFile } from '../data/virtual_file';
 
 export type DBEntity = {
     path: string;
@@ -16,7 +16,14 @@ export type DBEMeta = {
     encoding: number;
 }
 
-export function databaseEntity(obj) {
+export function dbeMeta(obj) {
+    this.blocks = obj.blocks;
+    this.uniqueBlocks = obj.uniqueBlocks
+    this.blockSize = obj.blockSize;
+    this.encoding = obj.encoding;
+}
+
+export function dbEntity(obj) {
     this.id = obj.id;
     this.name = obj.name;
     this.path = obj.path;
@@ -25,10 +32,10 @@ export function databaseEntity(obj) {
     this.vf = null;
 }
 
-databaseEntity.prototype.setVf = function(vf) {
+dbEntity.prototype.setVf = function(vf) {
     this.vf = vf;
 }
 
-databaseEntity.prototype.setEncoding = function(enc) {
+dbEntity.prototype.setEncoding = function(enc) {
     this.encoding = enc;
 }
