@@ -1,11 +1,9 @@
-import { open, stat, Stats } from 'fs';
-import { promisify } from 'util';
+import { Stats } from 'fs';
+import { open, stat } from 'fs/promises';
 import { DEFAULT_BUFFER_BYTE_SIZE } from './constants';
 
 const MODE = 'r+';
 const RIGHTS = 0o666;
-const openP = promisify(open);
-const statP = promisify(stat);
 
 export type VirtualFile = {
     fd: number,
@@ -41,7 +39,7 @@ virtualFile.prototype.read = function (offset, amount) {
 
 export function getVirtualFile(path: string, mode = MODE) {
     const vf = new virtualFile(path);
-    openP(path, mode, RIGHTS).then(vf.setFd);
-    statP(path, { bigint: false }).then(vf.setStat);
+    open(path, mode, RIGHTS).then((fh) => vf.setFd(fh.fd));
+    stat(path).then((st) => vf.setStat(st));
     return vf;
 }
