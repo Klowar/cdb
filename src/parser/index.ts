@@ -1,5 +1,6 @@
 import parser from '../compiler';
 import scope from './sqope';
+export * from './types';
 
 export function getParser() {
     parser.parser.yy.scope = new scope();

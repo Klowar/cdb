@@ -36,13 +36,7 @@ typedIdentifier.prototype.setType = function(type) {
 }
 
 // Root of query
-ast_root.prototype = Object.create(identifier, {
-    name: {
-        configurable: false,
-        writable: false,
-        value: 'root'
-    }
-});
+ast_root.prototype = new identifier({ name: 'root' });
 function ast_root() {
     this.objects = [];
     this.statement = null;
@@ -182,36 +176,22 @@ insertStatement.prototype.setColumns = function(columns) {
 updateStatement.prototype = new statement({ type: STATEMENTS.DML.UPDATE });
 function updateStatement() {
     this.where = null;
-    this.values = [];
-    this.columns = [];
+    this.expressions = []
 }
 updateStatement.prototype.setWhere = function(where) {
     this.where = where;
 }
-updateStatement.prototype.addValue = function(value) {
-    this.values.push(value);
-}
-updateStatement.prototype.addColumn = function(column) {
-    this.columns.push(column);
-}
-updateStatement.prototype.setColumns = function(columns) {
-    this.columns = columns;
+updateStatement.prototype.setExpressions = function(expressions) {
+    this.expressions = expressions;
 }
 
 
 deleteStatement.prototype = new statement({ type: STATEMENTS.DML.DELETE })
 function deleteStatement() {
     this.where = null;
-    this.columns = [];
 }
 deleteStatement.prototype.setWhere = function(where) {
     this.where = where;
-}
-deleteStatement.prototype.addColumn = function(column) {
-    this.columns.push(column);
-}
-deleteStatement.prototype.setColumns = function(columns) {
-    this.columns = columns;
 }
 
 
