@@ -12,7 +12,7 @@ export type TemporaryFile = {
     deadArr: number[] // indicies, not bitmap
 }
 
-function temporaryFile(vf: VirtualFile) {
+function TemporaryFile(vf: VirtualFile) {
     this.vf = vf;
     this.fd = 0;
     this.lockOn = {
@@ -21,21 +21,21 @@ function temporaryFile(vf: VirtualFile) {
     this.deadArr = [];
 }
 
-temporaryFile.prototype.setTarget = function (target: VirtualFile) {
+TemporaryFile.prototype.setTarget = function (target: VirtualFile) {
     this.target = target;
 }
 
-temporaryFile.prototype.write = function (offset, data) {
+TemporaryFile.prototype.write = function (offset, data) {
     console.log(this, "Tries to write");
 }
 
-temporaryFile.prototype.read = function (offset, amount) {
+TemporaryFile.prototype.read = function (offset, amount) {
     console.log(this, "Tries to read");
 }
 
 
 export function getTemporaryFile(vf: VirtualFile) {
-    const tf = new temporaryFile(vf);
+    const tf = new TemporaryFile(vf);
     tf.setTarget(getVirtualFile(nanoid()));
 
     return tf;

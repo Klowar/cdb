@@ -12,31 +12,31 @@ export type VirtualFile = {
     buffer: ArrayBuffer
 }
 
-function virtualFile(path: string) {
+function VirtualFile(path: string) {
     this.fd = 0;
     this.path = path;
     this.buffer = new ArrayBuffer(DEFAULT_BUFFER_BYTE_SIZE);
 }
 
-virtualFile.prototype.setFd = function (fd: number) {
+VirtualFile.prototype.setFd = function (fd: number) {
     this.fd = fd;
 }
 
-virtualFile.prototype.setStat = function (stat: Stats) {
+VirtualFile.prototype.setStat = function (stat: Stats) {
     this.metaData = stat;
 }
 
-virtualFile.prototype.write = function (offset, data) {
+VirtualFile.prototype.write = function (offset, data) {
     console.log(this, "Tries to write to data file");
 }
 
-virtualFile.prototype.read = function (offset, amount) {
+VirtualFile.prototype.read = function (offset, amount) {
     console.log(this, "Tries to read the data file");
 }
 
 
 export function getVirtualFile(path: string, mode = MODE) {
-    const vf = new virtualFile(path);
+    const vf = new VirtualFile(path);
     open(path, mode, RIGHTS).then((fh) => vf.setFd(fh.fd));
     stat(path).then((st) => vf.setStat(st));
     return vf;
