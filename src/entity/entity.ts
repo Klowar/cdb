@@ -1,41 +1,35 @@
-import { VirtualFile } from '../data/virtual_file';
+import { MetaFile } from './../meta/meta_file';
 
-export type DBEntity = {
-    path: string;
-    blockSize: number;
-    uniqueBlocks: number;
-    vf: null | VirtualFile;
-    encoding: null;
-    meta: DBEMeta;
+
+export type Entity = {
+    mf: MetaFile,
+    name: string,
+    id: string
 }
 
-export type DBEMeta = {
-    blocks: number;
-    uniqueBlocks: number;
-    blockSize: number;
-    encoding: number;
+function Entity(mf: MetaFile) {
+    this.mf = mf;
 }
 
-export function dbeMeta(obj) {
-    this.blocks = obj.blocks;
-    this.uniqueBlocks = obj.uniqueBlocks
-    this.blockSize = obj.blockSize;
-    this.encoding = obj.encoding;
+Entity.prototype.setName = function(name: string) {
+    this.name = name;
 }
 
-export function dbEntity(obj) {
-    this.id = obj.id;
-    this.name = obj.name;
-    this.path = obj.path;
-    this.meta = obj.meta;
-    // Lazy init fields
-    this.vf = null;
+Entity.prototype.setId = function(id: string) {
+    this.id = id;
 }
 
-dbEntity.prototype.setVf = function(vf) {
-    this.vf = vf;
+Entity.prototype.write = function (offset, data) {
+    console.log(this, "Tries to write to data file");
 }
 
-dbEntity.prototype.setEncoding = function(enc) {
-    this.encoding = enc;
+Entity.prototype.read = function (offset, amount) {
+    console.log(this, "Tries to read the data file");
 }
+
+
+export function getEntity(mf: MetaFile) {
+    const vf = new Entity(mf);
+    return vf;
+}
+
