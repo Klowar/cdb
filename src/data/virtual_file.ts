@@ -16,8 +16,6 @@ function virtualFile(path: string) {
     this.fd = 0;
     this.path = path;
     this.buffer = new ArrayBuffer(DEFAULT_BUFFER_BYTE_SIZE);
-    this.readFilter = new ArrayBuffer(1024 * 1024);
-    this.writeFilter = new ArrayBuffer(1024 * 1024);
 }
 
 virtualFile.prototype.setFd = function (fd: number) {
