@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { getVirtualFile, VirtualFile } from './../data/virtual_file';
+import { getVirtualFile, VirtualFile } from '../data';
 import { DEFAULT_LOCK_SIZE } from './constants';
 
 export type TemporaryFile = {

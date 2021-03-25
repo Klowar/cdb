@@ -1,4 +1,4 @@
-import { TemporaryFile } from './../temp/temp_file';
+import { TemporaryFile } from '../temp';
 import { ENCODING_UTF_8 } from './constants';
 
 
