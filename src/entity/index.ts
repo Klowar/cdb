@@ -1,4 +1,4 @@
-import { MetaFile } from './../meta/meta_file';
+import { MetaFile } from '../meta';
 
 
 export type Entity = {
