@@ -1,9 +1,8 @@
-import { Entity } from './../entity/entity';
-
+import { Entity } from '../entity';
 
 
 export type Union = {
-    entities: Entity[]
+    entities: Map<string, Entity>
 }
 
 function Union(entities: Entity[]) {
