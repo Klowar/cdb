@@ -1,4 +1,9 @@
+import { Union } from './../union/index';
 
+export type CacheType = {
+    unionCache: Map<string, Map<string, Map<string, string>>>,
+    unions: Map<string, Union>
+}
 
 function Cache(config: {}) {
     // Each union has entity map and each entity map has padding to record mapping
