@@ -1,30 +1,38 @@
 import { Socket } from 'net';
 
-export function connection() {
+export function Connection() {
     this.logger = null;
     this.socket = null;
     this.credentials = null;
 }
 
-connection.prototype.init = function(socket: Socket) {
+Connection.prototype.init = function(socket: Socket) {
     this.socket = socket;
     this.socket.setEncoding("utf-8");
-    this.socket.addListener("data", (data: Buffer) => this.onData(data));
-    this.socket.addListener("error", (err: Error) => this.onError(err));
+    this.socket.addListener("data", this.onData);
+    this.socket.addListener("error", this.onError);
 }
 
-connection.prototype.setLogger = function(logger) {
+Connection.prototype.write = function(data: string | Uint8Array) {
+    this.socket.write(data);
+}
+
+Connection.prototype.getSocket = function() {
+    return this.socket;
+}
+
+Connection.prototype.setLogger = function(logger) {
     this.logger = logger;
 }
 
-connection.prototype.onData = function onData(data: Buffer) {
+Connection.prototype.onData = function onData(data: Buffer) {
     if (this.logger != null) this.logger.log("data", data);
 }
 
-connection.prototype.onError = function onError(err: Error) {
-    if (this.logger != null) this.logger.log("error", err);
+Connection.prototype.onError = function onError(err: Error) {
+    if (this.logger != null) this.logger.error("error", err);
 }
 
-connection.prototype.addListener = function(event: string, listener: EventListener) {
+Connection.prototype.addListener = function(event: string, listener: EventListener) {
     this.socket.addListener(event, listener);
 }
