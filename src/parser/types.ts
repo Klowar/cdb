@@ -66,3 +66,21 @@ export type Root = {
     statement: Statement;
 }
 
+export type ScopeType = {
+    literal: Literal;
+    ast_root: Root;
+    identifier: Identifier;
+    typedIdentifier: TypedIdentifier;
+    // Expressions
+    unaryExpression: UnaryExpression;
+    binaryExpression: BinaryExpression;
+    // Statements
+    selectStatement: SelectStatement;
+    insertStatement: InsertStatement;
+    updateStatement: UpdateStatement;
+    deleteStatement: DeleteStatement;
+    // DDL Statements
+    dropStatement: DropStatement;
+    alterStatement: AlterStatement;
+    createStatement: CreateStatement;
+}
