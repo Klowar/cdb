@@ -1,4 +1,4 @@
-import { MemoryManagerType } from './../memory/index';
+import { MemoryManagerType, newMemoryManager } from './../memory/index';
 
 
 export type ExecutorType = {
@@ -6,14 +6,20 @@ export type ExecutorType = {
 }
 
 function Executor(config) {
-    this.mm = config.memoryManager;
+    this.mm = newMemoryManager({});
 }
 
 Executor.prototype.process = function (request) {
-    console.log("Executor checks for premission, other", request);
+    // TODO checks for permissions and other
+    this.mm.process(request);
 }
 
+let executorInstance = null;
 
-export function getExecutor(config) {
-    return new Executor(config);
+export function getExecutor() {
+    return executorInstance;
+}
+
+export function newExecutor(config) {
+    return executorInstance = new Executor(config);
 }

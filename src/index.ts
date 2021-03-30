@@ -1,8 +1,8 @@
-import { getCore } from './core';
+import { newCore } from './core';
 import { server } from './net/server';
 
 const ENTITY_CONFIG_PATH = "./meta.json";
-const app = getCore({});
+const app = newCore({});
 const serv = new server();
 
 // const entityConfig = existsSync(ENTITY_CONFIG_PATH)

@@ -1,6 +1,6 @@
 import { Socket } from 'net';
 import { getQueryBuilder, QueryBuilderType } from '../builder';
-import { ExecutorType, getExecutor } from '../exec';
+import { ExecutorType, newExecutor } from '../exec';
 import { getParser, ParserType } from './../parser/index';
 
 export type CoreType = {
@@ -13,7 +13,7 @@ function Core(config) {
     this.connections = [];
     this.parser = getParser();
     this.queryBuilder = getQueryBuilder({});
-    this.executor = getExecutor({});
+    this.executor = newExecutor({});
 }
 
 Core.prototype.addConnection = function (conn) {
@@ -26,12 +26,20 @@ Core.prototype.onConnectionData = function (event: string, connection: Socket) {
 
         const parseResult = this.parser.parse(event);
         if (!parseResult) return;
-        connection.write(JSON.stringify(this.parser.parser.yy.ast) + '\n');
+        const execResult = this.executor.process(this.parser.parser.yy.ast);
+        connection.write(JSON.stringify(execResult) + '\n');
     } catch (e) {
+        console.error(e);
         connection.write(JSON.stringify(e) + '\n');
     }
 }
 
-export function getCore(config) {
-    return new Core(config);
+let coreInstance = null;
+
+export function getCore() {
+    return coreInstance;
+}
+
+export function newCore(config) {
+    return coreInstance = new Core(config);
 }

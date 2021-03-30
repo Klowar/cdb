@@ -1,4 +1,4 @@
-import { ProcessorType } from './../processor/index';
+import { newProseccor, ProcessorType } from './../processor/index';
 import { MAX_MEMORY_USAGE } from './constants';
 
 export type MemoryManagerType = {
@@ -7,7 +7,7 @@ export type MemoryManagerType = {
 }
 
 function MemoryManager(config) {
-    this.requestProcessor = config.processor;
+    this.requestProcessor = newProseccor({});
     this.requestQuery = [];
 }
 
@@ -16,8 +16,15 @@ MemoryManager.prototype.process = function (request: any) {
     if (usage.rss >= MAX_MEMORY_USAGE * 0.9)
         return this.requestQuery.push(request);
     // TODO else
+    this.requestProcessor.process(request);
 }
 
-export function getMemoryManager(config) {
-    return new MemoryManager(config);
+let memoryManagerInstance = null;
+
+export function getMemoryManager() {
+    return memoryManagerInstance;
+}
+
+export function newMemoryManager(config) {
+    return memoryManagerInstance = new MemoryManager(config);
 }

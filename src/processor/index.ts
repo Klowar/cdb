@@ -1,4 +1,4 @@
-import { CacheType } from './../cache/index';
+import { CacheType, newCache } from './../cache/index';
 
 
 export type ProcessorType = {
@@ -6,11 +6,11 @@ export type ProcessorType = {
 }
 
 function Processor(config) {
-    this.cache = config.cache;
+    this.cache = newCache({});
 }
 
 Processor.prototype.process = function (query) {
-    console.log("General method for calling");
+    console.log("General method for calling", query);
 }
 
 Processor.prototype.create = function (query) {
@@ -41,7 +41,13 @@ Processor.prototype.delete = function (query) {
     console.log("process delete query", query);
 }
 
-export function getProcessort(config) {
-    return new Processor(config);
+let processorInstance = null;
+
+export function getProcessor(config) {
+    return processorInstance;
+}
+
+export function newProseccor(config) {
+    return processorInstance = new Processor(config);
 }
 
