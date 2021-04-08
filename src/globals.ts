@@ -1,6 +1,6 @@
 import {join} from 'path';
 
-const DATA_FOLDER = "data";
+const DATA_FOLDER = "db";
 const ENTITY_CONFIG_PATH = "meta.json";
 
 export const DATA_ROOT = join(__dirname, DATA_FOLDER);

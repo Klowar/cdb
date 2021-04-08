@@ -1,5 +1,6 @@
 # App build folder
 build
+src/db
 
 # Logs
 logs

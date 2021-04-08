@@ -2,7 +2,7 @@ import { Statement } from '../parser';
 import { createUnion } from '../union';
 import { CacheType, newCache } from './../cache/index';
 import { STATEMENTS } from './../parser/constants';
-import { CreateStatement } from './../parser/types';
+import { CreateStatement, Root } from './../parser/types';
 
 
 export type ProcessorType = {
@@ -13,11 +13,12 @@ function Processor(this: ProcessorType, config) {
     this.cache = newCache({});
 }
 
-Processor.prototype.process = function (query: Statement) {
+Processor.prototype.process = function (query: Root) {
     console.log("General method for calling", query);
-    switch (query.type) {
+    if (query.statement == null) return;
+    switch (query.statement.type) {
         case STATEMENTS.DDL.CREATE:
-            return this.create(query);
+            return this.create(query.statement);
         default:
             return Error("No method realized");
     }
