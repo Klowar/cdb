@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { getVirtualFile, VirtualFile } from '../data';
+import { createVirtualFile, getVirtualFile, VirtualFile } from '../data';
 import { DEFAULT_LOCK_SIZE } from './constants';
 
 export type TemporaryFile = {
@@ -12,9 +12,8 @@ export type TemporaryFile = {
     deadArr: number[] // indicies, not bitmap
 }
 
-function TemporaryFile(vf: VirtualFile) {
+function TemporaryFile(this: TemporaryFile, vf: VirtualFile) {
     this.vf = vf;
-    this.fd = 0;
     this.lockOn = {
         size: DEFAULT_LOCK_SIZE
     };
@@ -38,5 +37,11 @@ export function getTemporaryFile(vf: VirtualFile) {
     const tf = new TemporaryFile(vf);
     tf.setTarget(getVirtualFile(nanoid()));
 
+    return tf;
+}
+
+export function createTemporaryFile() {
+    const tf = new TemporaryFile(createVirtualFile());
+    tf.setTarget(createVirtualFile());
     return tf;
 }

@@ -5,7 +5,7 @@ export type ExecutorType = {
     mm: MemoryManagerType
 }
 
-function Executor(config) {
+function Executor(this: ExecutorType, config) {
     this.mm = newMemoryManager({});
 }
 

@@ -5,10 +5,14 @@ export type CacheType = {
     unions: Map<string, Union>
 }
 
-function Cache(config: {}) {
+function Cache(this: CacheType, config: {}) {
     // Each union has entity map and each entity map has padding to record mapping
-    this.uniounCache = new Map<string, Map<string, Map<string, string>>>();
+    this.unionCache = new Map<string, Map<string, Map<string, string>>>();
     this.unions = new Map<string, Union>();
+}
+
+Cache.prototype.addUnion = function (union: Union) {
+    this.unions.set(union.name, union);
 }
 
 Cache.prototype.write = function (offset, data) {

@@ -1,3 +1,7 @@
-import * as parser from './sql2';
+import { Parser } from './sql2';
 
-export default parser;
+export function getParser() {
+    const p = new Parser();
+
+    return p;
+}

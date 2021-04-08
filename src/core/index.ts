@@ -1,17 +1,19 @@
 import { Socket } from 'net';
 import { getQueryBuilder, QueryBuilderType } from '../builder';
 import { ExecutorType, newExecutor } from '../exec';
-import { getParser, ParserType } from './../parser/index';
+import { ConnectionType } from './../net/connection';
+import { Parser, ParserType } from './../parser/index';
 
 export type CoreType = {
-    parser: ParserType,
-    queryBuilder: QueryBuilderType,
-    executor: ExecutorType
+    connections: ConnectionType[];
+    parser: ParserType;
+    queryBuilder: QueryBuilderType;
+    executor: ExecutorType;
 }
 
-function Core(config) {
+function Core(this: CoreType, config) {
     this.connections = [];
-    this.parser = getParser();
+    this.parser = new Parser();
     this.queryBuilder = getQueryBuilder({});
     this.executor = newExecutor({});
 }

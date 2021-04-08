@@ -6,7 +6,7 @@ export type MemoryManagerType = {
     requestQuery: any[]
 }
 
-function MemoryManager(config) {
+function MemoryManager(this: MemoryManagerType, config) {
     this.requestProcessor = newProseccor({});
     this.requestQuery = [];
 }

@@ -1,4 +1,4 @@
-import { TemporaryFile } from '../temp';
+import { createTemporaryFile, TemporaryFile } from '../temp';
 import { ENCODING_UTF_8 } from './constants';
 
 
@@ -10,7 +10,7 @@ export type MetaFile = {
     encoding: string
 }
 
-function MetaFile(tf: TemporaryFile) {
+function MetaFile(this: MetaFile, tf: TemporaryFile) {
     this.tf = tf;
     this.blockSize = 0;
     this.blockAmount = 0;
@@ -39,6 +39,12 @@ MetaFile.prototype.read = function (offset, amount) {
 
 export function getMetaFile(tf: TemporaryFile) {
     const vf = new MetaFile(tf);
+
+    return vf;
+}
+
+export function createMetaFile() {
+    const vf = new MetaFile(createTemporaryFile());
 
     return vf;
 }

@@ -1,7 +1,11 @@
 import { Stats } from 'fs';
 import { open, stat } from 'fs/promises';
+import { nanoid } from 'nanoid';
+import { join } from 'path';
+import { DATA_ROOT } from './../globals';
 import { DEFAULT_BUFFER_BYTE_SIZE } from './constants';
 
+const CREATE_MODE = 'a+';
 const MODE = 'r+';
 const RIGHTS = 0o666;
 
@@ -12,7 +16,7 @@ export type VirtualFile = {
     buffer: ArrayBuffer
 }
 
-function VirtualFile(path: string) {
+function VirtualFile(this: VirtualFile, path: string) {
     this.fd = 0;
     this.path = path;
     this.buffer = new ArrayBuffer(DEFAULT_BUFFER_BYTE_SIZE);
@@ -38,6 +42,14 @@ VirtualFile.prototype.read = function (offset, amount) {
 export function getVirtualFile(path: string, mode = MODE) {
     const vf = new VirtualFile(path);
     open(path, mode, RIGHTS).then((fh) => vf.setFd(fh.fd));
+    stat(path).then((st) => vf.setStat(st));
+    return vf;
+}
+
+export function createVirtualFile() {
+    const path = join(DATA_ROOT, nanoid());
+    const vf = new VirtualFile(path);
+    open(path, CREATE_MODE, RIGHTS).then((fh) => vf.setFd(fh.fd));
     stat(path).then((st) => vf.setStat(st));
     return vf;
 }

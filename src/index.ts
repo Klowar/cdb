@@ -1,13 +1,16 @@
+import { existsSync, mkdirSync } from 'fs';
 import { newCore } from './core';
+import { CONFIG_ROOT, DATA_ROOT } from './globals';
 import { server } from './net/server';
 
-const ENTITY_CONFIG_PATH = "./meta.json";
 const app = newCore({});
 const serv = new server();
 
-// const entityConfig = existsSync(ENTITY_CONFIG_PATH)
-//                     ? require(ENTITY_CONFIG_PATH) 
-//                     : {};
+if (!existsSync(DATA_ROOT)) mkdirSync(DATA_ROOT);
+
+const entityConfig = existsSync(CONFIG_ROOT)
+    ? require(CONFIG_ROOT)
+    : {};
 
 // serv.addListener("connect", console.log);
 serv.addListener("connect", (c) => app.addConnection(c));

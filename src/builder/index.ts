@@ -4,7 +4,7 @@ export type QueryBuilderType = {
     executor: ExecutorType
 }
 
-function QueryBuilder(config) {
+function QueryBuilder(this: QueryBuilderType, config) {
     this.executor = config.executor;
 }
 

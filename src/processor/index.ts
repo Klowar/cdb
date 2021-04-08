@@ -1,20 +1,34 @@
+import { Statement } from '../parser';
+import { createUnion } from '../union';
 import { CacheType, newCache } from './../cache/index';
+import { STATEMENTS } from './../parser/constants';
+import { CreateStatement } from './../parser/types';
 
 
 export type ProcessorType = {
     cache: CacheType
 }
 
-function Processor(config) {
+function Processor(this: ProcessorType, config) {
     this.cache = newCache({});
 }
 
-Processor.prototype.process = function (query) {
+Processor.prototype.process = function (query: Statement) {
     console.log("General method for calling", query);
+    switch (query.type) {
+        case STATEMENTS.DDL.CREATE:
+            return this.create(query);
+        default:
+            return Error("No method realized");
+    }
 }
 
-Processor.prototype.create = function (query) {
+Processor.prototype.create = function (query: CreateStatement) {
     console.log("process create query", query);
+    const union = createUnion(query);
+    this.cache.addUnion(union);
+    return union;
+
 }
 
 Processor.prototype.drop = function (query) {
