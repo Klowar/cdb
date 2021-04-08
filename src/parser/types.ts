@@ -4,8 +4,8 @@ export type Literal = {
 
 export type Identifier = {
     name: string;
-    alias: string;
-    scope: Identifier;
+    alias: string | undefined;
+    scope: Identifier | undefined;
 }
 
 export type TypedIdentifier = {
@@ -18,7 +18,7 @@ export type Expression = {
 }
 
 export type UnaryExpression = Expression & {
-    param: string;
+    param: Identifier | Literal | Expression;
 }
 
 export type BinaryExpression = Expression & {
@@ -29,7 +29,7 @@ export type BinaryExpression = Expression & {
 export type Statement = {
     type: string;
     schema: string;
-    target: Identifier;
+    target: Identifier | null;
 }
 
 export type CreateStatement = Statement & {
@@ -43,7 +43,7 @@ export type AlterStatement = Statement & {
 export type DropStatement = Statement;
 
 export type SelectStatement = Statement & {
-    where: Expression;
+    where: Expression | null;
     columns: Identifier[];
 }
 
@@ -53,34 +53,86 @@ export type InsertStatement = Statement & {
 }
 
 export type UpdateStatement = Statement & {
-    where: Expression;
+    where: Expression | null;
     expressions: Expression[];
 }
 
 export type DeleteStatement = Statement & {
-    where: Expression;
+    where: Expression | null;
 }
 
 export type Root = {
     objects: any[];
-    statement: Statement;
+    statement: Statement | null;
+}
+
+export interface LiteralConstructor {
+    new(value: string | number): Literal;
+}
+
+export interface RootConstructor {
+    new(): Root;
+}
+
+export interface IdentifierConstructor {
+    new(obj?: { name: string, alias?: string, scope?: Identifier }): Identifier;
+}
+
+export interface TypedIdentifierConstructor {
+    new(obj?: { name: string, type: string }): TypedIdentifier;
+}
+
+export interface UnaryExpressionConstructor {
+    new(obj: { param: Identifier | Literal | Expression, operator: string }): UnaryExpression;
+}
+
+export interface BinaryExpressionConstructor {
+    new(obj: { lParam: Identifier | Literal | Expression, rParam: Identifier | Literal | Expression, operator: string }): BinaryExpression;
+}
+
+export interface SelectStatementConstructor {
+    new(): SelectStatement;
+}
+
+export interface InsertStatementConstructor {
+    new(): InsertStatement;
+}
+
+export interface UpdateStatementConstructor {
+    new(): UpdateStatement;
+}
+
+export interface DeleteStatementConstructor {
+    new(): DeleteStatement;
+}
+
+export interface DropStatementConstructor {
+    new(): DropStatement;
+}
+
+export interface AlterStatementConstructor {
+    new(): AlterStatement;
+}
+
+export interface CreateStatementConstructor {
+    new(): CreateStatement;
 }
 
 export type ScopeType = {
-    literal: Literal;
-    ast_root: Root;
-    identifier: Identifier;
-    typedIdentifier: TypedIdentifier;
+    literal: LiteralConstructor;
+    ast_root: RootConstructor;
+    identifier: IdentifierConstructor;
+    typedIdentifier: TypedIdentifierConstructor;
     // Expressions
-    unaryExpression: UnaryExpression;
-    binaryExpression: BinaryExpression;
+    unaryExpression: UnaryExpressionConstructor;
+    binaryExpression: BinaryExpressionConstructor;
     // Statements
-    selectStatement: SelectStatement;
-    insertStatement: InsertStatement;
-    updateStatement: UpdateStatement;
-    deleteStatement: DeleteStatement;
+    selectStatement: SelectStatementConstructor;
+    insertStatement: InsertStatementConstructor;
+    updateStatement: UpdateStatementConstructor;
+    deleteStatement: DeleteStatementConstructor;
     // DDL Statements
-    dropStatement: DropStatement;
-    alterStatement: AlterStatement;
-    createStatement: CreateStatement;
+    dropStatement: DropStatementConstructor;
+    alterStatement: AlterStatementConstructor;
+    createStatement: CreateStatementConstructor;
 }

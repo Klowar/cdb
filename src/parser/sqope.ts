@@ -1,115 +1,109 @@
+import { STATEMENTS } from './constants';
+import { AlterStatement, AlterStatementConstructor, BinaryExpression, BinaryExpressionConstructor, CreateStatement, CreateStatementConstructor, DeleteStatement, DeleteStatementConstructor, DropStatement, DropStatementConstructor, Expression, Identifier, IdentifierConstructor, InsertStatement, InsertStatementConstructor, Literal, LiteralConstructor, Root, RootConstructor, ScopeType, SelectStatement, SelectStatementConstructor, Statement, TypedIdentifier, TypedIdentifierConstructor, UnaryExpression, UnaryExpressionConstructor, UpdateStatement, UpdateStatementConstructor } from './types';
 /** ast tree wrapper */
 
 // Some parameter like static strings, numbers in query
 literal.prototype = Object.create(null);
-function literal(value: string | number) {
+function literal(this: Literal, value: string | number) {
     this.value = value;
 }
 
 // Column names, table names and other named things
 identifier.prototype = Object.create(null);
-function identifier(obj?: { name: string, alias?: string, scope?: typeof identifier }) {
-    this.name = obj.name;
-    this.alias = obj.alias;
-    this.scope = obj.scope;
+function identifier(this: Identifier, obj?: { name: string, alias?: string, scope?: Identifier }) {
+    if (obj !== undefined) {
+        this.name = obj.name;
+        this.alias = obj.alias;
+        this.scope = obj.scope;
+    }
 }
-identifier.prototype.setName = function(name) {
+identifier.prototype.setName = function (name) {
     this.name = name;
 }
-identifier.prototype.setAlias = function(alias) {
+identifier.prototype.setAlias = function (alias) {
     this.alias = alias;
 }
-identifier.prototype.setScope = function(scope) {
+identifier.prototype.setScope = function (scope) {
     this.scope = scope;
 }
 
 typedIdentifier.prototype = Object.create(null);
-function typedIdentifier(obj?: { name: string, type: string }) {
-    this.name = obj.name;
-    this.type = obj.type;
+function typedIdentifier(this: TypedIdentifier, obj?: { name: string, type: string }) {
+    if (obj !== undefined) {
+        this.name = obj.name;
+        this.type = obj.type;
+    }
 }
-typedIdentifier.prototype.setName = function(name) {
+typedIdentifier.prototype.setName = function (name) {
     this.name = name;
 }
-typedIdentifier.prototype.setType = function(type) {
+typedIdentifier.prototype.setType = function (type) {
     this.type = type;
 }
 
 // Root of query
 ast_root.prototype = new identifier({ name: 'root' });
-function ast_root() {
+function ast_root(this: Root) {
     this.objects = [];
     this.statement = null;
 }
-ast_root.prototype.setStatement = function(statement) {
+ast_root.prototype.setStatement = function (statement) {
     this.statement = statement;
 }
-ast_root.prototype.add = function(some) {
+ast_root.prototype.add = function (some) {
     this.objects.push(some);
 }
 
 // Calculatable values
-function expression(obj: { operator: string }) {
+function expression(this: Expression, obj: { operator: string }) {
     this.operator = obj.operator;
 }
-expression.prototype.setOperator = function(operator: string) {
+expression.prototype.setOperator = function (operator: string) {
     this.operator = operator;
 }
 
 // not a ... etc
 unaryExpression.prototype = Object.create(expression);
-function unaryExpression(obj: { param?: string | number }) {
+function unaryExpression(this: UnaryExpression, obj: { param: Identifier | Literal | Expression, operator: string }) {
+    this.operator = obj.operator;
     this.param = obj.param;
 }
-unaryExpression.prototype.setParam = function(param) {
+unaryExpression.prototype.setParam = function (param) {
     this.param = param;
 }
 
 // a > b ... etc
 binaryExpression.prototype = Object.create(expression);
-function binaryExpression(obj: { lParam: typeof literal | typeof identifier, rParam: typeof literal | typeof identifier, operator: string }) {
+function binaryExpression(this: BinaryExpression, obj: { lParam: Identifier | Literal | Expression, rParam: Identifier | Literal | Expression, operator: string }) {
     this.lParam = obj.lParam;
     this.rParam = obj.rParam;
     this.operator = obj.operator;
 }
-binaryExpression.prototype.setLParam = function(lParam: typeof literal | typeof identifier) {
+binaryExpression.prototype.setLParam = function (lParam: typeof literal | typeof identifier) {
     this.lParam = lParam;
 }
-binaryExpression.prototype.setRParam = function(rParam: typeof literal | typeof identifier) {
+binaryExpression.prototype.setRParam = function (rParam: typeof literal | typeof identifier) {
     this.rParam = rParam;
 }
-binaryExpression.prototype.setOperator = function(operator: string) {
+binaryExpression.prototype.setOperator = function (operator: string) {
     this.operator = operator;
 }
 
-const STATEMENTS = {
-    DDL: {
-        CREATE: 'create',
-        ALTER: 'alter',
-        DROP: 'drop'
-    },
-    DML: {
-        SELECT: 'select',
-        INSERT: 'insert',
-        UPDATE: 'update',
-        DELETE: 'delete'
-    }
-};
 const DEFAULT_SCHEMA = 'default';
 // Select, insert, update base
-function statement(obj: { type: string }) {
+function statement(this: Statement, obj: { type: string }) {
     this.type = obj.type;
-    this.target = null
+    this.target = null;
     this.schema = DEFAULT_SCHEMA;
 }
 statement.prototype = {
-    setTarget: function(target) {
+    setTarget: function (target) {
         this.target = target;
     },
-    setSchema: function(schema) {
+    setSchema: function (schema) {
         this.schema = schema;
     },
-    setType: function() {
+    setType: function () {
         throw Error("Not allowed to change statement type");
     }
 }
@@ -117,100 +111,98 @@ statement.prototype = {
 // DDL
 
 createStatement.prototype = new statement({ type: STATEMENTS.DDL.CREATE });
-function createStatement() {
+function createStatement(this: CreateStatement) {
     this.columns = [];
 }
-createStatement.prototype.setColumns = function(columns) {
+createStatement.prototype.setColumns = function (columns) {
     this.columns = columns;
 }
 
 alterStatement.prototype = new statement({ type: STATEMENTS.DDL.ALTER })
-function alterStatement() {
+function alterStatement(this: AlterStatement) {
     this.expressions = [];
 }
-alterStatement.prototype.setExpressions = function(expressions) {
+alterStatement.prototype.setExpressions = function (expressions) {
     this.expressions = expressions;
 }
 
 dropStatement.prototype = new statement({ type: STATEMENTS.DDL.DROP })
-function dropStatement() {}
+function dropStatement(this: DropStatement) { }
 
 // DML
 
 selectStatement.prototype = new statement({ type: STATEMENTS.DML.SELECT });
-function selectStatement() {
+function selectStatement(this: SelectStatement) {
     this.where = null;
     this.columns = [];
 }
-selectStatement.prototype.setWhere = function(where) {
+selectStatement.prototype.setWhere = function (where) {
     this.where = where;
 }
-selectStatement.prototype.addColumn = function(elem) {
+selectStatement.prototype.addColumn = function (elem) {
     this.columns.push(elem);
 }
-selectStatement.prototype.setColumns = function(columns) {
+selectStatement.prototype.setColumns = function (columns) {
     this.columns = columns;
 }
 
 
 insertStatement.prototype = new statement({ type: STATEMENTS.DML.INSERT });
-function insertStatement() {
+function insertStatement(this: InsertStatement) {
     this.values = [];
     this.columns = [];
 }
-insertStatement.prototype.addValue = function(value) {
+insertStatement.prototype.addValue = function (value) {
     this.values.push(value);
 }
-insertStatement.prototype.setValues = function(values) {
+insertStatement.prototype.setValues = function (values) {
     this.values = values;
 }
-insertStatement.prototype.addColumn = function(column) {
+insertStatement.prototype.addColumn = function (column) {
     this.columns.push(column);
 }
-insertStatement.prototype.setColumns = function(columns) {
+insertStatement.prototype.setColumns = function (columns) {
     this.columns = columns;
 }
 
 
 
 updateStatement.prototype = new statement({ type: STATEMENTS.DML.UPDATE });
-function updateStatement() {
+function updateStatement(this: UpdateStatement) {
     this.where = null;
     this.expressions = []
 }
-updateStatement.prototype.setWhere = function(where) {
+updateStatement.prototype.setWhere = function (where) {
     this.where = where;
 }
-updateStatement.prototype.setExpressions = function(expressions) {
+updateStatement.prototype.setExpressions = function (expressions) {
     this.expressions = expressions;
 }
 
 
 deleteStatement.prototype = new statement({ type: STATEMENTS.DML.DELETE })
-function deleteStatement() {
+function deleteStatement(this: DeleteStatement) {
     this.where = null;
 }
-deleteStatement.prototype.setWhere = function(where) {
+deleteStatement.prototype.setWhere = function (where) {
     this.where = where;
 }
 
-
-
-export default function scope() {
-    this.literal = literal;
-    this.ast_root = ast_root;
-    this.identifier = identifier;
-    this.typedIdentifier = typedIdentifier;
+export default function scope(this: ScopeType) {
+    this.literal = (literal as unknown) as LiteralConstructor;
+    this.ast_root = (ast_root as unknown) as RootConstructor;
+    this.identifier = (identifier as unknown) as IdentifierConstructor;
+    this.typedIdentifier = (typedIdentifier as unknown) as TypedIdentifierConstructor;
     // Expressions
-    this.unaryExpression = unaryExpression
-    this.binaryExpression = binaryExpression;
+    this.unaryExpression = (unaryExpression as unknown) as UnaryExpressionConstructor;
+    this.binaryExpression = (binaryExpression as unknown) as BinaryExpressionConstructor;
     // Statements
-    this.selectStatement = selectStatement;
-    this.insertStatement = insertStatement;
-    this.updateStatement = updateStatement;
-    this.deleteStatement = deleteStatement;
+    this.selectStatement = (selectStatement as unknown) as SelectStatementConstructor;
+    this.insertStatement = (insertStatement as unknown) as InsertStatementConstructor;
+    this.updateStatement = (updateStatement as unknown) as UpdateStatementConstructor;
+    this.deleteStatement = (deleteStatement as unknown) as DeleteStatementConstructor;
     // DDL Statements
-    this.dropStatement = dropStatement;
-    this.alterStatement = alterStatement;
-    this.createStatement = createStatement;
+    this.dropStatement = (dropStatement as unknown) as DropStatementConstructor;
+    this.alterStatement = (alterStatement as unknown) as AlterStatementConstructor;
+    this.createStatement = (createStatement as unknown) as CreateStatementConstructor;
 }
