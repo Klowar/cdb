@@ -1,31 +1,31 @@
 import { EventEmitter } from 'events';
-import { Server, Socket } from 'net';
-import { Connection, ConnectionType } from './connection';
+import { Server as PServer, Socket } from 'net';
+import { Connection } from './connection';
 
-export type ServerType = {
-    connections: ConnectionType[];
-    server: Server;
+export type Server = {
+    connections: Connection[];
+    server: PServer;
 } & ServerProtoType;
 
 export type ServerProtoType = {
-    getPhysicalServer: () => Server;
-    onConnection: (socket: Socket) => ConnectionType;
+    getPhysicalServer: () => PServer;
+    onConnection: (socket: Socket) => Connection;
 } & EventEmitter;
 
 serverPrototype.prototype = new EventEmitter();
 function serverPrototype(this: ServerProtoType) {
-    this.getPhysicalServer = function (this: ServerType) {
+    this.getPhysicalServer = function (this: Server) {
         return this.server;
     }
     this.onConnection = function (socket: Socket) {
-        const conn: ConnectionType = new Connection();
+        const conn: Connection = new Connection();
         conn.init(socket);
         return conn;
     }
 }
 
-server.prototype = new serverPrototype();
-export function server(this: ServerType) {
+Server.prototype = new serverPrototype();
+export function Server(this: Server) {
     this.connections = [];
     this.server = new Server();
     this.server.addListener("connection", (socket: Socket) => {

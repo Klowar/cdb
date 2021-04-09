@@ -1,29 +1,31 @@
 import { Socket } from 'net';
-import { getQueryBuilder, QueryBuilderType } from '../builder';
-import { ExecutorType, newExecutor } from '../exec';
-import { ConnectionType } from './../net/connection';
-import { Parser, ParserType } from './../parser/index';
+import { getQueryBuilder, QueryBuilder } from '../builder';
+import { Executor, newExecutor } from '../exec';
+import { Connection } from './../net/connection';
+import { Parser } from './../parser/index';
 
-export type CoreType = {
-    connections: ConnectionType[];
-    parser: ParserType;
-    queryBuilder: QueryBuilderType;
-    executor: ExecutorType;
+export type Core = {
+    connections: Connection[];
+    parser: Parser;
+    queryBuilder: QueryBuilder;
+    executor: Executor;
+    addConnection: (conn: Socket) => void;
+    onConnectionData: (event: string, connection: Connection) => void;
 }
 
-function Core(this: CoreType, config) {
+function Core(this: Core, config) {
     this.connections = [];
     this.parser = new Parser();
     this.queryBuilder = getQueryBuilder({});
     this.executor = newExecutor({});
 }
 
-Core.prototype.addConnection = function (conn) {
-    conn.addListener("data", (event,) => this.onConnectionData(event, conn));
+Core.prototype.addConnection = function (this: Core, conn: Connection) {
+    conn.addListener("data", (event: string,) => this.onConnectionData(event, conn));
     this.connections.push(conn);
 }
 
-Core.prototype.onConnectionData = function (event: string, connection: Socket) {
+Core.prototype.onConnectionData = function (this: Core, event: string, connection: Connection) {
     try {
 
         const parseResult = this.parser.parse(event);
@@ -36,12 +38,12 @@ Core.prototype.onConnectionData = function (event: string, connection: Socket) {
     }
 }
 
-let coreInstance = null;
+let coreInstance: Core | null = null;
 
-export function getCore() {
+export function getCore(): Core | null {
     return coreInstance;
 }
 
-export function newCore(config) {
+export function newCore(config): Core {
     return coreInstance = new Core(config);
 }

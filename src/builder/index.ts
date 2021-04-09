@@ -1,17 +1,18 @@
-import { ExecutorType } from './../exec/index';
+import { Executor } from './../exec/index';
+import { Root } from './../parser/types';
 
-export type QueryBuilderType = {
-    executor: ExecutorType
+export type QueryBuilder = {
+    executor: Executor,
 }
 
-function QueryBuilder(this: QueryBuilderType, config) {
+function QueryBuilder(this: QueryBuilder, config) {
     this.executor = config.executor;
 }
 
-QueryBuilder.prototype.process = function (request) {
+QueryBuilder.prototype.process = function (this: QueryBuilder, request: Root) {
     console.log("Checks for other request to same data to compose", request);
 }
 
-export function getQueryBuilder(config) {
+export function getQueryBuilder(config): QueryBuilder {
     return new QueryBuilder(config);
 }

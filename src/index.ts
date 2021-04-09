@@ -1,10 +1,10 @@
 import { existsSync, mkdirSync } from 'fs';
 import { newCore } from './core';
 import { CONFIG_ROOT, DATA_ROOT } from './globals';
-import { server } from './net/server';
+import { Server } from './net/server';
 
 const app = newCore({});
-const serv = new server();
+const serv = new Server();
 
 if (!existsSync(DATA_ROOT)) mkdirSync(DATA_ROOT);
 

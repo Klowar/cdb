@@ -14,30 +14,30 @@ function Union(this: Union, entities: Entity[]) {
     this.entities = new Map(entities.map(_ => [_.name, _]));
 }
 
-Union.prototype.setName = function (name: string) {
+Union.prototype.setName = function (this: Union, name: string) {
     this.name = name;
 }
 
-Union.prototype.setId = function (id: string) {
+Union.prototype.setId = function (this: Union, id: string) {
     this.id = id;
 }
 
-Union.prototype.write = function (offset, data) {
+Union.prototype.write = function (this: Union, offset: number, data: number) {
     console.log(this, "Tries to write");
 }
 
-Union.prototype.read = function (offset, amount) {
+Union.prototype.read = function (this: Union, offset: number, amount: number) {
     console.log(this, "Tries to read");
 }
 
 
-export function getUnion(ents: Entity[]) {
+export function getUnion(ents: Entity[]): Union {
     const union = new Union(ents);
 
     return union;
 }
 
-export function createUnion(req: CreateStatement) {
+export function createUnion(req: CreateStatement): Union {
     const columns: Entity[] = [];
     for (const column of req.columns)
         columns.push(createEntity(column));

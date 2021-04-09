@@ -1,12 +1,14 @@
 import { getParser as getCompiledParser } from '../compiler';
 import scope from './sqope';
+import { Root } from './types';
 export * from './types';
 
-export type ParserType = {
+export type Parser = {
     parser: {
         parse: Function,
         yy: { [key: string]: any }
-    }
+    },
+    parse: (data: string) => Root;
 }
 
 function getParser() {
@@ -16,10 +18,10 @@ function getParser() {
     return parser;
 }
 
-export function Parser(this: ParserType) {
+export function Parser(this: Parser) {
     this.parser = getParser();
 }
 
-Parser.prototype.parse = function () {
-    return this.parser.parse.apply(this.parser, arguments);
+Parser.prototype.parse = function (this: Parser, event: string) {
+    return this.parser.parse.apply(this.parser, event);
 }

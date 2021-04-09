@@ -1,68 +1,76 @@
-import { Statement } from '../parser';
 import { createUnion } from '../union';
-import { CacheType, newCache } from './../cache/index';
+import { Cache, newCache } from './../cache/index';
 import { STATEMENTS } from './../parser/constants';
-import { CreateStatement, Root } from './../parser/types';
+import { AlterStatement, CreateStatement, DeleteStatement, DropStatement, InsertStatement, Root, SelectStatement, UpdateStatement } from './../parser/types';
 
 
-export type ProcessorType = {
-    cache: CacheType
+export type Processor = {
+    cache: Cache;
+    process: (query: Root) => any;
+    drop: (query: DropStatement) => any;
+    alter: (query: AlterStatement) => any;
+    create: (query: CreateStatement) => any;
+    select: (query: SelectStatement) => any;
+    insert: (query: InsertStatement) => any;
+    update: (query: UpdateStatement) => any;
+    delete: (query: DeleteStatement) => any;
 }
 
-function Processor(this: ProcessorType, config) {
+function Processor(this: Processor, config) {
     this.cache = newCache({});
 }
 
-Processor.prototype.process = function (query: Root) {
+Processor.prototype.process = function (this: Processor, query: Root) {
     console.log("General method for calling", query);
     if (query.statement == null) return;
     switch (query.statement.type) {
         case STATEMENTS.DDL.CREATE:
-            return this.create(query.statement);
+            return this.create(query.statement as CreateStatement);
         default:
             return Error("No method realized");
     }
 }
 
-Processor.prototype.create = function (query: CreateStatement) {
+Processor.prototype.create = function (this: Processor, query: CreateStatement) {
     console.log("process create query", query);
+    if (query.target?.name && this.cache.has(query.target?.name)) return "Table already exists";
     const union = createUnion(query);
     this.cache.addUnion(union);
     return union;
 
 }
 
-Processor.prototype.drop = function (query) {
+Processor.prototype.drop = function (this: Processor, query: DropStatement) {
     console.log("process drop query", query);
 }
 
-Processor.prototype.alter = function (query) {
+Processor.prototype.alter = function (this: Processor, query: AlterStatement) {
     console.log("process alter query", query);
 }
 
-Processor.prototype.select = function (query) {
+Processor.prototype.select = function (this: Processor, query: SelectStatement) {
     console.log("process select query", query);
 }
 
-Processor.prototype.insert = function (query) {
+Processor.prototype.insert = function (this: Processor, query: InsertStatement) {
     console.log("process insert query", query);
 }
 
-Processor.prototype.update = function (query) {
+Processor.prototype.update = function (this: Processor, query: UpdateStatement) {
     console.log("process update query", query);
 }
 
-Processor.prototype.delete = function (query) {
+Processor.prototype.delete = function (this: Processor, query: DeleteStatement) {
     console.log("process delete query", query);
 }
 
-let processorInstance = null;
+let processorInstance: Processor | null = null;
 
-export function getProcessor(config) {
+export function getProcessor(config): Processor | null {
     return processorInstance;
 }
 
-export function newProseccor(config) {
+export function newProseccor(config): Processor {
     return processorInstance = new Processor(config);
 }
 
