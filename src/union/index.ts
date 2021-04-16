@@ -1,7 +1,8 @@
 import { nanoid } from 'nanoid';
 import { createEntity } from '../entity';
-import { CreateStatement, Statement } from '../parser';
+import { CreateStatement } from '../parser';
 import { Entity } from './../entity/index';
+import { InsertStatement, SelectStatement, UpdateStatement } from './../parser/types';
 
 
 export type Union = {
@@ -10,8 +11,9 @@ export type Union = {
     entities: Map<string, Entity>;
     setName: (name: string) => void;
     setId: (id: string) => void;
-    write: (statement: Statement) => boolean;
-    read: (statement: Statement) => any;
+    write: (statement: InsertStatement) => any;
+    update: (statement: UpdateStatement) => any;
+    read: (statement: SelectStatement) => any;
 }
 
 function Union(this: Union, entities: Entity[]) {
@@ -26,11 +28,15 @@ Union.prototype.setId = function (this: Union, id: string) {
     this.id = id;
 }
 
-Union.prototype.write = function (this: Union, statement: Statement) {
+Union.prototype.write = function (this: Union, statement: InsertStatement) {
     console.log(this, "Tries to write");
 }
 
-Union.prototype.read = function (this: Union, statement: Statement) {
+Union.prototype.update = function (this: Union, statement: UpdateStatement) {
+    console.log(this, "Tries to update");
+}
+
+Union.prototype.read = function (this: Union, statement: SelectStatement) {
     console.log(this, "Tries to read");
 }
 

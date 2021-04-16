@@ -11,7 +11,7 @@ export type TemporaryFile = {
     };
     deadArr: number[]; // indicies, not bitmap,
     setTarget: (target: VirtualFile) => void;
-    write: (offset: number, data: any) => void;
+    write: (offset: number, data: any) => any;
     read: (offset: number, amount: number) => any;
 }
 

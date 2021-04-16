@@ -1,4 +1,4 @@
-import { InsertStatement, SelectStatement, Statement, UpdateStatement } from './../parser/types';
+import { InsertStatement, SelectStatement, UpdateStatement } from './../parser/types';
 import { Union } from './../union/index';
 
 export type Cache = {
@@ -8,8 +8,9 @@ export type Cache = {
     has: (name: string) => boolean;
     get: (name: string) => Union | undefined;
     remove: (name: string) => boolean;
-    write: (statement: Statement) => boolean;
-    read: (statement: Statement) => any;
+    write: (statement: InsertStatement) => any;
+    update: (statement: UpdateStatement) => any;
+    read: (statement: SelectStatement) => any;
 }
 
 function Cache(this: Cache, config: {}) {
@@ -26,16 +27,22 @@ Cache.prototype.has = function (this: Cache, name: string) {
     return this.unions.has(name);
 }
 
-Cache.prototype.get = function(this: Cache, name: string) {
+Cache.prototype.get = function (this: Cache, name: string) {
     return this.unions.get(name);
 }
 
-Cache.prototype.remove = function(this: Cache, name: string) {
+Cache.prototype.remove = function (this: Cache, name: string) {
     return this.unions.delete(name);
 }
 
-Cache.prototype.write = function (this: Cache, statement: Statement) {
+Cache.prototype.write = function (this: Cache, statement: InsertStatement) {
     console.log(this, "Tries to write");
+    if (statement.target) return this.unions.get(statement.target.name)?.write(statement);
+    else return "No write target";
+}
+
+Cache.prototype.update = function (this: Cache, statement: UpdateStatement) {
+    console.log(this, "Tries to update");
 }
 
 Cache.prototype.read = function (this: Cache, statement: SelectStatement) {

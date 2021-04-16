@@ -16,7 +16,7 @@ export type VirtualFile = {
     buffer: ArrayBuffer
     setFd: (fd: number) => void;
     setStat: (stat: Stats) => void;
-    write: (offset: number, data: any) => void;
+    write: (offset: number, data: any) => any;
     read: (offset: number, amount: number) => any;
 }
 
