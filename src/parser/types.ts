@@ -4,6 +4,7 @@ export type Literal = {
 
 export type Identifier = {
     name: string;
+    index: number;
     alias: string | undefined;
     scope: Identifier | undefined;
 }
@@ -11,6 +12,7 @@ export type Identifier = {
 export type TypedIdentifier = {
     name: string;
     type: string;
+    index: number;
 }
 
 export type Expression = {

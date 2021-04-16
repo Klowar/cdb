@@ -10,11 +10,12 @@ function literal(this: Literal, value: string | number) {
 
 // Column names, table names and other named things
 identifier.prototype = Object.create(null);
-function identifier(this: Identifier, obj?: { name: string, alias?: string, scope?: Identifier }) {
+function identifier(this: Identifier, obj?: { name: string, index?: number, alias?: string, scope?: Identifier }) {
     if (obj !== undefined) {
         this.name = obj.name;
         this.alias = obj.alias;
         this.scope = obj.scope;
+        this.index = obj.index || 0;
     }
 }
 identifier.prototype.setName = function (name) {
@@ -26,12 +27,16 @@ identifier.prototype.setAlias = function (alias) {
 identifier.prototype.setScope = function (scope) {
     this.scope = scope;
 }
+identifier.prototype.setIndex = function (index) {
+    this.index = index;
+}
 
 typedIdentifier.prototype = Object.create(null);
-function typedIdentifier(this: TypedIdentifier, obj?: { name: string, type: string }) {
+function typedIdentifier(this: TypedIdentifier, obj?: { name: string, type: string, index?: number }) {
     if (obj !== undefined) {
         this.name = obj.name;
         this.type = obj.type;
+        this.index = obj.index || 0;
     }
 }
 typedIdentifier.prototype.setName = function (name) {
@@ -40,9 +45,12 @@ typedIdentifier.prototype.setName = function (name) {
 typedIdentifier.prototype.setType = function (type) {
     this.type = type;
 }
+typedIdentifier.prototype.setIndex = function (index) {
+    this.index = index;
+}
 
 // Root of query
-ast_root.prototype = new identifier({ name: 'root' });
+ast_root.prototype = new identifier({ name: 'root', index: -1 });
 function ast_root(this: Root) {
     this.objects = [];
     this.statement = null;
