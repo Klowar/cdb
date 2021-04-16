@@ -197,11 +197,19 @@ case 41: case 42: case 45:
             }
         
 break;
-case 49: case 51: case 71:
+case 49: case 71:
 
             {
                 this.$ = Array.isArray($$[$0-2]) ? $$[$0-2] : [$$[$0-2]];
                 this.$.push($$[$0]);
+            }
+        
+break;
+case 51:
+
+            {
+                this.$ = Array.isArray($$[$0-2]) ? $$[$0-2] : [$$[$0-2]];
+                this.$.push($$[$0].setIndex(this.$.length));
             }
         
 break;

@@ -12,7 +12,7 @@
     "build": "tsc",
     "start": "node build/index.js",
     "test": "mocha --require ts-node/register 'test/**/*.ts'",
-    "compile": "node_modules/.bin/jison compile/sql2.jison compile/sql.jisonlex"
+    "compile": "node_modules/.bin/jison src/compiler/compile/sql2.jison src/compiler/compile/sql.jisonlex"
   },
   "devDependencies": {
     "@types/mocha": "^8.2.0",

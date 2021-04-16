@@ -236,7 +236,7 @@ multi_identifier:
         multi_identifier ',' identifier {
             {
                 $$ = Array.isArray($1) ? $1 : [$1];
-                $$.push($3);
+                $$.push($3.setIndex($$.length));
             }
         }
     |   identifier
