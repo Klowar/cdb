@@ -27,7 +27,7 @@ function serverPrototype(this: ServerProtoType) {
 Server.prototype = new serverPrototype();
 export function Server(this: Server) {
     this.connections = [];
-    this.server = new Server();
+    this.server = new PServer();
     this.server.addListener("connection", (socket: Socket) => {
         const conn = this.onConnection(socket);
         this.emit("connect", conn);
