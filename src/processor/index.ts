@@ -1,3 +1,4 @@
+import { Union } from './../union/index';
 import { createUnion } from '../union';
 import { Cache, newCache } from './../cache/index';
 import { STATEMENTS } from './../parser/constants';
@@ -26,6 +27,10 @@ Processor.prototype.process = function (this: Processor, query: Root) {
     switch (query.statement.type) {
         case STATEMENTS.DDL.CREATE:
             return this.create(query.statement as CreateStatement);
+        case STATEMENTS.DDL.DROP:
+            return this.drop(query.statement);
+        case STATEMENTS.DML.INSERT:
+            return this.insert(query.statement as InsertStatement);
         default:
             return Error("No method realized");
     }
@@ -42,6 +47,11 @@ Processor.prototype.create = function (this: Processor, query: CreateStatement) 
 
 Processor.prototype.drop = function (this: Processor, query: DropStatement) {
     console.log("process drop query", query);
+    if (query.target?.name != null && !this.cache.has(query.target?.name)) return "Table does not exists";
+    if (query.target?.name != null)
+        return this.cache.remove(query.target.name);
+    // TODO create cleaning job
+    return false;
 }
 
 Processor.prototype.alter = function (this: Processor, query: AlterStatement) {
@@ -54,6 +64,7 @@ Processor.prototype.select = function (this: Processor, query: SelectStatement) 
 
 Processor.prototype.insert = function (this: Processor, query: InsertStatement) {
     console.log("process insert query", query);
+    return this.cache.write(query);
 }
 
 Processor.prototype.update = function (this: Processor, query: UpdateStatement) {

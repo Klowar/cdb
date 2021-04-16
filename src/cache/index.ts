@@ -1,3 +1,4 @@
+import { InsertStatement, SelectStatement, Statement, UpdateStatement } from './../parser/types';
 import { Union } from './../union/index';
 
 export type Cache = {
@@ -5,8 +6,10 @@ export type Cache = {
     unions: Map<string, Union>;
     addUnion: (union: Union) => void;
     has: (name: string) => boolean;
-    write: (offset: number, data: any) => any;
-    read: (offset: number, amount: number) => any;
+    get: (name: string) => Union | undefined;
+    remove: (name: string) => boolean;
+    write: (statement: Statement) => boolean;
+    read: (statement: Statement) => any;
 }
 
 function Cache(this: Cache, config: {}) {
@@ -23,12 +26,19 @@ Cache.prototype.has = function (this: Cache, name: string) {
     return this.unions.has(name);
 }
 
+Cache.prototype.get = function(this: Cache, name: string) {
+    return this.unions.get(name);
+}
 
-Cache.prototype.write = function (this: Cache, offset: number, data: number) {
+Cache.prototype.remove = function(this: Cache, name: string) {
+    return this.unions.delete(name);
+}
+
+Cache.prototype.write = function (this: Cache, statement: Statement) {
     console.log(this, "Tries to write");
 }
 
-Cache.prototype.read = function (this: Cache, offset: number, amount: number) {
+Cache.prototype.read = function (this: Cache, statement: SelectStatement) {
     console.log(this, "Tries to read");
 }
 

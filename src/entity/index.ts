@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 import { createMetaFile, MetaFile } from '../meta';
-import { TypedIdentifier } from './../parser/types';
+import { Statement, TypedIdentifier } from './../parser/types';
 
 
 export type Entity = {
@@ -11,8 +11,8 @@ export type Entity = {
     setName: (name: string) => void;
     setId: (id: string) => void;
     setType: (type: string) => void;
-    write: (offset: number, data: any) => void;
-    read: (offset: number, amount: number) => any;
+    write: (statement: Statement) => boolean;
+    read: (statement: Statement) => any;
 }
 
 function Entity(this: Entity, mf: MetaFile) {
@@ -31,11 +31,11 @@ Entity.prototype.setType = function (this: Entity, type: string) {
     this.type = type;
 }
 
-Entity.prototype.write = function (this: Entity, offset: number, data: any) {
+Entity.prototype.write = function (this: Entity, statement: Statement) {
     console.log(this, "Tries to write to data file");
 }
 
-Entity.prototype.read = function (this: Entity, offset: number, amount: number) {
+Entity.prototype.read = function (this: Entity, statement: Statement) {
     console.log(this, "Tries to read the data file");
 }
 

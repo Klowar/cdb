@@ -1,4 +1,5 @@
 import { createTemporaryFile, TemporaryFile } from '../temp';
+import { Statement } from './../parser/types';
 import { ENCODING_UTF_8 } from './constants';
 
 
@@ -11,8 +12,8 @@ export type MetaFile = {
     setBlockSize: (size: number) => void;
     setBlockAmount: (amount: number) => void;
     setEncoding: (enc: string) => void;
-    write: (offset: number, data: any) => void;
-    read: (offset: number, amount: number) => void;
+    write: (statement: Statement) => boolean;
+    read: (statement: Statement) => any;
 }
 
 function MetaFile(this: MetaFile, tf: TemporaryFile) {
@@ -34,11 +35,11 @@ MetaFile.prototype.setEncoding = function (this: MetaFile, enc: string) {
     this.encoding = enc;
 }
 
-MetaFile.prototype.write = function (this: MetaFile, offset: number, data: any) {
+MetaFile.prototype.write = function (this: MetaFile, statement: Statement) {
     console.log(this, "Tries to write to data file");
 }
 
-MetaFile.prototype.read = function (this: MetaFile, offset: number, amount: number) {
+MetaFile.prototype.read = function (this: MetaFile, statement: Statement) {
     console.log(this, "Tries to read the data file");
 }
 
