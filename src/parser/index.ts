@@ -23,5 +23,5 @@ export function Parser(this: Parser) {
 }
 
 Parser.prototype.parse = function (this: Parser, event: string) {
-    return this.parser.parse.apply(this.parser, event);
+    return this.parser.parse.call(this.parser, event);
 }

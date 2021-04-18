@@ -29,6 +29,7 @@ TemporaryFile.prototype.setTarget = function (this: TemporaryFile, target: Virtu
 
 TemporaryFile.prototype.write = function (this: TemporaryFile, offset: number, data: any) {
     console.log(this, "Tries to write");
+    this.target.write(offset, data);
 }
 
 TemporaryFile.prototype.read = function (this: TemporaryFile, offset: number, amount: number) {
@@ -38,7 +39,7 @@ TemporaryFile.prototype.read = function (this: TemporaryFile, offset: number, am
 
 export function getTemporaryFile(vf: VirtualFile): TemporaryFile {
     const tf = new TemporaryFile(vf);
-    tf.setTarget(getVirtualFile(nanoid()));
+    tf.setTarget(getVirtualFile(nanoid(), nanoid()));
 
     return tf;
 }

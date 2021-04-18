@@ -30,6 +30,10 @@ Union.prototype.setId = function (this: Union, id: string) {
 
 Union.prototype.write = function (this: Union, statement: InsertStatement) {
     console.log(this, "Tries to write");
+    const arr = new Array(statement.values.length);
+    for (const entity of this.entities.values())
+        arr.push(entity.write(statement));
+    return arr;
 }
 
 Union.prototype.update = function (this: Union, statement: UpdateStatement) {

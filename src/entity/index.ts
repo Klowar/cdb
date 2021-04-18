@@ -34,6 +34,7 @@ Entity.prototype.setType = function (this: Entity, type: string) {
 
 Entity.prototype.write = function (this: Entity, statement: InsertStatement) {
     console.log(this, "Tries to write to data file");
+    this.mf.write(statement);
 }
 
 Entity.prototype.update = function (this: Entity, statement: UpdateStatement) {
@@ -51,7 +52,9 @@ export function getEntity(mf: MetaFile): Entity {
 }
 
 export function createEntity(req: TypedIdentifier): Entity {
-    const entity = new Entity(createMetaFile());
+    const metaFile = createMetaFile();
+    metaFile.setIndex(req.index);
+    const entity = new Entity(metaFile);
     entity.setType(req.type);
     entity.setName(req.name);
     entity.setId(nanoid());

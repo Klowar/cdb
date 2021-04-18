@@ -1,33 +1,40 @@
 import { Stats } from 'fs';
-import { open, stat } from 'fs/promises';
+import { open, stat, write, FileHandle } from 'fs/promises';
 import { nanoid } from 'nanoid';
 import { join } from 'path';
 import { DATA_ROOT } from './../globals';
 import { DEFAULT_BUFFER_BYTE_SIZE } from './constants';
 
-const CREATE_MODE = 'a+';
+const CREATE_MODE = 'wx+';
 const MODE = 'r+';
 const RIGHTS = 0o666;
 
 export type VirtualFile = {
-    fd: number,
-    path: string,
-    metaData: Stats,
-    buffer: ArrayBuffer
-    setFd: (fd: number) => void;
+    dataFile: FileHandle;
+    offsetFile: FileHandle;
+    path: string;
+    offsetPath: string;
+    metaData: Stats;
+    buffer: ArrayBuffer;
+    setDataFile: (dataFile: FileHandle) => void;
+    setOffsetFile: (offsetFile: FileHandle) => void;
     setStat: (stat: Stats) => void;
     write: (offset: number, data: any) => any;
     read: (offset: number, amount: number) => any;
 }
 
-function VirtualFile(this: VirtualFile, path: string) {
-    this.fd = 0;
+function VirtualFile(this: VirtualFile, path: string, offsetPath: string) {
     this.path = path;
+    this.offsetPath = offsetPath;
     this.buffer = new ArrayBuffer(DEFAULT_BUFFER_BYTE_SIZE);
 }
 
-VirtualFile.prototype.setFd = function (this: VirtualFile, fd: number) {
-    this.fd = fd;
+VirtualFile.prototype.setDataFile = function (this: VirtualFile, dataFile: FileHandle) {
+    this.dataFile = dataFile;
+}
+
+VirtualFile.prototype.setOffsetFile = function (this: VirtualFile, offsetFile: FileHandle) {
+    this.offsetFile = offsetFile;
 }
 
 VirtualFile.prototype.setStat = function (this: VirtualFile, stat: Stats) {
@@ -36,6 +43,9 @@ VirtualFile.prototype.setStat = function (this: VirtualFile, stat: Stats) {
 
 VirtualFile.prototype.write = function (this: VirtualFile, offset: number, data: any) {
     console.log(this, "Tries to write to data file");
+    data = typeof data === 'number' ? [data] : data;
+    const arr = typeof data === 'string' ? Buffer.from(data) : Uint8Array.from(data);
+    write(this.dataFile, arr, offset);
 }
 
 VirtualFile.prototype.read = function (this: VirtualFile, offset: number, amount: number) {
@@ -43,17 +53,20 @@ VirtualFile.prototype.read = function (this: VirtualFile, offset: number, amount
 }
 
 
-export function getVirtualFile(path: string, mode = MODE): VirtualFile {
-    const vf = new VirtualFile(path);
-    open(path, mode, RIGHTS).then((fh) => vf.setFd(fh.fd));
+export function getVirtualFile(path: string, offsetPath: string, mode = MODE): VirtualFile {
+    const vf = new VirtualFile(path, offsetPath);
+    open(path, mode, RIGHTS).then((fh) => vf.setDataFile(fh));
+    open(offsetPath, mode, RIGHTS).then((fh) => vf.setOffsetFile(fh));
     stat(path).then((st) => vf.setStat(st));
     return vf;
 }
 
 export function createVirtualFile(): VirtualFile {
-    const path = join(DATA_ROOT, nanoid());
-    const vf = new VirtualFile(path);
-    open(path, CREATE_MODE, RIGHTS).then((fh) => vf.setFd(fh.fd));
-    stat(path).then((st) => vf.setStat(st));
+    const dataPath = join(DATA_ROOT, nanoid());
+    const offsetPath = join(DATA_ROOT, nanoid());
+    const vf = new VirtualFile(dataPath, offsetPath);
+    open(dataPath, CREATE_MODE, RIGHTS).then((fh) => vf.setDataFile(fh));
+    open(offsetPath, CREATE_MODE, RIGHTS).then((fh) => vf.setOffsetFile(fh));
+    stat(dataPath).then((st) => vf.setStat(st));
     return vf;
 }

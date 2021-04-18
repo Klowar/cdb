@@ -6,9 +6,12 @@ import { ENCODING_UTF_8 } from './constants';
 
 export type MetaFile = {
     tf: TemporaryFile;
+    index: number;
     blockSize: number;
     blockAmount: number;
     encoding: string;
+    getIndex: () => number;
+    setIndex: (index: number) => void;
     setBlockSize: (size: number) => void;
     setBlockAmount: (amount: number) => void;
     setEncoding: (enc: string) => void;
@@ -22,6 +25,14 @@ function MetaFile(this: MetaFile, tf: TemporaryFile) {
     this.blockSize = 0;
     this.blockAmount = 0;
     this.encoding = ENCODING_UTF_8;
+}
+
+MetaFile.prototype.getIndex = function (this: MetaFile) {
+    return this.index;
+}
+
+MetaFile.prototype.setIndex = function (this: MetaFile, index: number) {
+    this.index = index;
 }
 
 MetaFile.prototype.setBlockSize = function (this: MetaFile, size: number) {
@@ -38,6 +49,7 @@ MetaFile.prototype.setEncoding = function (this: MetaFile, enc: string) {
 
 MetaFile.prototype.write = function (this: MetaFile, statement: InsertStatement) {
     console.log(this, "Tries to write to data file");
+    this.tf.write(this.blockAmount++ * this.blockSize, statement.values[this.index]);
 }
 
 MetaFile.prototype.update = function (this: MetaFile, statement: UpdateStatement) {
