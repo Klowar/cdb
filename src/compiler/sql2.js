@@ -209,7 +209,8 @@ case 51:
 
             {
                 this.$ = Array.isArray($$[$0-2]) ? $$[$0-2] : [$$[$0-2]];
-                this.$.push($$[$0].setIndex(this.$.length));
+                $$[$0].setIndex(this.$.length || 0);
+                this.$.push($$[$0]);
             }
         
 break;
