@@ -1,3 +1,4 @@
+import { Literal } from './../parser/types';
 import { Stats } from 'fs';
 import { open, stat, write, FileHandle } from 'fs/promises';
 import { nanoid } from 'nanoid';
@@ -41,11 +42,10 @@ VirtualFile.prototype.setStat = function (this: VirtualFile, stat: Stats) {
     this.metaData = stat;
 }
 
-VirtualFile.prototype.write = function (this: VirtualFile, offset: number, data: any) {
+VirtualFile.prototype.write = function (this: VirtualFile, offset: number, data: Literal) {
     console.log(this, "Tries to write to data file");
-    data = typeof data === 'number' ? [data] : data;
-    const arr = typeof data === 'string' ? Buffer.from(data) : Uint8Array.from(data);
-    write(this.dataFile, arr, offset);
+    const arr = typeof data.value === 'string' ? Buffer.from(data.value) : Uint8Array.from([data.value]);
+    this.dataFile.write(arr, offset);
 }
 
 VirtualFile.prototype.read = function (this: VirtualFile, offset: number, amount: number) {
