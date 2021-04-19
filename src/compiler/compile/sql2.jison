@@ -319,7 +319,7 @@ multi_literal:
 literal:
         STRING {
             {
-                $$ = new yy.scope.literal($1);
+                $$ = new yy.scope.literal($1.substring(1, $1.length - 1));
             }
         }
     |   INTNUM {

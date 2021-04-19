@@ -256,7 +256,14 @@ case 62:
             }
         
 break;
-case 73: case 74:
+case 73:
+
+            {
+                this.$ = new yy.scope.literal($$[$0].substring(1, $$[$0].length - 1));
+            }
+        
+break;
+case 74:
 
             {
                 this.$ = new yy.scope.literal($$[$0]);
