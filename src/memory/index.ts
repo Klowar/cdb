@@ -5,7 +5,7 @@ import { MAX_MEMORY_USAGE } from './constants';
 export type MemoryManager = {
     requestProcessor: Processor;
     requestQuery: any[];
-    process: (request: Root) => any;
+    process: (request: Root) => Promise<any>;
 }
 
 function MemoryManager(this: MemoryManager, config) {

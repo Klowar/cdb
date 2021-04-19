@@ -31,7 +31,8 @@ Core.prototype.onConnectionData = function (this: Core, event: string, connectio
         const parseResult = this.parser.parse(event);
         if (!parseResult) return;
         const execResult = this.executor.process(this.parser.parser.yy.ast);
-        connection.write(JSON.stringify(execResult) + '\n');
+        execResult.then((data) => connection.write(JSON.stringify(data) + '\n'));
+        execResult.catch((e) => connection.write(JSON.stringify(e) + '\n'));
     } catch (e) {
         console.error(e);
         connection.write(JSON.stringify(e) + '\n');

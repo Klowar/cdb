@@ -11,8 +11,8 @@ export type TemporaryFile = {
     };
     deadArr: number[]; // indicies, not bitmap,
     setTarget: (target: VirtualFile) => void;
-    write: (offset: number, data: any) => any;
-    read: (offset: number, amount: number) => any;
+    write: (offset: number, data: any) => Promise<any>;
+    read: (offset: number, amount: number) => Promise<any>;
 }
 
 function TemporaryFile(this: TemporaryFile, vf: VirtualFile) {
@@ -27,12 +27,12 @@ TemporaryFile.prototype.setTarget = function (this: TemporaryFile, target: Virtu
     this.target = target;
 }
 
-TemporaryFile.prototype.write = function (this: TemporaryFile, offset: number, data: any) {
+TemporaryFile.prototype.write = async function (this: TemporaryFile, offset: number, data: any) {
     console.log(this, "Tries to write");
-    this.target.write(offset, data);
+    return this.target.write(offset, data);
 }
 
-TemporaryFile.prototype.read = function (this: TemporaryFile, offset: number, amount: number) {
+TemporaryFile.prototype.read = async function (this: TemporaryFile, offset: number, amount: number) {
     console.log(this, "Tries to read");
 }
 

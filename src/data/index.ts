@@ -1,9 +1,9 @@
-import { Literal } from './../parser/types';
 import { Stats } from 'fs';
-import { open, stat, write, FileHandle } from 'fs/promises';
+import { FileHandle, open, stat } from 'fs/promises';
 import { nanoid } from 'nanoid';
 import { join } from 'path';
 import { DATA_ROOT } from './../globals';
+import { Literal } from './../parser/types';
 import { DEFAULT_BUFFER_BYTE_SIZE } from './constants';
 
 const CREATE_MODE = 'wx+';
@@ -20,8 +20,8 @@ export type VirtualFile = {
     setDataFile: (dataFile: FileHandle) => void;
     setOffsetFile: (offsetFile: FileHandle) => void;
     setStat: (stat: Stats) => void;
-    write: (offset: number, data: any) => any;
-    read: (offset: number, amount: number) => any;
+    write: (offset: number, data: any) => Promise<any>;
+    read: (offset: number, amount: number) => Promise<any>;
 }
 
 function VirtualFile(this: VirtualFile, path: string, offsetPath: string) {
@@ -42,13 +42,18 @@ VirtualFile.prototype.setStat = function (this: VirtualFile, stat: Stats) {
     this.metaData = stat;
 }
 
-VirtualFile.prototype.write = function (this: VirtualFile, offset: number, data: Literal) {
+VirtualFile.prototype.write = async function (this: VirtualFile, offset: number, data: Literal) {
     console.log(this, "Tries to write to data file");
     const arr = typeof data.value === 'string' ? Buffer.from(data.value) : Uint8Array.from([data.value]);
-    this.dataFile.write(arr, offset);
+    return Promise.all(
+        [
+            this.dataFile.write(arr, offset),
+            this.offsetFile.write(Uint8Array.from([offset]))
+        ]
+    );
 }
 
-VirtualFile.prototype.read = function (this: VirtualFile, offset: number, amount: number) {
+VirtualFile.prototype.read = async function (this: VirtualFile, offset: number, amount: number) {
     console.log(this, "Tries to read the data file");
 }
 

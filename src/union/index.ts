@@ -11,9 +11,9 @@ export type Union = {
     entities: Map<string, Entity>;
     setName: (name: string) => void;
     setId: (id: string) => void;
-    write: (statement: InsertStatement) => any;
-    update: (statement: UpdateStatement) => any;
-    read: (statement: SelectStatement) => any;
+    write: (statement: InsertStatement) => Promise<any>;
+    update: (statement: UpdateStatement) => Promise<any>;
+    read: (statement: SelectStatement) => Promise<any>;
 }
 
 function Union(this: Union, entities: Entity[]) {
@@ -33,7 +33,7 @@ Union.prototype.write = function (this: Union, statement: InsertStatement) {
     const arr = new Array(statement.values.length);
     for (const entity of this.entities.values())
         arr.push(entity.write(statement));
-    return arr;
+    return Promise.all(arr);
 }
 
 Union.prototype.update = function (this: Union, statement: UpdateStatement) {
@@ -45,18 +45,18 @@ Union.prototype.read = function (this: Union, statement: SelectStatement) {
 }
 
 
-export function getUnion(ents: Entity[]): Union {
+export function getUnion(ents: Entity[]): Promise<Union> {
     const union = new Union(ents);
 
-    return union;
+    return new Promise((res) => res(union));
 }
 
-export function createUnion(req: CreateStatement): Union {
+export function createUnion(req: CreateStatement): Promise<Union> {
     const columns: Entity[] = [];
     for (const column of req.columns)
         columns.push(createEntity(column));
     const union = new Union(columns);
     union.setName(req.target?.name);
     union.setId(nanoid());
-    return union;
+    return new Promise((res) => res(union));
 }

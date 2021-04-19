@@ -15,9 +15,9 @@ export type MetaFile = {
     setBlockSize: (size: number) => void;
     setBlockAmount: (amount: number) => void;
     setEncoding: (enc: string) => void;
-    write: (statement: InsertStatement) => any;
-    update: (statement: UpdateStatement) => any;
-    read: (statement: SelectStatement) => any;
+    write: (statement: InsertStatement) => Promise<any>;
+    update: (statement: UpdateStatement) => Promise<any>;
+    read: (statement: SelectStatement) => Promise<any>;
 }
 
 function MetaFile(this: MetaFile, tf: TemporaryFile) {
@@ -49,7 +49,11 @@ MetaFile.prototype.setEncoding = function (this: MetaFile, enc: string) {
 
 MetaFile.prototype.write = function (this: MetaFile, statement: InsertStatement) {
     console.log(this, "Tries to write to data file");
-    this.tf.write(this.blockAmount++ * this.blockSize, statement.values[this.index]);
+    return new Promise((res, rej) => {
+        this.tf.write(this.blockAmount++ * this.blockSize, statement.values[this.index])
+            .then(() => res(this.blockAmount))
+            .catch(rej);
+    });
 }
 
 MetaFile.prototype.update = function (this: MetaFile, statement: UpdateStatement) {

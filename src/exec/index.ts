@@ -4,7 +4,7 @@ import { MemoryManager, newMemoryManager } from './../memory/index';
 
 export type Executor = {
     mm: MemoryManager;
-    process: (request: Root) => any;
+    process: (request: Root) => Promise<any>;
 }
 
 function Executor(this: Executor, config) {

@@ -7,14 +7,14 @@ import { AlterStatement, CreateStatement, DeleteStatement, DropStatement, Insert
 
 export type Processor = {
     cache: Cache;
-    process: (query: Root) => any;
-    drop: (query: DropStatement) => any;
-    alter: (query: AlterStatement) => any;
-    create: (query: CreateStatement) => any;
-    select: (query: SelectStatement) => any;
-    insert: (query: InsertStatement) => any;
-    update: (query: UpdateStatement) => any;
-    delete: (query: DeleteStatement) => any;
+    process: (query: Root) => Promise<any>;
+    drop: (query: DropStatement) => Promise<any>;
+    alter: (query: AlterStatement) => Promise<any>;
+    create: (query: CreateStatement) => Promise<any>;
+    select: (query: SelectStatement) => Promise<any>;
+    insert: (query: InsertStatement) => Promise<any>;
+    update: (query: UpdateStatement) => Promise<any>;
+    delete: (query: DeleteStatement) => Promise<any>;
 }
 
 function Processor(this: Processor, config) {
@@ -39,19 +39,13 @@ Processor.prototype.process = function (this: Processor, query: Root) {
 Processor.prototype.create = function (this: Processor, query: CreateStatement) {
     console.log("process create query", query);
     if (query.target?.name && this.cache.has(query.target?.name)) return "Table already exists";
-    const union = createUnion(query);
-    this.cache.addUnion(union);
-    return union;
-
+    return createUnion(query).then((union) => this.cache.addUnion(union));
 }
 
 Processor.prototype.drop = function (this: Processor, query: DropStatement) {
     console.log("process drop query", query);
     if (query.target?.name != null && !this.cache.has(query.target?.name)) return "Table does not exists";
-    if (query.target?.name != null)
-        return this.cache.remove(query.target.name);
-    // TODO create cleaning job
-    return false;
+    return new Promise((res) => res(query.target != null ? this.cache.remove(query.target.name) : false));
 }
 
 Processor.prototype.alter = function (this: Processor, query: AlterStatement) {

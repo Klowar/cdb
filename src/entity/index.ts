@@ -11,9 +11,9 @@ export type Entity = {
     setName: (name: string) => void;
     setId: (id: string) => void;
     setType: (type: string) => void;
-    write: (statement: InsertStatement) => any;
-    update: (statement: UpdateStatement) => any;
-    read: (statement: SelectStatement) => any;
+    write: (statement: InsertStatement) => Promise<any>;
+    update: (statement: UpdateStatement) => Promise<any>;
+    read: (statement: SelectStatement) => Promise<any>;
 }
 
 function Entity(this: Entity, mf: MetaFile) {
@@ -34,7 +34,7 @@ Entity.prototype.setType = function (this: Entity, type: string) {
 
 Entity.prototype.write = function (this: Entity, statement: InsertStatement) {
     console.log(this, "Tries to write to data file");
-    this.mf.write(statement);
+    return this.mf.write(statement);
 }
 
 Entity.prototype.update = function (this: Entity, statement: UpdateStatement) {
