@@ -13,6 +13,7 @@ export type TemporaryFile = {
     setTarget: (target: VirtualFile) => void;
     write: (offset: number, data: any) => Promise<any>;
     read: (offset: number, amount: number) => Promise<any>;
+    delete: (offset: number, amount: number) => Promise<any>;
 }
 
 function TemporaryFile(this: TemporaryFile, vf: VirtualFile) {
@@ -28,12 +29,16 @@ TemporaryFile.prototype.setTarget = function (this: TemporaryFile, target: Virtu
 }
 
 TemporaryFile.prototype.write = async function (this: TemporaryFile, offset: number, data: any) {
-    console.log(this, "Tries to write");
+    console.log(this, "Tries to write temp file");
     return this.target.write(offset, data);
 }
 
 TemporaryFile.prototype.read = async function (this: TemporaryFile, offset: number, amount: number) {
-    console.log(this, "Tries to read");
+    console.log(this, "Tries to read temp file");
+}
+
+TemporaryFile.prototype.delete = async function (this: TemporaryFile, offset: number, amount: number) {
+    console.log(this, "Tries to delete temp file");
 }
 
 

@@ -1,4 +1,3 @@
-import { Union } from './../union/index';
 import { createUnion } from '../union';
 import { Cache, newCache } from './../cache/index';
 import { STATEMENTS } from './../parser/constants';
@@ -28,7 +27,7 @@ Processor.prototype.process = function (this: Processor, query: Root) {
         case STATEMENTS.DDL.CREATE:
             return this.create(query.statement as CreateStatement);
         case STATEMENTS.DDL.DROP:
-            return this.drop(query.statement);
+            return this.drop(query.statement as DropStatement);
         case STATEMENTS.DML.INSERT:
             return this.insert(query.statement as InsertStatement);
         default:

@@ -1,5 +1,5 @@
 import { createTemporaryFile, TemporaryFile } from '../temp';
-import { InsertStatement, SelectStatement, UpdateStatement } from './../parser/types';
+import { DeleteStatement, InsertStatement, SelectStatement, UpdateStatement } from './../parser/types';
 import { ENCODING_UTF_8 } from './constants';
 
 
@@ -48,7 +48,7 @@ MetaFile.prototype.setEncoding = function (this: MetaFile, enc: string) {
 }
 
 MetaFile.prototype.write = function (this: MetaFile, statement: InsertStatement) {
-    console.log(this, "Tries to write to data file");
+    console.log(this, "Tries to write to meta file");
     return new Promise((res, rej) => {
         this.tf.write(this.blockAmount++ * this.blockSize, statement.values[this.index])
             .then(() => res(this.blockAmount))
@@ -57,11 +57,15 @@ MetaFile.prototype.write = function (this: MetaFile, statement: InsertStatement)
 }
 
 MetaFile.prototype.update = function (this: MetaFile, statement: UpdateStatement) {
-    console.log(this, "Tries to write to data file");
+    console.log(this, "Tries to write to meta file");
 }
 
 MetaFile.prototype.read = function (this: MetaFile, statement: SelectStatement) {
-    console.log(this, "Tries to read the data file");
+    console.log(this, "Tries to read the meta file");
+}
+
+MetaFile.prototype.delete = function (this: MetaFile, statement: DeleteStatement) {
+    console.log(this, "Tries to delete the meta file");
 }
 
 export function getMetaFile(tf: TemporaryFile): MetaFile {

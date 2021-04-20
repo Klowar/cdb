@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 import { createMetaFile, MetaFile } from '../meta';
-import { InsertStatement, SelectStatement, TypedIdentifier, UpdateStatement } from './../parser/types';
+import { DeleteStatement, InsertStatement, SelectStatement, TypedIdentifier, UpdateStatement } from './../parser/types';
 
 
 export type Entity = {
@@ -14,6 +14,7 @@ export type Entity = {
     write: (statement: InsertStatement) => Promise<any>;
     update: (statement: UpdateStatement) => Promise<any>;
     read: (statement: SelectStatement) => Promise<any>;
+    delete: (statement: DeleteStatement) => Promise<any>;
 }
 
 function Entity(this: Entity, mf: MetaFile) {
@@ -33,16 +34,20 @@ Entity.prototype.setType = function (this: Entity, type: string) {
 }
 
 Entity.prototype.write = function (this: Entity, statement: InsertStatement) {
-    console.log(this, "Tries to write to data file");
+    console.log(this, "Tries to write entity");
     return this.mf.write(statement);
 }
 
 Entity.prototype.update = function (this: Entity, statement: UpdateStatement) {
-    console.log(this, "Tries to write to data file");
+    console.log(this, "Tries to update entity");
 }
 
 Entity.prototype.read = function (this: Entity, statement: SelectStatement) {
-    console.log(this, "Tries to read the data file");
+    console.log(this, "Tries to read entity");
+}
+
+Entity.prototype.delete = function (this: Entity, statement: DeleteStatement) {
+    console.log(this, "Tries to read entity");
 }
 
 

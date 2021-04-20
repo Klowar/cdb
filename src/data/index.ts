@@ -22,6 +22,7 @@ export type VirtualFile = {
     setStat: (stat: Stats) => void;
     write: (offset: number, data: any) => Promise<any>;
     read: (offset: number, amount: number) => Promise<any>;
+    delete: (offset: number, amount: number) => Promise<any>;
 }
 
 function VirtualFile(this: VirtualFile, path: string, offsetPath: string) {
@@ -55,6 +56,10 @@ VirtualFile.prototype.write = async function (this: VirtualFile, offset: number,
 
 VirtualFile.prototype.read = async function (this: VirtualFile, offset: number, amount: number) {
     console.log(this, "Tries to read the data file");
+}
+
+VirtualFile.prototype.delete = async function (this: VirtualFile, offset: number, amount: number) {
+    console.log(this, "Tries to delete the data file");
 }
 
 

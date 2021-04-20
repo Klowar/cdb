@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid';
 import { createEntity } from '../entity';
 import { CreateStatement } from '../parser';
 import { Entity } from './../entity/index';
-import { InsertStatement, SelectStatement, UpdateStatement } from './../parser/types';
+import { DeleteStatement, InsertStatement, SelectStatement, UpdateStatement } from './../parser/types';
 
 
 export type Union = {
@@ -14,6 +14,7 @@ export type Union = {
     write: (statement: InsertStatement) => Promise<any>;
     update: (statement: UpdateStatement) => Promise<any>;
     read: (statement: SelectStatement) => Promise<any>;
+    delete: (statement: DeleteStatement) => Promise<any>;
 }
 
 function Union(this: Union, entities: Entity[]) {
@@ -29,7 +30,7 @@ Union.prototype.setId = function (this: Union, id: string) {
 }
 
 Union.prototype.write = function (this: Union, statement: InsertStatement) {
-    console.log(this, "Tries to write");
+    console.log(this, "Tries to write union");
     const arr = new Array(statement.values.length);
     for (const entity of this.entities.values())
         arr.push(entity.write(statement));
@@ -37,11 +38,15 @@ Union.prototype.write = function (this: Union, statement: InsertStatement) {
 }
 
 Union.prototype.update = function (this: Union, statement: UpdateStatement) {
-    console.log(this, "Tries to update");
+    console.log(this, "Tries to update union");
 }
 
 Union.prototype.read = function (this: Union, statement: SelectStatement) {
-    console.log(this, "Tries to read");
+    console.log(this, "Tries to read union");
+}
+
+Union.prototype.delete = function (this: Union, statement: DeleteStatement) {
+    console.log(this, "Tries to delete unioun");
 }
 
 
