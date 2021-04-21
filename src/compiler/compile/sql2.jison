@@ -185,14 +185,24 @@ delete_target:
     ;
 
 condition_clause:
-        WHERE simple_name_identifier COMPARISON simple_name_identifier {
+        WHERE condition_part {
+            {
+                $$ = $2;
+            }
+        }
+    ;
+
+condition_part:
+        binary_expression
+    |
+        condition_part AND binary_expression {
             {
                 $$ = new yy.scope.binaryExpression({
                     lParam: $2, rParam: $4, operator: $3
                 });
             }
         }
-    |   WHERE simple_name_identifier COMPARISON literal {
+    |   condition_part OR binary_expression {
             {
                 $$ = new yy.scope.binaryExpression({
                     lParam: $2, rParam: $4, operator: $3
@@ -208,6 +218,13 @@ expression:
 
 binary_expression:
         simple_name_identifier '=' literal {
+            {
+                $$ = new yy.scope.binaryExpression({
+                    lParam: $1, rParam: $3, operator: $2
+                });
+            }
+        }
+    |   simple_name_identifier COMPARISON literal {
             {
                 $$ = new yy.scope.binaryExpression({
                     lParam: $1, rParam: $3, operator: $2
