@@ -5,3 +5,5 @@ export const DEFAULT_BUFFER_SIZE = 100;
 export const DEFAULT_BUFFER_AMOUNT = 4;
 // Static sized buffer = 16 mb
 export const DEFAULT_BUFFER_BYTE_SIZE = 16 * 1024 * 1024;
+// Default read step in bytes = 40 kb
+export const DEFAULT_READ_STEP = 40 * 1024;

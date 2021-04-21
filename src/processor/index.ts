@@ -1,8 +1,16 @@
 import { createUnion } from '../union';
 import { Cache, newCache } from './../cache/index';
 import { STATEMENTS } from './../parser/constants';
-import { AlterStatement, CreateStatement, DeleteStatement, DropStatement, InsertStatement, Root, SelectStatement, UpdateStatement } from './../parser/types';
+import { AlterStatement, CreateStatement, DeleteStatement, DropStatement, InsertStatement, Root, SelectStatement, Statement, UpdateStatement } from './../parser/types';
 
+export type Request<T> = {
+    statement: T,
+    filter?: number[]
+}
+
+function Request(this: Request<Statement>, statement: Statement) {
+    this.statement = statement;
+}
 
 export type Processor = {
     cache: Cache;
@@ -30,6 +38,8 @@ Processor.prototype.process = function (this: Processor, query: Root) {
             return this.drop(query.statement as DropStatement);
         case STATEMENTS.DML.INSERT:
             return this.insert(query.statement as InsertStatement);
+        case STATEMENTS.DML.SELECT:
+            return this.select(query.statement as SelectStatement);
         default:
             return Error("No method realized");
     }
@@ -53,11 +63,12 @@ Processor.prototype.alter = function (this: Processor, query: AlterStatement) {
 
 Processor.prototype.select = function (this: Processor, query: SelectStatement) {
     console.log("process select query", query);
+    return this.cache.read(new Request(query));
 }
 
 Processor.prototype.insert = function (this: Processor, query: InsertStatement) {
     console.log("process insert query", query);
-    return this.cache.write(query);
+    return this.cache.write(new Request(query));
 }
 
 Processor.prototype.update = function (this: Processor, query: UpdateStatement) {

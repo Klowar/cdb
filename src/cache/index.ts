@@ -1,4 +1,5 @@
 import { DeleteStatement, InsertStatement, SelectStatement, UpdateStatement } from './../parser/types';
+import { Request } from './../processor/index';
 import { Union } from './../union/index';
 
 export type Cache = {
@@ -8,10 +9,10 @@ export type Cache = {
     has: (name: string) => boolean;
     get: (name: string) => Union | undefined;
     remove: (name: string) => boolean;
-    write: (statement: InsertStatement) => Promise<any>;
-    update: (statement: UpdateStatement) => Promise<any>;
-    read: (statement: SelectStatement) => Promise<any>;
-    delete: (statement: DeleteStatement) => Promise<any>;
+    write: (statement: Request<InsertStatement>) => Promise<any>;
+    update: (statement: Request<UpdateStatement>) => Promise<any>;
+    read: (statement: Request<SelectStatement>) => Promise<any>;
+    delete: (statement: Request<DeleteStatement>) => Promise<any>;
 }
 
 function Cache(this: Cache, config: {}) {
@@ -36,21 +37,23 @@ Cache.prototype.remove = function (this: Cache, name: string) {
     return this.unions.delete(name);
 }
 
-Cache.prototype.write = function (this: Cache, statement: InsertStatement) {
+Cache.prototype.write = function (this: Cache, req: Request<InsertStatement>) {
     console.log(this, "Tries to write cache");
-    if (statement.target) return this.unions.get(statement.target.name)?.write(statement);
+    if (req.statement.target) return this.unions.get(req.statement.target.name)?.write(req);
     else return new Promise(res => res("No write target"));
 }
 
-Cache.prototype.update = function (this: Cache, statement: UpdateStatement) {
+Cache.prototype.update = function (this: Cache, req: Request<UpdateStatement>) {
     console.log(this, "Tries to update cache");
 }
 
-Cache.prototype.read = function (this: Cache, statement: SelectStatement) {
+Cache.prototype.read = function (this: Cache, req: Request<SelectStatement>) {
     console.log(this, "Tries to read cache");
+    if (req.statement.target) return this.unions.get(req.statement.target.name)?.read(req);
+    else return new Promise(res => res("No write target"));
 }
 
-Cache.prototype.delete = function (this: Cache, statement: DeleteStatement) {
+Cache.prototype.delete = function (this: Cache, req: Request<DeleteStatement>) {
     console.log(this, "Tries to delete cache");
 }
 

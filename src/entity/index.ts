@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid';
 import { createMetaFile, MetaFile } from '../meta';
-import { DeleteStatement, InsertStatement, SelectStatement, TypedIdentifier, UpdateStatement } from './../parser/types';
+import { Request } from '../processor';
+import { DeleteStatement, InsertStatement, Literal, SelectStatement, TypedIdentifier, UpdateStatement } from './../parser/types';
 
 
 export type Entity = {
@@ -11,10 +12,11 @@ export type Entity = {
     setName: (name: string) => void;
     setId: (id: string) => void;
     setType: (type: string) => void;
-    write: (statement: InsertStatement) => Promise<any>;
-    update: (statement: UpdateStatement) => Promise<any>;
-    read: (statement: SelectStatement) => Promise<any>;
-    delete: (statement: DeleteStatement) => Promise<any>;
+    getIndices: (value: Literal) => Promise<number[]>;
+    write: (request: Request<InsertStatement>) => Promise<any>;
+    update: (statement: Request<UpdateStatement>) => Promise<any>;
+    read: (statement: Request<SelectStatement>) => Promise<any>;
+    delete: (statement: Request<DeleteStatement>) => Promise<any>;
 }
 
 function Entity(this: Entity, mf: MetaFile) {
@@ -33,20 +35,24 @@ Entity.prototype.setType = function (this: Entity, type: string) {
     this.type = type;
 }
 
-Entity.prototype.write = function (this: Entity, statement: InsertStatement) {
-    console.log(this, "Tries to write entity");
-    return this.mf.write(statement);
+Entity.prototype.getIndices = async function (this: Entity, value: Literal) {
+    return this.mf.getIndices(value);
 }
 
-Entity.prototype.update = function (this: Entity, statement: UpdateStatement) {
+Entity.prototype.write = function (this: Entity, req: Request<InsertStatement>) {
+    console.log(this, "Tries to write entity");
+    return this.mf.write(req);
+}
+
+Entity.prototype.update = function (this: Entity, req: Request<UpdateStatement>) {
     console.log(this, "Tries to update entity");
 }
 
-Entity.prototype.read = function (this: Entity, statement: SelectStatement) {
+Entity.prototype.read = function (this: Entity, req: Request<SelectStatement>) {
     console.log(this, "Tries to read entity");
 }
 
-Entity.prototype.delete = function (this: Entity, statement: DeleteStatement) {
+Entity.prototype.delete = function (this: Entity, req: Request<DeleteStatement>) {
     console.log(this, "Tries to read entity");
 }
 

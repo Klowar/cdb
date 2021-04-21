@@ -197,20 +197,21 @@ deleteStatement.prototype.setWhere = function (where) {
 }
 
 export default function scope(this: ScopeType) {
-    this.literal = (literal as unknown) as LiteralConstructor;
-    this.ast_root = (ast_root as unknown) as RootConstructor;
-    this.identifier = (identifier as unknown) as IdentifierConstructor;
-    this.typedIdentifier = (typedIdentifier as unknown) as TypedIdentifierConstructor;
-    // Expressions
-    this.unaryExpression = (unaryExpression as unknown) as UnaryExpressionConstructor;
-    this.binaryExpression = (binaryExpression as unknown) as BinaryExpressionConstructor;
-    // Statements
-    this.selectStatement = (selectStatement as unknown) as SelectStatementConstructor;
-    this.insertStatement = (insertStatement as unknown) as InsertStatementConstructor;
-    this.updateStatement = (updateStatement as unknown) as UpdateStatementConstructor;
-    this.deleteStatement = (deleteStatement as unknown) as DeleteStatementConstructor;
-    // DDL Statements
-    this.dropStatement = (dropStatement as unknown) as DropStatementConstructor;
-    this.alterStatement = (alterStatement as unknown) as AlterStatementConstructor;
-    this.createStatement = (createStatement as unknown) as CreateStatementConstructor;
 }
+
+scope.prototype.literal = literal;
+scope.prototype.ast_root = ast_root;
+scope.prototype.identifier = identifier;
+scope.prototype.typedIdentifier = typedIdentifier;
+// Expression
+scope.prototype.unaryExpression = unaryExpression;
+scope.prototype.binaryExpression = binaryExpression;
+// Statement
+scope.prototype.selectStatement = selectStatement;
+scope.prototype.insertStatement = insertStatement;
+scope.prototype.updateStatement = updateStatement;
+scope.prototype.deleteStatement = deleteStatement;
+// DDL
+scope.prototype.dropStatement = dropStatement;
+scope.prototype.alterStatement = alterStatement;
+scope.prototype.createStatement = createStatement;

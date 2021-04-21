@@ -1,5 +1,6 @@
+import { Request } from './../processor/index';
 import { createTemporaryFile, TemporaryFile } from '../temp';
-import { DeleteStatement, InsertStatement, SelectStatement, UpdateStatement } from './../parser/types';
+import { DeleteStatement, InsertStatement, SelectStatement, UpdateStatement, Literal } from './../parser/types';
 import { ENCODING_UTF_8 } from './constants';
 
 
@@ -15,9 +16,10 @@ export type MetaFile = {
     setBlockSize: (size: number) => void;
     setBlockAmount: (amount: number) => void;
     setEncoding: (enc: string) => void;
-    write: (statement: InsertStatement) => Promise<any>;
-    update: (statement: UpdateStatement) => Promise<any>;
-    read: (statement: SelectStatement) => Promise<any>;
+    getIndices: (value: Literal) => Promise<number[]>;
+    write: (statement: Request<InsertStatement>) => Promise<any>;
+    update: (statement: Request<UpdateStatement>) => Promise<any>;
+    read: (statement: Request<SelectStatement>) => Promise<any>;
 }
 
 function MetaFile(this: MetaFile, tf: TemporaryFile) {
@@ -47,7 +49,11 @@ MetaFile.prototype.setEncoding = function (this: MetaFile, enc: string) {
     this.encoding = enc;
 }
 
-MetaFile.prototype.write = function (this: MetaFile, statement: InsertStatement) {
+MetaFile.prototype.getIndices = async function (this: MetaFile, value: Literal) {
+    return this.tf.getIndices(0, this.blockAmount * this.blockSize, this.blockSize, value.value);
+}
+
+MetaFile.prototype.write = async function (this: MetaFile, statement: InsertStatement) {
     console.log(this, "Tries to write to meta file");
     return new Promise((res, rej) => {
         this.tf.write(this.blockAmount++ * this.blockSize, statement.values[this.index])
