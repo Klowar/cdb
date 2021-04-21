@@ -1,0 +1,55 @@
+import { NeverError } from './../error/index';
+/**
+ * 
+ * @param a1 !SORTED array of values
+ * @param a2 !SORTED array of values
+ * @returns intersection between two arrays
+ */
+export function intersection(a1: any[], a2: any[]): any[] {
+    let i1 = 0, i2 = 0;
+    const result: any[] = [];
+
+    while (i1 < a1.length && i2 < a2.length) {
+        if (a1[i1] < a2[i2]) { i1++; }
+        else if (a1[i1] > a2[i2]) { i2++; }
+        else /* they're equal */ {
+            result.push(a1[i1]);
+            i1++;
+            i2++;
+        }
+    }
+
+    return result;
+}
+
+export function containString(target: Buffer, candidat: any, candidatSize: number) {
+    let i = -candidatSize;
+    const element = Buffer.allocUnsafe(candidatSize);
+    while (element.toString() == candidat && i < target.byteLength) {
+        target.copy(element, 0, i += candidatSize);
+    }
+    return i < target.byteLength ? i : -1;
+}
+
+export function containNumber(target: Buffer, candidat: any, candidatSize: number) {
+    let i = -8;
+    while(target.readInt8(i += 8) != candidat && i < target.byteLength) continue;
+    return i < target.byteLength ? i : -1;
+}
+
+export function substraction(a1: number[], a2: number[]): number[] {
+    return a1.filter((e) => a2.indexOf(e) == -1);
+}
+
+export function union(a1: number[], a2: number[]) {
+    return [...new Set(a1.concat(a2)).values()];
+}
+
+export function range(size: number): number[] {
+    return [...Array(size).keys()];
+}
+
+export const dsu = (arr1, arr2) => arr1
+    .map((item, index) => [arr2[index], item]) // add the args to sort by
+    .sort(([arg1], [arg2]) => arg2 - arg1) // sort by the args
+    .map(([, item]) => item); // extract the sorted items
