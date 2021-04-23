@@ -198,14 +198,14 @@ condition_part:
         condition_part AND binary_expression {
             {
                 $$ = new yy.scope.binaryExpression({
-                    lParam: $2, rParam: $4, operator: $3
+                    lParam: $1, rParam: $3, operator: $2
                 });
             }
         }
     |   condition_part OR binary_expression {
             {
                 $$ = new yy.scope.binaryExpression({
-                    lParam: $2, rParam: $4, operator: $3
+                    lParam: $1, rParam: $3, operator: $2
                 });
             }
         }

@@ -195,16 +195,7 @@ case 41:
             }
         
 break;
-case 43: case 44:
-
-            {
-                this.$ = new yy.scope.binaryExpression({
-                    lParam: $$[$0-1], rParam: $$[$01], operator: $$[$0]
-                });
-            }
-        
-break;
-case 47: case 48:
+case 43: case 44: case 47: case 48:
 
             {
                 this.$ = new yy.scope.binaryExpression({
