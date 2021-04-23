@@ -2,6 +2,7 @@ import { nanoid } from 'nanoid';
 import { createMetaFile, MetaFile } from '../meta';
 import { Request } from '../processor';
 import { DeleteStatement, InsertStatement, Literal, SelectStatement, TypedIdentifier, UpdateStatement } from './../parser/types';
+import { getBlockSize } from './util';
 
 
 export type Entity = {
@@ -65,6 +66,7 @@ export function getEntity(mf: MetaFile): Entity {
 export function createEntity(req: TypedIdentifier): Entity {
     const metaFile = createMetaFile();
     metaFile.setIndex(req.index);
+    metaFile.setBlockSize(getBlockSize(req.type));
     const entity = new Entity(metaFile);
     entity.setType(req.type);
     entity.setName(req.name);

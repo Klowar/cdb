@@ -18,9 +18,11 @@ Filter.prototype.processWhere = async function (this: Filter, statement: SelectS
     let where = statement.where as BinaryExpression;
     // Planarize
     const planeExpression: BinaryExpression[] = [];
-    while (where.lParam instanceof scope.prototype.binaryExpression)
+    while (where.rParam instanceof scope.prototype.binaryExpression) {
         planeExpression.push(where.rParam as BinaryExpression);
-
+        where = where.lParam as BinaryExpression;
+    }
+    planeExpression.push(where);
     const entityIndicies = await Promise.all(
         planeExpression.map((_) => this.union.getEntity((_.lParam as Identifier).name).getIndices(_.rParam as Literal))
     );

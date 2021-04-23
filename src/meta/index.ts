@@ -53,24 +53,24 @@ MetaFile.prototype.getIndices = async function (this: MetaFile, value: Literal) 
     return this.tf.getIndices(0, this.blockAmount * this.blockSize, this.blockSize, value.value);
 }
 
-MetaFile.prototype.write = async function (this: MetaFile, statement: InsertStatement) {
+MetaFile.prototype.write = async function (this: MetaFile, req: Request<InsertStatement>) {
     console.log(this, "Tries to write to meta file");
     return new Promise((res, rej) => {
-        this.tf.write(this.blockAmount++ * this.blockSize, statement.values[this.index])
+        this.tf.write(this.blockAmount++ * this.blockSize, req.statement.values[this.index])
             .then(() => res(this.blockAmount))
             .catch(rej);
     });
 }
 
-MetaFile.prototype.update = function (this: MetaFile, statement: UpdateStatement) {
+MetaFile.prototype.update = function (this: MetaFile, statement: Request<UpdateStatement>) {
     console.log(this, "Tries to write to meta file");
 }
 
-MetaFile.prototype.read = function (this: MetaFile, statement: SelectStatement) {
+MetaFile.prototype.read = function (this: MetaFile, statement: Request<SelectStatement>) {
     console.log(this, "Tries to read the meta file");
 }
 
-MetaFile.prototype.delete = function (this: MetaFile, statement: DeleteStatement) {
+MetaFile.prototype.delete = function (this: MetaFile, statement: Request<DeleteStatement>) {
     console.log(this, "Tries to delete the meta file");
 }
 

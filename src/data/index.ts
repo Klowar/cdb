@@ -1,14 +1,14 @@
-import { Stats } from 'fs';
+import { constants, Stats } from 'fs';
 import { FileHandle, open, stat } from 'fs/promises';
 import { nanoid } from 'nanoid';
 import { join } from 'path';
-import { containString, containNumber } from '../util';
+import { containNumber, containString } from '../util';
 import { DATA_ROOT } from './../globals';
 import { Literal } from './../parser/types';
 import { DEFAULT_BUFFER_BYTE_SIZE, DEFAULT_READ_STEP } from './constants';
 
-const CREATE_MODE = 'wx+';
-const MODE = 'r+';
+const CREATE_MODE = constants.O_RDWR | constants.O_CREAT;
+const MODE = constants.O_NONBLOCK | constants.O_RDWR;
 const RIGHTS = 0o666;
 
 export type VirtualFile = {
@@ -22,7 +22,7 @@ export type VirtualFile = {
     setOffsetFile: (offsetFile: FileHandle) => void;
     setStat: (stat: Stats) => void;
     readIndices: (offset: number, amount: number, blockSize: number, value: string | number) => Promise<any>;
-    findOffset: (value: string | number, blockSize: number) => number;
+    findOffset: (value: string | number, blockSize: number) => Promise<number>;
     write: (offset: number, data: any) => Promise<any>;
     read: (offset: number, amount: number) => Promise<any>;
     delete: (offset: number, amount: number) => Promise<any>;
@@ -48,13 +48,13 @@ VirtualFile.prototype.setStat = function (this: VirtualFile, stat: Stats) {
 
 VirtualFile.prototype.readIndices = async function (this: VirtualFile, offset: number, amount: number, blockSize: number, value: string | number) {
     const indices: number[] = [];
-    const dataOffset = this.findOffset(value, blockSize);
+    const dataOffset = await this.findOffset(value, blockSize);
     if (dataOffset < 0) return indices;
-    
+
     let read;
     const buffer = Buffer.allocUnsafe(Math.min(DEFAULT_READ_STEP, amount));
     while ((read = await this.dataFile.read(buffer, offset)).bytesRead > 0 && amount > 0) {
-        for(let i = 0; i < read.bytesRead; i += 8) {
+        for (let i = 0; i < read.bytesRead; i += 8) {
             if (buffer.readInt8(i) == dataOffset)
                 indices.push(offset + i);
         }
@@ -69,12 +69,14 @@ VirtualFile.prototype.findOffset = async function (this: VirtualFile, value: str
     const buffer = Buffer.allocUnsafe(100 * blockSize);
     const scanner = typeof value === 'string' ? containString : containNumber;
     let offset = 0;
-    let read;
-    while ((read = await this.dataFile.read(buffer, offset)).bytesRead > 0) {
+    let read: { bytesRead: number; buffer: Buffer; };
+
+    do {
+        read = await this.dataFile.read(buffer, 0, buffer.byteLength, offset);
         const additionalOffset = scanner(buffer, value, blockSize);
         if (additionalOffset != -1) return offset + additionalOffset;
         offset += buffer.length;
-    }
+    } while (read.bytesRead > 0);
     return -1;
 }
 
