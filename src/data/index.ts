@@ -51,31 +51,31 @@ VirtualFile.prototype.readIndices = async function (this: VirtualFile, offset: n
     const dataOffset = await this.findOffset(value, blockSize);
     if (dataOffset < 0) return indices;
 
-    let read;
     const buffer = Buffer.allocUnsafe(Math.min(DEFAULT_READ_STEP, amount));
-    while ((read = await this.dataFile.read(buffer, offset)).bytesRead > 0 && amount > 0) {
-        for (let i = 0; i < read.bytesRead; i += 8) {
-            if (buffer.readInt8(i) == dataOffset)
+    let read: { bytesRead: number; buffer: Buffer; };
+    do {
+        read = await this.offsetFile.read(buffer, 0, buffer.length, offset);
+        for (let i = 0; i < read.bytesRead; i += 4)
+            if (buffer.readInt32BE(i) === dataOffset)
                 indices.push(offset + i);
-        }
-        amount -= buffer.length;
-        offset += buffer.length;
-    }
+        amount -= read.bytesRead;
+        offset += read.bytesRead;
+    } while (read.bytesRead > 0 && amount > 0);
 
     return indices;
 }
 
 VirtualFile.prototype.findOffset = async function (this: VirtualFile, value: string | number, blockSize: number) {
-    const buffer = Buffer.allocUnsafe(100 * blockSize);
+    const buffer = Buffer.allocUnsafe(128 * blockSize);
     const scanner = typeof value === 'string' ? containString : containNumber;
     let offset = 0;
     let read: { bytesRead: number; buffer: Buffer; };
 
     do {
         read = await this.dataFile.read(buffer, 0, buffer.byteLength, offset);
-        const additionalOffset = scanner(buffer, value, blockSize);
+        const additionalOffset = scanner(read.buffer, read.bytesRead, value, blockSize);
         if (additionalOffset != -1) return offset + additionalOffset;
-        offset += buffer.length;
+        offset += read.bytesRead;
     } while (read.bytesRead > 0);
     return -1;
 }
@@ -84,8 +84,8 @@ VirtualFile.prototype.write = async function (this: VirtualFile, offset: number,
     console.log(this, "Tries to write to data file");
     const arr = Buffer.alloc(blockSize);
     const offsetArray = Buffer.allocUnsafe(4);
-    typeof data.value === 'string' ? arr.write(data.value) : arr.writeUInt32BE(data.value);
-    offsetArray.writeInt32BE(offset);
+    typeof data.value === 'string' ? arr.write(data.value) : arr.writeInt32BE(data.value);
+    offsetArray.writeUInt32BE(offset);
     return Promise.all(
         [
             this.dataFile.write(arr, 0, arr.length, offset),
