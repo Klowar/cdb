@@ -23,7 +23,7 @@ export type VirtualFile = {
     setStat: (stat: Stats) => void;
     readIndices: (offset: number, amount: number, blockSize: number, value: string | number) => Promise<any>;
     findOffset: (value: string | number, blockSize: number) => Promise<number>;
-    write: (offset: number, data: any) => Promise<any>;
+    write: (offset: number, blockSize: number, data: any) => Promise<any>;
     read: (offset: number, amount: number) => Promise<any>;
     delete: (offset: number, amount: number) => Promise<any>;
 }
@@ -80,13 +80,16 @@ VirtualFile.prototype.findOffset = async function (this: VirtualFile, value: str
     return -1;
 }
 
-VirtualFile.prototype.write = async function (this: VirtualFile, offset: number, data: Literal) {
+VirtualFile.prototype.write = async function (this: VirtualFile, offset: number, blockSize: number, data: Literal) {
     console.log(this, "Tries to write to data file");
-    const arr = typeof data.value === 'string' ? Buffer.from(data.value) : Uint8Array.from([data.value]);
+    const arr = Buffer.alloc(blockSize);
+    const offsetArray = Buffer.allocUnsafe(4);
+    typeof data.value === 'string' ? arr.write(data.value) : arr.writeUInt32BE(data.value);
+    offsetArray.writeInt32BE(offset);
     return Promise.all(
         [
             this.dataFile.write(arr, 0, arr.length, offset),
-            this.offsetFile.write(Uint8Array.from([offset]))
+            this.offsetFile.write(offsetArray)
         ]
     );
 }

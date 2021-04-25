@@ -1,6 +1,6 @@
-import { Request } from './../processor/index';
 import { createTemporaryFile, TemporaryFile } from '../temp';
-import { DeleteStatement, InsertStatement, SelectStatement, UpdateStatement, Literal } from './../parser/types';
+import { DeleteStatement, InsertStatement, Literal, SelectStatement, UpdateStatement } from './../parser/types';
+import { Request } from './../processor/index';
 import { ENCODING_UTF_8 } from './constants';
 
 
@@ -56,7 +56,7 @@ MetaFile.prototype.getIndices = async function (this: MetaFile, value: Literal) 
 MetaFile.prototype.write = async function (this: MetaFile, req: Request<InsertStatement>) {
     console.log(this, "Tries to write to meta file");
     return new Promise((res, rej) => {
-        this.tf.write(this.blockAmount * this.blockSize, req.statement.values[this.index])
+        this.tf.write(this.blockAmount * this.blockSize, this.blockSize, req.statement.values[this.index])
             .then(() => res(++this.blockAmount))
             .catch(rej);
     });
