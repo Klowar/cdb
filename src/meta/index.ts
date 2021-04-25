@@ -56,8 +56,8 @@ MetaFile.prototype.getIndices = async function (this: MetaFile, value: Literal) 
 MetaFile.prototype.write = async function (this: MetaFile, req: Request<InsertStatement>) {
     console.log(this, "Tries to write to meta file");
     return new Promise((res, rej) => {
-        this.tf.write(this.blockAmount++ * this.blockSize, req.statement.values[this.index])
-            .then(() => res(this.blockAmount))
+        this.tf.write(this.blockAmount * this.blockSize, req.statement.values[this.index])
+            .then(() => res(++this.blockAmount))
             .catch(rej);
     });
 }

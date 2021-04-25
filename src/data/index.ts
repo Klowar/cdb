@@ -85,7 +85,7 @@ VirtualFile.prototype.write = async function (this: VirtualFile, offset: number,
     const arr = typeof data.value === 'string' ? Buffer.from(data.value) : Uint8Array.from([data.value]);
     return Promise.all(
         [
-            this.dataFile.write(arr, offset),
+            this.dataFile.write(arr, 0, arr.length, offset),
             this.offsetFile.write(Uint8Array.from([offset]))
         ]
     );
