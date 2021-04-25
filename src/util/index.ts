@@ -23,7 +23,8 @@ export function intersection(a1: any[], a2: any[]): any[] {
 
 export function containString(target: Buffer, bytesRead: number, candidat: any, candidatSize: number) {
     let i = 0;
-    const element = Buffer.from(candidat);
+    const element = Buffer.alloc(candidatSize);
+    element.write(candidat);
     while (!element.equals(target.subarray(i, candidatSize)) && i < bytesRead) i += candidatSize;
     return i < bytesRead ? i : -1;
 }
