@@ -113,8 +113,8 @@ This is an example of how to list things you need to use the software and how to
 
 Now we support 3 kind of queries.
 Honestly parser support alter, update, delete and other statements, but for now we do not realize their logic
-Also no client as psql, so just use netcat or 
-    ```sh
+Also no client as psql, so just use netcat or
+0.  ```sh
     sh src/client/client.sh
     ```
 1. 
