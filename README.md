@@ -12,7 +12,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/Klowar/cdb">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="images/logo.png" alt="Logo" width="256" height="256">
   </a>
 
   <h3 align="center">CBD</h3>
@@ -142,7 +142,8 @@ _For more examples, please refer to the [Documentation](https://github.com/Klowa
 <!-- ROADMAP -->
 ## Roadmap
 
-1. SELECTION support, CHARACTER size support
+1. SELECTION support
+2. CHARACTER size support
 
 See the [open issues](https://github.com/Klowar/cdb/issues) for a list of proposed features (and known issues).
 
