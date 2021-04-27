@@ -100,11 +100,11 @@ This is an example of how to list things you need to use the software and how to
    ```
 3. Build
     ```sh
-    yarn install
+    yarn build
     ```
 4. Start
    ```sh
-   yarn install
+   yarn start
    ```
 
 
