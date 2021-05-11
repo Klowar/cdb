@@ -115,8 +115,9 @@ export function createVirtualFile(): VirtualFile {
     const dataPath = join(DATA_ROOT, nanoid());
     const offsetPath = join(DATA_ROOT, nanoid());
     const vf = new VirtualFile(dataPath, offsetPath);
-    open(dataPath, CREATE_MODE, RIGHTS).then((fh) => vf.setDataFile(fh));
+    open(dataPath, CREATE_MODE, RIGHTS)
+        .then((fh) => vf.setDataFile(fh))
+        .then(() => stat(dataPath).then((st) => vf.setStat(st)));
     open(offsetPath, CREATE_MODE, RIGHTS).then((fh) => vf.setOffsetFile(fh));
-    stat(dataPath).then((st) => vf.setStat(st));
     return vf;
 }

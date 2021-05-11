@@ -1,7 +1,7 @@
 import { createUnion } from '../union';
-import { Cache, newCache } from './../cache/index';
 import { STATEMENTS } from './../parser/constants';
 import { AlterStatement, CreateStatement, DeleteStatement, DropStatement, InsertStatement, Root, SelectStatement, Statement, UpdateStatement } from './../parser/types';
+import { Union } from './../union/index';
 
 export type Request<T> = {
     statement: T,
@@ -13,7 +13,8 @@ function Request(this: Request<Statement>, statement: Statement) {
 }
 
 export type Processor = {
-    cache: Cache;
+    unions: Map<string, Union>;
+    addUnion: (union: Union) => Promise<any>;
     process: (query: Root) => Promise<any>;
     drop: (query: DropStatement) => Promise<any>;
     alter: (query: AlterStatement) => Promise<any>;
@@ -25,7 +26,7 @@ export type Processor = {
 }
 
 function Processor(this: Processor, config) {
-    this.cache = newCache({});
+    this.unions = new Map<string, Union>();
 }
 
 Processor.prototype.process = function (this: Processor, query: Root) {
@@ -45,16 +46,32 @@ Processor.prototype.process = function (this: Processor, query: Root) {
     }
 }
 
+Processor.prototype.addUnion = function (this: Processor, union: Union) {
+    this.unions.set(union.name, union);
+}
+
+Processor.prototype.has = function (this: Processor, name: string) {
+    return this.unions.has(name);
+}
+
+Processor.prototype.get = function (this: Processor, name: string) {
+    return this.unions.get(name);
+}
+
+Processor.prototype.remove = function (this: Processor, name: string) {
+    return this.unions.delete(name);
+}
+
 Processor.prototype.create = function (this: Processor, query: CreateStatement) {
     console.log("process create query", query);
-    if (query.target?.name && this.cache.has(query.target?.name)) return "Table already exists";
-    return createUnion(query).then((union) => this.cache.addUnion(union));
+    if (query.target?.name && this.unions.has(query.target?.name)) return "Table already exists";
+    return createUnion(query).then((union) => this.addUnion(union));
 }
 
 Processor.prototype.drop = function (this: Processor, query: DropStatement) {
     console.log("process drop query", query);
-    if (query.target?.name != null && !this.cache.has(query.target?.name)) return "Table does not exists";
-    return new Promise((res) => res(query.target != null ? this.cache.remove(query.target.name) : false));
+    if (query.target?.name != null && !this.unions.has(query.target?.name)) return "Table does not exists";
+    return new Promise((res) => res(query.target != null ? this.unions.delete(query.target.name) : false));
 }
 
 Processor.prototype.alter = function (this: Processor, query: AlterStatement) {
@@ -63,12 +80,14 @@ Processor.prototype.alter = function (this: Processor, query: AlterStatement) {
 
 Processor.prototype.select = function (this: Processor, query: SelectStatement) {
     console.log("process select query", query);
-    return this.cache.read(new Request(query));
+    if (query.target) return this.unions.get(query.target.name)?.read(new Request(query));
+    else return new Promise(res => res("No read target"));
 }
 
 Processor.prototype.insert = function (this: Processor, query: InsertStatement) {
     console.log("process insert query", query);
-    return this.cache.write(new Request(query));
+    if (query.target) return this.unions.get(query.target.name)?.write(new Request(query));
+    else return new Promise(res => res("No write target"));
 }
 
 Processor.prototype.update = function (this: Processor, query: UpdateStatement) {

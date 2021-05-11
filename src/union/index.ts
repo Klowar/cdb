@@ -54,8 +54,9 @@ Union.prototype.read = async function (this: Union, req: Request<SelectStatement
     console.log(this, "Tries to read union");
     req.filter = await this.filter.processWhere(req.statement);
     const arr = new Array(req.statement.columns.length);
-    for (const entity of this.entities.values())
-        arr.push(entity.read(req));
+    for(const entity of req.statement.columns) {
+        arr.push(this.entities.get(entity.name)?.read(req));
+    }
     return Promise.all(arr);
 }
 

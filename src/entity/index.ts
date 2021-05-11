@@ -1,12 +1,12 @@
 import { nanoid } from 'nanoid';
-import { createMetaFile, MetaFile } from '../meta';
 import { Request } from '../processor';
+import { Cache, newCache } from './../cache/index';
 import { DeleteStatement, InsertStatement, Literal, SelectStatement, TypedIdentifier, UpdateStatement } from './../parser/types';
-import { castTo, getBlockSize } from './util';
+import { castTo } from './util';
 
 
 export type Entity = {
-    mf: MetaFile;
+    cache: Cache;
     index: number;
     name: string;
     type: string;
@@ -23,8 +23,8 @@ export type Entity = {
     delete: (statement: Request<DeleteStatement>) => Promise<any>;
 }
 
-function Entity(this: Entity, mf: MetaFile) {
-    this.mf = mf;
+function Entity(this: Entity, cache: Cache) {
+    this.cache = cache;
 }
 
 Entity.prototype.setName = function (this: Entity, name: string) {
@@ -48,12 +48,12 @@ Entity.prototype.setIndex = function (this: Entity, index: number) {
 }
 
 Entity.prototype.getIndices = async function (this: Entity, value: Literal) {
-    return this.mf.getIndices(castTo(this.type, value));
+    return this.cache.getIndices(castTo(this.type, value));
 }
 
 Entity.prototype.write = function (this: Entity, req: Request<InsertStatement>) {
     console.log(this, "Tries to write entity");
-    return this.mf.write(castTo(this.type, req.statement.values[this.index]));
+    return this.cache.write(castTo(this.type, req.statement.values[this.index]));
 }
 
 Entity.prototype.update = function (this: Entity, req: Request<UpdateStatement>) {
@@ -62,6 +62,7 @@ Entity.prototype.update = function (this: Entity, req: Request<UpdateStatement>)
 
 Entity.prototype.read = function (this: Entity, req: Request<SelectStatement>) {
     console.log(this, "Tries to read entity");
+    return this.cache.read(req);
 }
 
 Entity.prototype.delete = function (this: Entity, req: Request<DeleteStatement>) {
@@ -69,15 +70,14 @@ Entity.prototype.delete = function (this: Entity, req: Request<DeleteStatement>)
 }
 
 
-export function getEntity(mf: MetaFile): Entity {
-    const vf = new Entity(mf);
+export function getEntity(cache: Cache): Entity {
+    const vf = new Entity(cache);
     return vf;
 }
 
 export function createEntity(req: TypedIdentifier): Entity {
-    const metaFile = createMetaFile();
-    metaFile.setBlockSize(getBlockSize(req.type));
-    const entity = new Entity(metaFile);
+    const cache = newCache(req);
+    const entity = new Entity(cache);
     entity.setIndex(req.index);
     entity.setType(req.type);
     entity.setName(req.name);

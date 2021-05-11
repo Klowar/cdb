@@ -1,46 +1,30 @@
-import { DeleteStatement, InsertStatement, SelectStatement, UpdateStatement } from './../parser/types';
+import { getBlockSize } from '../entity/util';
+import { createMetaFile, MetaFile } from './../meta/index';
+import { DeleteStatement, Literal, SelectStatement, TypedIdentifier, UpdateStatement } from './../parser/types';
 import { Request } from './../processor/index';
-import { Union } from './../union/index';
 
 export type Cache = {
-    unionCache: Map<string, Map<string, Map<string, string>>>;
-    unions: Map<string, Union>;
-    addUnion: (union: Union) => void;
-    has: (name: string) => boolean;
-    get: (name: string) => Union | undefined;
-    remove: (name: string) => boolean;
-    write: (statement: Request<InsertStatement>) => Promise<any>;
+    data: Map<string, any>;
+    mf: MetaFile;
+    getIndices: (value: Literal) => Promise<number[]>;
+    write: (statement: Literal) => Promise<any>;
     update: (statement: Request<UpdateStatement>) => Promise<any>;
     read: (statement: Request<SelectStatement>) => Promise<any>;
     delete: (statement: Request<DeleteStatement>) => Promise<any>;
 }
 
-function Cache(this: Cache, config: {}) {
-    // Each union has entity map and each entity map has padding to record mapping
-    this.unionCache = new Map<string, Map<string, Map<string, string>>>();
-    this.unions = new Map<string, Union>();
+function Cache(this: Cache, mf: MetaFile) {
+    this.mf = mf;
+    this.data = new Map<string, any>();
 }
 
-Cache.prototype.addUnion = function (this: Cache, union: Union) {
-    this.unions.set(union.name, union);
+Cache.prototype.getIndices = async function (this: Cache, value: Literal) {
+    return this.mf.getIndices(value);
 }
 
-Cache.prototype.has = function (this: Cache, name: string) {
-    return this.unions.has(name);
-}
-
-Cache.prototype.get = function (this: Cache, name: string) {
-    return this.unions.get(name);
-}
-
-Cache.prototype.remove = function (this: Cache, name: string) {
-    return this.unions.delete(name);
-}
-
-Cache.prototype.write = function (this: Cache, req: Request<InsertStatement>) {
+Cache.prototype.write = function (this: Cache, req: Literal) {
     console.log(this, "Tries to write cache");
-    if (req.statement.target) return this.unions.get(req.statement.target.name)?.write(req);
-    else return new Promise(res => res("No write target"));
+    return this.mf.write(req);
 }
 
 Cache.prototype.update = function (this: Cache, req: Request<UpdateStatement>) {
@@ -49,20 +33,19 @@ Cache.prototype.update = function (this: Cache, req: Request<UpdateStatement>) {
 
 Cache.prototype.read = function (this: Cache, req: Request<SelectStatement>) {
     console.log(this, "Tries to read cache");
-    if (req.statement.target) return this.unions.get(req.statement.target.name)?.read(req);
-    else return new Promise(res => res("No write target"));
 }
 
 Cache.prototype.delete = function (this: Cache, req: Request<DeleteStatement>) {
     console.log(this, "Tries to delete cache");
 }
 
-let cacheInstance: Cache | null = null;
 
-export function getCache(): Cache | null {
-    return cacheInstance;
+export function getCache(mf: MetaFile): Cache | null {
+    return new Cache(mf);
 }
 
-export function newCache(config: {}): Cache {
-    return cacheInstance = new Cache(config);
+export function newCache(req: TypedIdentifier): Cache {
+    const metaFile = createMetaFile();
+    metaFile.setBlockSize(getBlockSize(req.type));
+    return new Cache(metaFile);
 }
