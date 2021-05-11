@@ -105,9 +105,10 @@ VirtualFile.prototype.delete = async function (this: VirtualFile, offset: number
 
 export function getVirtualFile(path: string, offsetPath: string, mode = MODE): VirtualFile {
     const vf = new VirtualFile(path, offsetPath);
-    open(path, mode, RIGHTS).then((fh) => vf.setDataFile(fh));
+    open(path, mode, RIGHTS)
+        .then((fh) => vf.setDataFile(fh))
+        .then(() => stat(path).then((st) => vf.setStat(st)));
     open(offsetPath, mode, RIGHTS).then((fh) => vf.setOffsetFile(fh));
-    stat(path).then((st) => vf.setStat(st));
     return vf;
 }
 
