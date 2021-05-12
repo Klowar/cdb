@@ -2,6 +2,8 @@ import { nanoid } from 'nanoid';
 import { createVirtualFile, getVirtualFile, VirtualFile } from '../data';
 import { DEFAULT_LOCK_SIZE } from './constants';
 
+
+
 export type TemporaryFile = {
     vf: VirtualFile;
     target: VirtualFile;
@@ -13,7 +15,7 @@ export type TemporaryFile = {
     setTarget: (target: VirtualFile) => void;
     getIndices: (offset: number, amount: number, blockSize: number, value: string | number) => Promise<number[]>;
     write: (offset: number, blockSize: number, data: any) => Promise<any>;
-    read: (offset: number, amount: number) => Promise<any>;
+    read: (offset: number, blockSize: number, amount: number) => Promise<{ bytesRead: number; buffer: Buffer; }>;
     delete: (offset: number, amount: number) => Promise<any>;
 }
 
@@ -38,8 +40,9 @@ TemporaryFile.prototype.write = async function (this: TemporaryFile, offset: num
     return this.target.write(offset, blockSize, data);
 }
 
-TemporaryFile.prototype.read = async function (this: TemporaryFile, offset: number, amount: number) {
+TemporaryFile.prototype.read = async function (this: TemporaryFile, record: number, blockSize: number, amount: number) {
     console.log(this, "Tries to read temp file");
+    return this.target.read(record, amount);
 }
 
 TemporaryFile.prototype.delete = async function (this: TemporaryFile, offset: number, amount: number) {

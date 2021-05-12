@@ -5,11 +5,11 @@ import { DeleteStatement, InsertStatement, Literal, SelectStatement, TypedIdenti
 import { castTo } from './util';
 
 
+
 export type Entity = {
     cache: Cache;
     index: number;
     name: string;
-    type: string;
     id: string;
     setName: (name: string) => void;
     setId: (id: string) => void;
@@ -35,10 +35,6 @@ Entity.prototype.setId = function (this: Entity, id: string) {
     this.id = id;
 }
 
-Entity.prototype.setType = function (this: Entity, type: string) {
-    this.type = type;
-}
-
 Entity.prototype.getIndex = function (this: Entity) {
     return this.index;
 }
@@ -48,12 +44,12 @@ Entity.prototype.setIndex = function (this: Entity, index: number) {
 }
 
 Entity.prototype.getIndices = async function (this: Entity, value: Literal) {
-    return this.cache.getIndices(castTo(this.type, value));
+    return this.cache.getIndices(castTo(this.cache.getDataType(), value));
 }
 
 Entity.prototype.write = function (this: Entity, req: Request<InsertStatement>) {
     console.log(this, "Tries to write entity");
-    return this.cache.write(castTo(this.type, req.statement.values[this.index]));
+    return this.cache.write(castTo(this.cache.getDataType(), req.statement.values[this.index]));
 }
 
 Entity.prototype.update = function (this: Entity, req: Request<UpdateStatement>) {
@@ -62,7 +58,7 @@ Entity.prototype.update = function (this: Entity, req: Request<UpdateStatement>)
 
 Entity.prototype.read = function (this: Entity, req: Request<SelectStatement>) {
     console.log(this, "Tries to read entity");
-    return this.cache.read(req);
+    return this.cache.read(req.filter);
 }
 
 Entity.prototype.delete = function (this: Entity, req: Request<DeleteStatement>) {
@@ -79,7 +75,6 @@ export function createEntity(req: TypedIdentifier): Entity {
     const cache = newCache(req);
     const entity = new Entity(cache);
     entity.setIndex(req.index);
-    entity.setType(req.type);
     entity.setName(req.name);
     entity.setId(nanoid());
     return entity;

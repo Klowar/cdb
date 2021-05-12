@@ -1,22 +1,26 @@
 import { createTemporaryFile, TemporaryFile } from '../temp';
-import { DeleteStatement, Literal, SelectStatement, UpdateStatement } from './../parser/types';
+import { DeleteStatement, Literal, UpdateStatement } from './../parser/types';
 import { Request } from './../processor/index';
 import { ENCODING_UTF_8 } from './constants';
+import { buildType } from './util';
 
 
 
 export type MetaFile = {
     tf: TemporaryFile;
+    dataType: string;
     blockSize: number;
     blockAmount: number;
     encoding: string;
+    getDataType: () => string;
+    setDataType: (dataType: string) => void;
     setBlockSize: (size: number) => void;
     setBlockAmount: (amount: number) => void;
     setEncoding: (enc: string) => void;
     getIndices: (value: Literal) => Promise<number[]>;
     write: (statement: Literal) => Promise<any>;
     update: (statement: Request<UpdateStatement>) => Promise<any>;
-    read: (statement: Request<SelectStatement>) => Promise<any>;
+    read: (statement: number[] | undefined) => Promise<any>;
 }
 
 function MetaFile(this: MetaFile, tf: TemporaryFile) {
@@ -24,6 +28,14 @@ function MetaFile(this: MetaFile, tf: TemporaryFile) {
     this.blockSize = 0;
     this.blockAmount = 0;
     this.encoding = ENCODING_UTF_8;
+}
+
+MetaFile.prototype.getDataType = function (this: MetaFile) {
+    return this.dataType;
+}
+
+MetaFile.prototype.setDataType = function (this: MetaFile, dataType: string) {
+    this.dataType = dataType;
 }
 
 MetaFile.prototype.setBlockSize = function (this: MetaFile, size: number) {
@@ -51,15 +63,24 @@ MetaFile.prototype.write = async function (this: MetaFile, lit: Literal) {
     });
 }
 
-MetaFile.prototype.update = function (this: MetaFile, statement: Request<UpdateStatement>) {
+MetaFile.prototype.update = function (this: MetaFile, req: Request<UpdateStatement>) {
     console.log(this, "Tries to write to meta file");
 }
 
-MetaFile.prototype.read = function (this: MetaFile, statement: Request<SelectStatement>) {
+MetaFile.prototype.read = async function (this: MetaFile, req: number[] | undefined) {
     console.log(this, "Tries to read the meta file");
+    if (req === undefined) return new Promise(() => []);
+    // TODO: Change read strategy
+    return Promise.all(
+        req.map((record) => {
+            return this.tf.read(record, this.blockSize, this.blockSize).then((val) => {
+                return buildType(this.dataType, val.buffer);
+            })
+        })
+    )
 }
 
-MetaFile.prototype.delete = function (this: MetaFile, statement: Request<DeleteStatement>) {
+MetaFile.prototype.delete = function (this: MetaFile, req: Request<DeleteStatement>) {
     console.log(this, "Tries to delete the meta file");
 }
 

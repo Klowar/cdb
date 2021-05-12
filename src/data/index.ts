@@ -24,7 +24,7 @@ export type VirtualFile = {
     readIndices: (offset: number, amount: number, blockSize: number, value: string | number) => Promise<any>;
     findOffset: (value: string | number, blockSize: number) => Promise<number>;
     write: (offset: number, blockSize: number, data: any) => Promise<any>;
-    read: (offset: number, amount: number) => Promise<any>;
+    read: (offset: number, amount: number) => Promise<{ bytesRead: number; buffer: Buffer; }>;
     delete: (offset: number, amount: number) => Promise<any>;
 }
 
@@ -57,7 +57,7 @@ VirtualFile.prototype.readIndices = async function (this: VirtualFile, offset: n
         read = await this.offsetFile.read(buffer, 0, buffer.length, offset);
         for (let i = 0; i < read.bytesRead; i += 4)
             if (buffer.readInt32BE(i) === dataOffset)
-                indices.push(offset + i);
+                indices.push(i / 4);
         amount -= read.bytesRead;
         offset += read.bytesRead;
     } while (read.bytesRead > 0 && amount > 0);
@@ -94,11 +94,14 @@ VirtualFile.prototype.write = async function (this: VirtualFile, offset: number,
     );
 }
 
-VirtualFile.prototype.read = async function (this: VirtualFile, offset: number, amount: number) {
+VirtualFile.prototype.read = async function (this: VirtualFile, record: number, amount: number) {
     console.log(this, "Tries to read the data file");
+    return this.offsetFile.read(Buffer.allocUnsafe(4), 0, 4, record * 4).then((val) =>
+        this.dataFile.read(Buffer.allocUnsafe(amount), 0, amount, val.buffer.readInt32BE())
+    );
 }
 
-VirtualFile.prototype.delete = async function (this: VirtualFile, offset: number, amount: number) {
+VirtualFile.prototype.delete = async function (this: VirtualFile, record: number, amount: number) {
     console.log(this, "Tries to delete the data file");
 }
 
