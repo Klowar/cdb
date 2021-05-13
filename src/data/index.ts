@@ -4,7 +4,6 @@ import { nanoid } from 'nanoid';
 import { join } from 'path';
 import { containNumber, containString } from '../util';
 import { DATA_ROOT } from './../globals';
-import { Literal } from './../parser/types';
 import { DEFAULT_BUFFER_BYTE_SIZE, DEFAULT_READ_STEP } from './constants';
 
 const CREATE_MODE = constants.O_RDWR | constants.O_CREAT;
@@ -23,8 +22,8 @@ export type VirtualFile = {
     setStat: (stat: Stats) => void;
     readIndices: (offset: number, amount: number, blockSize: number, value: string | number) => Promise<any>;
     findOffset: (value: string | number, blockSize: number) => Promise<number>;
-    write: (offset: number, blockSize: number, data: any) => Promise<any>;
-    read: (offset: number, amount: number) => Promise<{ bytesRead: number; buffer: Buffer; }>;
+    write: (offset: number, blockSize: number, data: string | number) => Promise<any>;
+    read: (record: number, amount: number) => Promise<{ bytesRead: number; buffer: Buffer; }>;
     delete: (offset: number, amount: number) => Promise<any>;
 }
 
@@ -80,11 +79,11 @@ VirtualFile.prototype.findOffset = async function (this: VirtualFile, value: str
     return -1;
 }
 
-VirtualFile.prototype.write = async function (this: VirtualFile, offset: number, blockSize: number, data: Literal) {
+VirtualFile.prototype.write = async function (this: VirtualFile, offset: number, blockSize: number, data: number | string) {
     console.log(this, "Tries to write to data file");
     const arr = Buffer.alloc(blockSize);
     const offsetArray = Buffer.allocUnsafe(4);
-    typeof data.value === 'string' ? arr.write(data.value) : arr.writeInt32BE(data.value);
+    typeof data === 'string' ? arr.write(data) : arr.writeInt32BE(data);
     offsetArray.writeUInt32BE(offset);
     return Promise.all(
         [
@@ -97,7 +96,7 @@ VirtualFile.prototype.write = async function (this: VirtualFile, offset: number,
 VirtualFile.prototype.read = async function (this: VirtualFile, record: number, amount: number) {
     console.log(this, "Tries to read the data file");
     return this.offsetFile.read(Buffer.allocUnsafe(4), 0, 4, record * 4).then((val) =>
-        this.dataFile.read(Buffer.allocUnsafe(amount), 0, amount, val.buffer.readInt32BE())
+        this.dataFile.read(Buffer.allocUnsafe(amount), 0, amount, val.buffer.readUInt32BE())
     );
 }
 

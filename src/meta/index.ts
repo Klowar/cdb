@@ -1,5 +1,5 @@
-import { createTemporaryFile, TemporaryFile } from '../temp';
-import { DeleteStatement, Literal, UpdateStatement } from './../parser/types';
+import { createVirtualFile, VirtualFile } from './../data/index';
+import { DeleteStatement, UpdateStatement } from './../parser/types';
 import { Request } from './../processor/index';
 import { ENCODING_UTF_8 } from './constants';
 import { buildType } from './util';
@@ -7,7 +7,7 @@ import { buildType } from './util';
 
 
 export type MetaFile = {
-    tf: TemporaryFile;
+    vf: VirtualFile;
     dataType: string;
     blockSize: number;
     blockAmount: number;
@@ -17,14 +17,14 @@ export type MetaFile = {
     setBlockSize: (size: number) => void;
     setBlockAmount: (amount: number) => void;
     setEncoding: (enc: string) => void;
-    getIndices: (value: Literal) => Promise<number[]>;
-    write: (statement: Literal) => Promise<any>;
+    getIndices: (value: string | number) => Promise<number[]>;
+    write: (statement: string | number) => Promise<any>;
     update: (statement: Request<UpdateStatement>) => Promise<any>;
     read: (statement: number[] | undefined) => Promise<any>;
 }
 
-function MetaFile(this: MetaFile, tf: TemporaryFile) {
-    this.tf = tf;
+function MetaFile(this: MetaFile, vf: VirtualFile) {
+    this.vf = vf;
     this.blockSize = 0;
     this.blockAmount = 0;
     this.encoding = ENCODING_UTF_8;
@@ -50,14 +50,14 @@ MetaFile.prototype.setEncoding = function (this: MetaFile, enc: string) {
     this.encoding = enc;
 }
 
-MetaFile.prototype.getIndices = async function (this: MetaFile, value: Literal) {
-    return this.tf.getIndices(0, this.blockAmount * this.blockSize, this.blockSize, value.value);
+MetaFile.prototype.getIndices = async function (this: MetaFile, value: number | string) {
+    return this.vf.readIndices(0, this.blockAmount * this.blockSize, this.blockSize, value);
 }
 
-MetaFile.prototype.write = async function (this: MetaFile, lit: Literal) {
+MetaFile.prototype.write = async function (this: MetaFile, lit: string | number) {
     console.log(this, "Tries to write to meta file");
     return new Promise((res, rej) => {
-        this.tf.write(this.blockAmount * this.blockSize, this.blockSize, lit)
+        this.vf.write(this.blockAmount * this.blockSize, this.blockSize, lit)
             .then(() => res(++this.blockAmount))
             .catch(rej);
     });
@@ -73,7 +73,7 @@ MetaFile.prototype.read = async function (this: MetaFile, req: number[] | undefi
     // TODO: Change read strategy
     return Promise.all(
         req.map((record) => {
-            return this.tf.read(record, this.blockSize, this.blockSize).then((val) => {
+            return this.vf.read(record, this.blockSize).then((val) => {
                 return buildType(this.dataType, val.buffer);
             })
         })
@@ -84,14 +84,13 @@ MetaFile.prototype.delete = function (this: MetaFile, req: Request<DeleteStateme
     console.log(this, "Tries to delete the meta file");
 }
 
-export function getMetaFile(tf: TemporaryFile): MetaFile {
-    const vf = new MetaFile(tf);
+export function getMetaFile(vf: VirtualFile): MetaFile {
+    const mf = new MetaFile(vf);
 
-    return vf;
+    return mf;
 }
 
 export function createMetaFile(): MetaFile {
-    const vf = new MetaFile(createTemporaryFile());
-
-    return vf;
+    const mf = new MetaFile(createVirtualFile());
+    return mf;
 }

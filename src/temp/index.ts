@@ -1,25 +1,30 @@
-import { nanoid } from 'nanoid';
-import { createVirtualFile, getVirtualFile, VirtualFile } from '../data';
+import { VirtualFile } from '../data';
+import { createMetaFile, MetaFile } from './../meta/index';
+import { Literal, UpdateStatement } from './../parser/types';
+import { Request } from './../processor/index';
 import { DEFAULT_LOCK_SIZE } from './constants';
 
 
 
 export type TemporaryFile = {
-    vf: VirtualFile;
-    target: VirtualFile;
+    vf: MetaFile;
+    target: MetaFile;
     lockOn: {
         size?: number,
         time?: Date
     };
     deadArr: number[]; // indicies, not bitmap,
+    getDataType: () => string;
+    setDataType: (dataType: string) => void;
+    setBlockSize: (size: number) => void;
     setTarget: (target: VirtualFile) => void;
-    getIndices: (offset: number, amount: number, blockSize: number, value: string | number) => Promise<number[]>;
-    write: (offset: number, blockSize: number, data: any) => Promise<any>;
-    read: (offset: number, blockSize: number, amount: number) => Promise<{ bytesRead: number; buffer: Buffer; }>;
-    delete: (offset: number, amount: number) => Promise<any>;
+    getIndices: (value: Literal) => Promise<number[]>;
+    write: (statement: Literal) => Promise<any>;
+    update: (statement: Request<UpdateStatement>) => Promise<any>;
+    read: (statement: number[] | undefined) => Promise<any>;
 }
 
-function TemporaryFile(this: TemporaryFile, vf: VirtualFile) {
+function TemporaryFile(this: TemporaryFile, vf: MetaFile) {
     this.vf = vf;
     this.lockOn = {
         size: DEFAULT_LOCK_SIZE
@@ -27,22 +32,36 @@ function TemporaryFile(this: TemporaryFile, vf: VirtualFile) {
     this.deadArr = [];
 }
 
-TemporaryFile.prototype.setTarget = function (this: TemporaryFile, target: VirtualFile) {
+TemporaryFile.prototype.getDataType = function (this: TemporaryFile) {
+    return this.target.getDataType();
+}
+
+TemporaryFile.prototype.setDataType = function (this: TemporaryFile, dataType: string) {
+    this.target.setDataType(dataType);
+    this.vf.setDataType(dataType);
+}
+
+TemporaryFile.prototype.setBlockSize = function (this: TemporaryFile, size: number) {
+    this.target.setBlockSize(size);
+    this.vf.setBlockSize(size);
+}
+
+TemporaryFile.prototype.setTarget = function (this: TemporaryFile, target: MetaFile) {
     this.target = target;
 }
 
-TemporaryFile.prototype.getIndices = async function (this: TemporaryFile, offset: number, amount: number, blockSize: number, value: string | number) {
-    return this.target.readIndices(offset, amount, blockSize, value);
+TemporaryFile.prototype.getIndices = async function (this: TemporaryFile, value: Literal) {
+    return this.target.getIndices(value.value);
 }
 
-TemporaryFile.prototype.write = async function (this: TemporaryFile, offset: number, blockSize: number, data: any) {
+TemporaryFile.prototype.write = async function (this: TemporaryFile, data: Literal) {
     console.log(this, "Tries to write temp file");
-    return this.target.write(offset, blockSize, data);
+    return this.target.write(data.value);
 }
 
-TemporaryFile.prototype.read = async function (this: TemporaryFile, record: number, blockSize: number, amount: number) {
+TemporaryFile.prototype.read = async function (this: TemporaryFile, req: number[] | undefined) {
     console.log(this, "Tries to read temp file");
-    return this.target.read(record, amount);
+    return this.target.read(req);
 }
 
 TemporaryFile.prototype.delete = async function (this: TemporaryFile, offset: number, amount: number) {
@@ -50,15 +69,15 @@ TemporaryFile.prototype.delete = async function (this: TemporaryFile, offset: nu
 }
 
 
-export function getTemporaryFile(vf: VirtualFile): TemporaryFile {
-    const tf = new TemporaryFile(vf);
-    tf.setTarget(getVirtualFile(nanoid(), nanoid()));
+export function getTemporaryFile(mf: MetaFile): TemporaryFile {
+    const tf = new TemporaryFile(mf);
+    tf.setTarget(createMetaFile());
 
     return tf;
 }
 
 export function createTemporaryFile(): TemporaryFile {
-    const tf = new TemporaryFile(createVirtualFile());
-    tf.setTarget(createVirtualFile());
+    const tf = new TemporaryFile(createMetaFile());
+    tf.setTarget(createMetaFile());
     return tf;
 }
