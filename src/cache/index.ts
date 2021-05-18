@@ -55,6 +55,6 @@ export function getCache(tf: TemporaryFile): Cache | null {
 export function newCache(req: TypedIdentifier): Cache {
     const tf = createTemporaryFile();
     tf.setDataType(req.type);
-    tf.setBlockSize(getBlockSize(req.type));
+    tf.setBlockSize(req.size ? Number(req.size) : getBlockSize(req.type));
     return new Cache(tf);
 }

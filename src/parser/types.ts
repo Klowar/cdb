@@ -12,6 +12,7 @@ export type Identifier = {
 export type TypedIdentifier = {
     name: string;
     type: string;
+    size: number | undefined;
     index: number;
 }
 

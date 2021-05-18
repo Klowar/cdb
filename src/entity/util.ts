@@ -5,8 +5,6 @@ const scopeInstance: ScopeType = new scope();
 
 export function getBlockSize(type: string): number {
     switch (type) {
-        case 'CHARACTER':
-            return 100;
         case 'INTEGER':
             return 4;
         default:

@@ -32,10 +32,11 @@ identifier.prototype.setIndex = function (index) {
 }
 
 typedIdentifier.prototype = Object.create(null);
-function typedIdentifier(this: TypedIdentifier, obj?: { name: string, type: string, index?: number }) {
+function typedIdentifier(this: TypedIdentifier, obj?: { name: string, type: string, size?: number, index?: number }) {
     if (obj !== undefined) {
         this.name = obj.name;
         this.type = obj.type;
+        this.size = obj.size;
         this.index = obj.index || 0;
     }
 }
