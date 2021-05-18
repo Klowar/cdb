@@ -25,7 +25,7 @@ export function containString(target: Buffer, bytesRead: number, candidat: any, 
     let i = 0;
     const element = Buffer.alloc(candidatSize);
     element.write(candidat);
-    while (!element.equals(target.subarray(i, candidatSize)) && i < bytesRead) i += candidatSize;
+    while (!element.equals(target.subarray(i, i + candidatSize)) && i < bytesRead) i += candidatSize;
     return i < bytesRead ? i : -1;
 }
 
