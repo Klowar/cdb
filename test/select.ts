@@ -1,21 +1,18 @@
-import parser from '../src/compiler';
-import scope from './sqope';
+import { Parser } from '../src/parser';
 
 
 describe("Parser.parse", function select() {
 
-    before(function setup() {
-        parser.parser.yy.scope = new scope();
-    })
+    let parser = new Parser();
 
     beforeEach(function setup() {
-        parser.parser.yy.ast = new parser.parser.yy.scope.ast_root();
+        parser = new Parser();
     });
 
     afterEach(function cleanup() {
-        // console.dir(parser.parser.yy.ast.statement);
+        console.dir(parser.parser.yy.ast.statement);
     });
-    
+
     it("all column select", function all_column_select() {
         parser.parse('SELECT * FROM t1;');
     });
