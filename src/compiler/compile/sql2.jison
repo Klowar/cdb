@@ -302,9 +302,9 @@ ddl_identifier:
                 $$ = new yy.scope.typedIdentifier({ name: $1, type: $2 })
             }
         }
-    |   NAME type constraint {
+    |   NAME sized_type '(' INTNUM ')' {
             {
-                $$ = new yy.scope.typedIdentifier({ name: $1, type: $2 });
+                $$ = new yy.scope.typedIdentifier({ name: $1, type: $2, size: $4 })
             }
         }
     ;
@@ -317,10 +317,13 @@ constraint:
 type:
         INTEGER
     |   DOUBLE
-    |   CHARACTER
     |   DECIMAL
     |   FLOAT
     |   DATETIME
+    ;
+
+sized_type:
+        CHARACTER
     ;
 
 multi_literal:
