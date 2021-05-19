@@ -3,12 +3,15 @@ import { createMetaFile, MetaFile } from './../meta/index';
 import { Literal, UpdateStatement } from './../parser/types';
 import { Request } from './../processor/index';
 import { DEFAULT_LOCK_SIZE } from './constants';
+import { StreamJob } from './job';
 
 
 
 export type TemporaryFile = {
     vf: MetaFile;
     target: MetaFile;
+    streamJob: StreamJob;
+    streamOffset: number;
     lockOn: {
         size?: number,
         time?: Date
@@ -26,6 +29,8 @@ export type TemporaryFile = {
 
 function TemporaryFile(this: TemporaryFile, vf: MetaFile) {
     this.vf = vf;
+    this.streamJob = new StreamJob(this).start();
+    this.streamOffset = 0;
     this.lockOn = {
         size: DEFAULT_LOCK_SIZE
     };
@@ -56,12 +61,13 @@ TemporaryFile.prototype.getIndices = async function (this: TemporaryFile, value:
 
 TemporaryFile.prototype.write = async function (this: TemporaryFile, data: Literal) {
     console.log(this, "Tries to write temp file");
-    return this.target.write(data.value);
+    return this.vf.write(data.value);
 }
 
 TemporaryFile.prototype.read = async function (this: TemporaryFile, req: number[] | undefined) {
     console.log(this, "Tries to read temp file");
-    return this.target.read(req);
+    if (req === undefined) return new Promise(() => []);
+    return Promise.all([this.target.read(req.filter(_ => _ > this.streamOffset)), this.vf.read(req)]);
 }
 
 TemporaryFile.prototype.delete = async function (this: TemporaryFile, offset: number, amount: number) {

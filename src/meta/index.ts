@@ -14,12 +14,17 @@ export type MetaFile = {
     encoding: string;
     getDataType: () => string;
     setDataType: (dataType: string) => void;
+    getBlockSize: () => number;
     setBlockSize: (size: number) => void;
+    getBlockAmount: () => number;
     setBlockAmount: (amount: number) => void;
     setEncoding: (enc: string) => void;
     getIndices: (value: string | number) => Promise<number[]>;
+    getOffset: (value: string | number) => Promise<number>;
     write: (statement: string | number) => Promise<any>;
+    writeOffset: (offset: number) => Promise<any>;
     update: (statement: Request<UpdateStatement>) => Promise<any>;
+    readRange: (start: number, end: number) => Promise<any>;
     read: (statement: number[] | undefined) => Promise<any>;
 }
 
@@ -38,8 +43,16 @@ MetaFile.prototype.setDataType = function (this: MetaFile, dataType: string) {
     this.dataType = dataType;
 }
 
+MetaFile.prototype.getBlockSize = function (this: MetaFile) {
+    return this.blockSize;
+}
+
 MetaFile.prototype.setBlockSize = function (this: MetaFile, size: number) {
     this.blockSize = size;
+}
+
+MetaFile.prototype.getBlockAmount = function (this: MetaFile) {
+    return this.blockAmount;
 }
 
 MetaFile.prototype.setBlockAmount = function (this: MetaFile, amount: number) {
@@ -54,13 +67,18 @@ MetaFile.prototype.getIndices = async function (this: MetaFile, value: number | 
     return this.vf.readIndices(0, this.blockAmount * this.blockSize, this.blockSize, value);
 }
 
+MetaFile.prototype.getOffset = async function (this: MetaFile, value: number | string) {
+    return this.vf.findOffset(value, this.blockSize);
+}
+
 MetaFile.prototype.write = async function (this: MetaFile, lit: string | number) {
     console.log(this, "Tries to write to meta file");
-    return new Promise((res, rej) => {
-        this.vf.write(this.blockAmount * this.blockSize, this.blockSize, lit)
-            .then(() => res(++this.blockAmount))
-            .catch(rej);
-    });
+    return this.vf.write(this.blockAmount * this.blockSize, this.blockSize, lit)
+        .then(() => ++this.blockAmount);
+}
+
+MetaFile.prototype.writeOffset = async function (this: MetaFile, offset: number) {
+    return this.vf.writeOffset(offset).then(() => ++this.blockAmount);
 }
 
 MetaFile.prototype.update = function (this: MetaFile, req: Request<UpdateStatement>) {
@@ -78,6 +96,20 @@ MetaFile.prototype.read = async function (this: MetaFile, req: number[] | undefi
             })
         })
     )
+}
+
+MetaFile.prototype.readRange = async function (this: MetaFile, start: number, end: number) {
+    console.log(this, "Tries to read the meta file");
+    // TODO: Change read strategy
+    const promises: Promise<any>[] = [];
+    for (let i = start; i < end; i++) {
+        promises.push(
+            this.vf.read(i, this.blockSize).then((val) => {
+                return buildType(this.dataType, val.buffer);
+            })
+        );
+    }
+    return Promise.all(promises)
 }
 
 MetaFile.prototype.delete = function (this: MetaFile, req: Request<DeleteStatement>) {
