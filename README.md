@@ -111,18 +111,18 @@ This is an example of how to list things you need to use the software and how to
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Now we support 3 kind of queries.
-Honestly parser support alter, update, delete and other statements, but for now we do not realize their logic
-Also no client as psql, so just use netcat
+No client and protocol described, so use netcat instead or just connect to 9999 port, or u did specify
+
+
 1.  Connect
     ```sh
     sh src/client/client.sh
     ```
-2. CREATE
+2. Create statment currently 2 data types - CHARACTER(number), INTEGER
     ```sh
     CREATE TABLE users(...);
     ```
-3. INSERT
+3. Insert statement
     ```sh
     INSERT INTO users(...) VALUES (...); 
     ```
@@ -130,7 +130,12 @@ Also no client as psql, so just use netcat
     ```sh
     INSERT INTO users VALUES (...); 
     ```
-4. DROP
+4. We support Selections only with 'WHERE' statement
+   ```sh
+    SELECT name, age FROM users WHERE age > 10;
+    SELECT name, age FROM users WHERE name == 'Carl';
+    ```
+5. DROP
     ```sh
     DROP TABLE users;
     ```
@@ -143,8 +148,10 @@ _For more examples, please refer to the [Documentation](https://github.com/Klowa
 <!-- ROADMAP -->
 ## Roadmap
 
-1. SELECTION support
-2. CHARACTER size support
+1. Writters for data types
+2. Update operator
+3. Delete operator
+4. Alter operator
 
 See the [open issues](https://github.com/Klowar/cdb/issues) for a list of proposed features (and known issues).
 
