@@ -320,6 +320,7 @@ type:
     |   DECIMAL
     |   FLOAT
     |   DATETIME
+    |   VARCHAR
     ;
 
 sized_type:
