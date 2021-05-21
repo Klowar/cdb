@@ -4,25 +4,28 @@ import { nanoid } from 'nanoid';
 import { join } from 'path';
 import { containNumber, containString } from '../util';
 import { DATA_ROOT } from './../globals';
-import { DEFAULT_BUFFER_BYTE_SIZE, DEFAULT_READ_STEP } from './constants';
+import { Reader } from './../meta/reader/reader';
+import { Writer } from './../meta/writer/writer';
+import { DEFAULT_READ_STEP } from './constants';
 
 const CREATE_MODE = constants.O_RDWR | constants.O_CREAT;
 const MODE = constants.O_NONBLOCK | constants.O_RDWR;
 const RIGHTS = 0o666;
 
 export type VirtualFile = {
+    writer: Writer<any>;
+    reader: Reader<any>;
     dataFile: FileHandle;
     offsetFile: FileHandle;
     path: string;
     offsetPath: string;
     metaData: Stats;
-    buffer: ArrayBuffer;
     setDataFile: (dataFile: FileHandle) => void;
     setOffsetFile: (offsetFile: FileHandle) => void;
     setStat: (stat: Stats) => void;
     readIndices: (offset: number, amount: number, blockSize: number, value: string | number) => Promise<any>;
     findOffset: (value: string | number, blockSize: number) => Promise<number>;
-    write: (offset: number, blockSize: number, data: string | number) => Promise<any>;
+    write: (offset: number, data: string | number) => Promise<any>;
     writeOffset: (offset: number) => Promise<any>;
     read: (record: number, amount: number) => Promise<{ bytesRead: number; buffer: Buffer; }>;
     delete: (offset: number, amount: number) => Promise<any>;
@@ -31,7 +34,6 @@ export type VirtualFile = {
 function VirtualFile(this: VirtualFile, path: string, offsetPath: string) {
     this.path = path;
     this.offsetPath = offsetPath;
-    this.buffer = new ArrayBuffer(DEFAULT_BUFFER_BYTE_SIZE);
 }
 
 VirtualFile.prototype.setDataFile = function (this: VirtualFile, dataFile: FileHandle) {
@@ -80,31 +82,20 @@ VirtualFile.prototype.findOffset = async function (this: VirtualFile, value: str
     return -1;
 }
 
-VirtualFile.prototype.write = async function (this: VirtualFile, offset: number, blockSize: number, data: number | string) {
-    console.log(this, "Tries to write to data file");
-    const arr = Buffer.alloc(blockSize);
-    const offsetArray = Buffer.allocUnsafe(4);
-    typeof data === 'string' ? arr.write(data) : arr.writeInt32BE(data);
-    offsetArray.writeUInt32BE(offset);
-    return Promise.all(
-        [
-            this.dataFile.write(arr, 0, arr.length, offset),
-            this.offsetFile.write(offsetArray)
-        ]
-    );
+VirtualFile.prototype.write = async function (this: VirtualFile, offset: number, data: number | string) {
+    console.log(this, "Write data layer");
+    return this.writer.write(offset, data);
 }
 
 VirtualFile.prototype.writeOffset = async function (this: VirtualFile, offset: number) {
-    const offsetArray = Buffer.allocUnsafe(4);
-    offsetArray.writeUInt32BE(offset);
-    return this.offsetFile.write(offsetArray);
+    const offsetBuffer = Buffer.allocUnsafe(4);
+    offsetBuffer.writeUInt32BE(offset);
+    return this.offsetFile.write(offsetBuffer);
 }
 
-VirtualFile.prototype.read = async function (this: VirtualFile, record: number, amount: number) {
-    console.log(this, "Tries to read the data file");
-    return this.offsetFile.read(Buffer.allocUnsafe(4), 0, 4, record * 4).then((val) =>
-        this.dataFile.read(Buffer.allocUnsafe(amount), 0, amount, val.buffer.readUInt32BE())
-    );
+VirtualFile.prototype.read = async function (this: VirtualFile, record: number) {
+    console.log(this, "Read data layer");
+    return this.reader.read(record);
 }
 
 VirtualFile.prototype.delete = async function (this: VirtualFile, record: number, amount: number) {
