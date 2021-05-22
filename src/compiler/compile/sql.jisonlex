@@ -25,6 +25,7 @@ special_symbols     "*"|","|";"|"."|"("|")"|"="
 "BY"		        return 'BY';
 "C"		            return 'C';
 "CHARACTER"	        return 'CHARACTER';
+"VARCHAR"	        return 'VARCHAR';
 "CHECK"		        return 'CHECK';
 "CLOSE"		        return 'CLOSE';
 "COBOL"		        return 'COBOL';
