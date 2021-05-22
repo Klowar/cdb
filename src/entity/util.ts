@@ -7,6 +7,8 @@ export function getBlockSize(type: string): number {
     switch (type) {
         case 'INTEGER':
             return 4;
+        case 'VARCHAR':
+            return -1;
         default:
             throw new Error("Unknown type " + type);
     }
@@ -14,6 +16,7 @@ export function getBlockSize(type: string): number {
 
 export function castTo(type: string, value: Literal): Literal {
     switch (type) {
+        case 'VARCHAR':
         case 'CHARACTER':
             return new scopeInstance.literal(String(value.value));
         case 'INTEGER':
