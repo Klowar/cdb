@@ -8,19 +8,6 @@ import { VarCharWriter } from "./writer/varchar_writer";
 
 
 
-
-export function buildType(type: string, data: Buffer): number | string | Date {
-
-    switch (type) {
-        case 'CHARACTER':
-            return data.toString('utf-8')
-        case 'INTEGER':
-            return data.readInt32BE(0);
-        default:
-            throw new Error("Unknown type " + type)
-    }
-}
-
 export function getReader(type: string, mf: MetaFile) {
     switch (type) {
         case 'CHARACTER':
@@ -45,4 +32,18 @@ export function getWriter(type: string, mf: MetaFile) {
         default:
             throw new Error("Unknown type " + type);
     }
+}
+
+export function containString(target: Buffer, bytesRead: number, candidat: any, candidatSize: number) {
+    let i = 0;
+    const element = Buffer.alloc(candidatSize);
+    element.write(candidat);
+    while (!element.equals(target.subarray(i, i + candidatSize)) && i < bytesRead) i += candidatSize;
+    return i < bytesRead ? i : -1;
+}
+
+export function containNumber(target: Buffer, bytesRead: number, candidat: any, candidatSize: number) {
+    let i = 0;
+    while (target.readInt32BE(i) != candidat && i < bytesRead) i += 4;
+    return i < bytesRead ? i : -1;
 }

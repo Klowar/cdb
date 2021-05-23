@@ -21,20 +21,6 @@ export function intersection(a1: any[], a2: any[]): any[] {
     return result;
 }
 
-export function containString(target: Buffer, bytesRead: number, candidat: any, candidatSize: number) {
-    let i = 0;
-    const element = Buffer.alloc(candidatSize);
-    element.write(candidat);
-    while (!element.equals(target.subarray(i, i + candidatSize)) && i < bytesRead) i += candidatSize;
-    return i < bytesRead ? i : -1;
-}
-
-export function containNumber(target: Buffer, bytesRead: number, candidat: any, candidatSize: number) {
-    let i = 0;
-    while (target.readInt32BE(i) != candidat && i < bytesRead) i += 4;
-    return i < bytesRead ? i : -1;
-}
-
 export function substraction(a1: number[], a2: number[]): number[] {
     return a1.filter((e) => a2.indexOf(e) == -1);
 }

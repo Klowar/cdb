@@ -2,7 +2,6 @@ import { constants, Stats } from 'fs';
 import { FileHandle, open, stat } from 'fs/promises';
 import { nanoid } from 'nanoid';
 import { join } from 'path';
-import { containNumber, containString } from '../util';
 import { DATA_ROOT } from './../globals';
 import { Reader } from './../meta/reader/reader';
 import { Writer } from './../meta/writer/writer';
@@ -68,18 +67,7 @@ VirtualFile.prototype.readIndices = async function (this: VirtualFile, offset: n
 }
 
 VirtualFile.prototype.findOffset = async function (this: VirtualFile, value: string | number, blockSize: number) {
-    const buffer = Buffer.allocUnsafe(128 * blockSize);
-    const scanner = typeof value === 'string' ? containString : containNumber;
-    let offset = 0;
-    let read: { bytesRead: number; buffer: Buffer; };
-
-    do {
-        read = await this.dataFile.read(buffer, 0, buffer.byteLength, offset);
-        const additionalOffset = scanner(read.buffer, read.bytesRead, value, blockSize);
-        if (additionalOffset != -1) return offset + additionalOffset;
-        offset += read.bytesRead;
-    } while (read.bytesRead > 0);
-    return -1;
+    return await this.reader.findOffset(value);
 }
 
 VirtualFile.prototype.write = async function (this: VirtualFile, offset: number, data: number | string) {

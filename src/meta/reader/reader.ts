@@ -7,6 +7,7 @@ export type Reader<T> = {
     mf: MetaFile;
     vf: VirtualFile;
     read: (record: number) => Promise<T>;
+    findOffset: (data: T) => Promise<number>;
 }
 
 export function Reader<T>(this: Reader<T>, mf: MetaFile, vf: VirtualFile) {
@@ -16,5 +17,9 @@ export function Reader<T>(this: Reader<T>, mf: MetaFile, vf: VirtualFile) {
 
 Reader.prototype.read = async function (this: Reader<any>, record: number) {
     throw new Error("Unrealized reader:read");
+}
+
+Reader.prototype.findOffset = async function (this: Reader<any>, record: number) {
+    throw new Error("Unrealized reader:findOffset");
 }
 

@@ -2,7 +2,7 @@ import { createVirtualFile, VirtualFile } from './../data/index';
 import { DeleteStatement, UpdateStatement } from './../parser/types';
 import { Request } from './../processor/index';
 import { ENCODING_UTF_8 } from './constants';
-import { buildType, getReader, getWriter } from './util';
+import { getReader, getWriter } from './util';
 
 
 
