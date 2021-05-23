@@ -27,7 +27,7 @@ export type VirtualFile = {
     findOffset: (value: string | number, blockSize: number) => Promise<number>;
     write: (offset: number, data: string | number) => Promise<any>;
     writeOffset: (offset: number) => Promise<any>;
-    read: (record: number, amount: number) => Promise<{ bytesRead: number; buffer: Buffer; }>;
+    read: (record: number) => Promise<{ bytesRead: number; buffer: Buffer; }>;
     delete: (offset: number, amount: number) => Promise<any>;
 }
 

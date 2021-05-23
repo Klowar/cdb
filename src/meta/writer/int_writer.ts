@@ -21,6 +21,6 @@ IntWriter.prototype.write = async function (this: IntWriter, offset: number, dat
             this.vf.offsetFile.write(offsetBuffer), // Append to offset file
             this.vf.dataFile.write(dataBuffer, 0, 4, offset) // Write to interested position
         ]
-    ).then(() => data);
+    ).then(() => 4);
 }
 

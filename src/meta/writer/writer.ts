@@ -6,7 +6,7 @@ import { MetaFile } from './../index';
 export type Writer<T> = {
     mf: MetaFile;
     vf: VirtualFile;
-    write: (offset: number, data: T) => Promise<T>;
+    write: (offset: number, data: T) => Promise<number>; // Number of bytes written
 }
 
 export function Writer<T>(this: Writer<T>, mf: MetaFile, vf: VirtualFile) {

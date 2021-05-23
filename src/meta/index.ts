@@ -11,6 +11,7 @@ export type MetaFile = {
     dataType: string;
     blockSize: number;
     blockAmount: number;
+    offset: number;
     encoding: BufferEncoding;
     getDataType: () => string;
     setDataType: (dataType: string) => void;
@@ -33,6 +34,7 @@ function MetaFile(this: MetaFile, vf: VirtualFile) {
     this.vf = vf;
     this.blockSize = 0;
     this.blockAmount = 0;
+    this.offset = 0;
     this.encoding = ENCODING_UTF_8;
 }
 
@@ -71,7 +73,7 @@ MetaFile.prototype.getEncoding = function (this: MetaFile) {
 }
 
 MetaFile.prototype.getIndices = async function (this: MetaFile, value: number | string) {
-    return this.vf.readIndices(0, this.blockAmount * this.blockSize, this.blockSize, value);
+    return this.vf.readIndices(0, this.offset, this.blockSize, value);
 }
 
 MetaFile.prototype.getOffset = async function (this: MetaFile, value: number | string) {
@@ -80,8 +82,8 @@ MetaFile.prototype.getOffset = async function (this: MetaFile, value: number | s
 
 MetaFile.prototype.write = async function (this: MetaFile, lit: string | number) {
     console.log(this, "Tries to write to meta file");
-    return this.vf.write(this.blockAmount * this.blockSize, lit)
-        .then(() => ++this.blockAmount);
+    return this.vf.write(this.offset, lit)
+        .then((size) => this.offset += size);
 }
 
 MetaFile.prototype.writeOffset = async function (this: MetaFile, offset: number) {
@@ -97,7 +99,7 @@ MetaFile.prototype.read = async function (this: MetaFile, req: number[] | undefi
     if (req === undefined) return new Promise(() => []);
     // TODO: Change read strategy
     return Promise.all(
-        req.map((record) => this.vf.read(record, this.blockSize))
+        req.map((record) => this.vf.read(record))
     );
 }
 
@@ -106,7 +108,7 @@ MetaFile.prototype.readRange = async function (this: MetaFile, start: number, en
     // TODO: Change read strategy
     const promises: Promise<any>[] = new Array(end - start);
     for (let i = start; i < end; i++)
-        promises[i - start] = this.vf.read(i, this.blockSize);
+        promises[i - start] = this.vf.read(i);
 
     return Promise.all(promises)
 }

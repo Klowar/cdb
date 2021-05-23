@@ -11,7 +11,7 @@ export function VarCharWriter(this: VarCharWriter, mf: MetaFile, vf: VirtualFile
     this.vf = vf;
 }
 
-VarCharWriter.prototype.write = async function (this: VarCharWriter, offset: number, data: string): Promise<string> {
+VarCharWriter.prototype.write = async function (this: VarCharWriter, offset: number, data: string): Promise<number> {
     const offsetBuffer = Buffer.allocUnsafe(8);
     const dataBuffer = Buffer.from(data)
     offsetBuffer.writeUInt32BE(offset);
@@ -22,6 +22,6 @@ VarCharWriter.prototype.write = async function (this: VarCharWriter, offset: num
             this.vf.offsetFile.write(offsetBuffer), // Append to offset file
             this.vf.dataFile.write(dataBuffer, 0, dataBuffer.length, offset) // Write to interested position
         ]
-    ).then(() => data);
+    ).then(() => data.length);
 }
 

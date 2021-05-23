@@ -29,6 +29,9 @@ StreamJob.prototype.stop = function (this: StreamJob) {
 }
 
 StreamJob.prototype.check = async function (this: StreamJob) {
+    if (this.file.getBlockSize() == -1) {
+        this.stop();
+    }
     console.log("Stream job check");
     const end = this.file.vf.getBlockAmount();
     const start = this.file.streamOffset;

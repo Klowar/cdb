@@ -11,7 +11,7 @@ export function CharWriter(this: CharWriter, mf: MetaFile, vf: VirtualFile) {
     this.vf = vf;
 }
 
-CharWriter.prototype.write = async function (this: CharWriter, offset: number, data: string): Promise<string> {
+CharWriter.prototype.write = async function (this: CharWriter, offset: number, data: string): Promise<number> {
     const offsetBuffer = Buffer.allocUnsafe(4);
     offsetBuffer.writeUInt32BE(offset);
     const dataBuffer = Buffer.alloc(this.mf.blockSize);
@@ -21,6 +21,6 @@ CharWriter.prototype.write = async function (this: CharWriter, offset: number, d
             this.vf.offsetFile.write(offsetBuffer), // Append to offset file
             this.vf.dataFile.write(dataBuffer, 0, this.mf.blockSize, offset) // Write to interested position
         ]
-    ).then(() => data);
+    ).then(() => this.mf.blockSize);
 }
 

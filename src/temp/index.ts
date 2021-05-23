@@ -20,6 +20,7 @@ export type TemporaryFile = {
     getDataType: () => string;
     setDataType: (dataType: string) => void;
     setBlockSize: (size: number) => void;
+    getBlockSize: () => number;
     setTarget: (target: VirtualFile) => void;
     getIndices: (value: Literal) => Promise<number[]>;
     write: (statement: Literal) => Promise<any>;
@@ -49,6 +50,10 @@ TemporaryFile.prototype.setDataType = function (this: TemporaryFile, dataType: s
 TemporaryFile.prototype.setBlockSize = function (this: TemporaryFile, size: number) {
     this.target.setBlockSize(size);
     this.vf.setBlockSize(size);
+}
+
+TemporaryFile.prototype.getBlockSize = function (this: TemporaryFile) {
+    return this.target.getBlockSize();
 }
 
 TemporaryFile.prototype.setTarget = function (this: TemporaryFile, target: MetaFile) {
