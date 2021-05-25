@@ -5,7 +5,8 @@ import { join } from 'path';
 import { DATA_ROOT } from './../globals';
 import { Reader } from './../meta/reader/reader';
 import { Writer } from './../meta/writer/writer';
-import { DEFAULT_READ_STEP } from './constants';
+
+
 
 const CREATE_MODE = constants.O_RDWR | constants.O_CREAT;
 const MODE = constants.O_NONBLOCK | constants.O_RDWR;
@@ -22,7 +23,7 @@ export type VirtualFile = {
     setDataFile: (dataFile: FileHandle) => void;
     setOffsetFile: (offsetFile: FileHandle) => void;
     setStat: (stat: Stats) => void;
-    readIndices: (offset: number, amount: number, blockSize: number, value: string | number) => Promise<any>;
+    readIndices: (offset: number, value: string | number) => Promise<any>;
     findOffset: (value: string | number, blockSize: number) => Promise<number>;
     write: (offset: number, data: string | number) => Promise<any>;
     writeOffset: (offset: number) => Promise<any>;
@@ -47,23 +48,8 @@ VirtualFile.prototype.setStat = function (this: VirtualFile, stat: Stats) {
     this.metaData = stat;
 }
 
-VirtualFile.prototype.readIndices = async function (this: VirtualFile, offset: number, amount: number, blockSize: number, value: string | number) {
-    const indices: number[] = [];
-    const dataOffset = await this.findOffset(value, blockSize);
-    if (dataOffset < 0) return indices;
-
-    const buffer = Buffer.allocUnsafe(Math.min(DEFAULT_READ_STEP, amount));
-    let read: { bytesRead: number; buffer: Buffer; };
-    do {
-        read = await this.offsetFile.read(buffer, 0, buffer.length, offset);
-        for (let i = 0; i < read.bytesRead; i += 4)
-            if (buffer.readInt32BE(i) === dataOffset)
-                indices.push(i / 4);
-        amount -= read.bytesRead;
-        offset += read.bytesRead;
-    } while (read.bytesRead > 0 && amount > 0);
-
-    return indices;
+VirtualFile.prototype.readIndices = async function (this: VirtualFile, offset: number, value: string | number) {
+    return this.reader.readIndices(offset, value);
 }
 
 VirtualFile.prototype.findOffset = async function (this: VirtualFile, value: string | number, blockSize: number) {

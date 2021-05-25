@@ -73,7 +73,7 @@ MetaFile.prototype.getEncoding = function (this: MetaFile) {
 }
 
 MetaFile.prototype.getIndices = async function (this: MetaFile, value: number | string) {
-    return this.vf.readIndices(0, this.offset, this.blockSize, value);
+    return this.vf.readIndices(0, value);
 }
 
 MetaFile.prototype.getOffset = async function (this: MetaFile, value: number | string) {
@@ -83,7 +83,8 @@ MetaFile.prototype.getOffset = async function (this: MetaFile, value: number | s
 MetaFile.prototype.write = async function (this: MetaFile, lit: string | number) {
     console.log(this, "Tries to write to meta file");
     return this.vf.write(this.offset, lit)
-        .then((size) => this.offset += size);
+        .then((size) => this.offset += size)
+        .then(() => ++this.blockAmount);
 }
 
 MetaFile.prototype.writeOffset = async function (this: MetaFile, offset: number) {
