@@ -35,7 +35,9 @@ VarCharReader.prototype.findOffset = async function (this: VarCharReader, data: 
         additionalOffset = containLength(read.buffer, read.bytesRead, data.length, 4);
         if (additionalOffset.length != 0
             && (await this.vf.dataFile.read(Buffer.allocUnsafe(data.length), 0, data.length, additionalOffset[0])).buffer.toString() == data)
-            read = await this.vf.offsetFile.read(buffer, 0, buffer.byteLength, offset);
+            return additionalOffset;
+        else additionalOffset.length = 0;
+        read = await this.vf.offsetFile.read(buffer, 0, buffer.byteLength, offset);
     }
 
     return additionalOffset;
