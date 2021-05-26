@@ -3,12 +3,14 @@ import { getQueryBuilder, QueryBuilder } from '../builder';
 import { Executor, newExecutor } from '../exec';
 import { Connection } from './../net/connection';
 import { Parser } from './../parser/index';
+import { Root } from './../parser/types';
 
 export type Core = {
     connections: Connection[];
     parser: Parser;
     queryBuilder: QueryBuilder;
     executor: Executor;
+    process: (root: Root) => Promise<any>;
     addConnection: (conn: Socket) => void;
     onConnectionData: (event: string, connection: Connection) => void;
 }
@@ -30,13 +32,17 @@ Core.prototype.onConnectionData = function (this: Core, event: string, connectio
 
         const parseResult = this.parser.parse(event);
         if (!parseResult) return;
-        const execResult = this.executor.process(this.parser.parser.yy.ast);
+        const execResult = this.process(this.parser.parser.yy.ast);
         execResult.then((data) => connection.write(JSON.stringify(data) + '\n'));
         execResult.catch((e) => connection.write(JSON.stringify(e) + '\n'));
     } catch (e) {
         console.error(e);
         connection.write(JSON.stringify(e) + '\n');
     }
+}
+
+Core.prototype.process = function (this: Core, ast: Root) {
+    return this.executor.process(ast);
 }
 
 let coreInstance: Core | null = null;
