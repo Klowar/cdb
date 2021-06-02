@@ -1,5 +1,5 @@
 import { STATEMENTS } from './constants';
-import { AlterStatement, AlterStatementConstructor, BinaryExpression, BinaryExpressionConstructor, CreateStatement, CreateStatementConstructor, DeleteStatement, DeleteStatementConstructor, DropStatement, DropStatementConstructor, Expression, Identifier, IdentifierConstructor, InsertStatement, InsertStatementConstructor, Literal, LiteralConstructor, Root, RootConstructor, ScopeType, SelectStatement, SelectStatementConstructor, Statement, TypedIdentifier, TypedIdentifierConstructor, UnaryExpression, UnaryExpressionConstructor, UpdateStatement, UpdateStatementConstructor } from './types';
+import { AlterStatement, Ammsc, BinaryExpression, CreateStatement, DeleteStatement, DropStatement, Expression, Identifier, InsertStatement, Literal, Root, ScopeType, SelectStatement, Statement, TypedIdentifier, UnaryExpression, UpdateStatement } from './types';
 /** ast tree wrapper */
 
 // Some parameter like static strings, numbers in query
@@ -96,6 +96,12 @@ binaryExpression.prototype.setRParam = function (rParam: typeof literal | typeof
 }
 binaryExpression.prototype.setOperator = function (operator: string) {
     this.operator = operator;
+}
+
+function ammsc(this: Ammsc, obj: { name: string, params: any[], alias?: string }) {
+    this.name = obj.name;
+    this.params = obj.params;
+    this.alias = obj.alias || obj.name;
 }
 
 const DEFAULT_SCHEMA = 'default';
@@ -207,6 +213,8 @@ scope.prototype.typedIdentifier = typedIdentifier;
 // Expression
 scope.prototype.unaryExpression = unaryExpression;
 scope.prototype.binaryExpression = binaryExpression;
+// Functions
+scope.prototype.ammsc = ammsc;
 // Statement
 scope.prototype.selectStatement = selectStatement;
 scope.prototype.insertStatement = insertStatement;

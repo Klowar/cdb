@@ -9,99 +9,53 @@ special_symbols     "*"|","|";"|"."|"("|")"|"="
 
 %%
 
-"ADA"               return 'ADA';
-"ALL"               return 'ALL';
-"AND"               return 'AND';
+// Agg functions
 "AVG"               return 'AMMSC';
 "MIN"               return 'AMMSC';
 "MAX"               return 'AMMSC';
 "SUM"               return 'AMMSC';
 "COUNT"             return 'AMMSC';
-"ANY"               return 'ANY';
-"AS"                return 'AS';
-"ASC"               return 'ASC';
-"AUTHORIZATION"     return 'AUTHORIZATION';
+// Operators
+"AND"               return 'AND';
+"OR"		        return 'OR';
 "BETWEEN"		    return 'BETWEEN';
+"NOT"		        return 'NOT';
+"SET"		        return 'SET';
+// Sorters
+"ASC"               return 'ASC';
+"DESC"		        return 'DESC';
+"ORDER"		        return 'ORDER';
+// Grouping
+"GROUP"		        return 'GROUP';
 "BY"		        return 'BY';
-"C"		            return 'C';
+// Types
+"SMALLINT"	        return 'SMALLINT';
+"INTEGER"	        return 'INTEGER';
+"FLOAT"		        return 'FLOAT';
+"DOUBLE"		    return 'DOUBLE';
 "CHARACTER"	        return 'CHARACTER';
 "VARCHAR"	        return 'VARCHAR';
-"CHECK"		        return 'CHECK';
-"CLOSE"		        return 'CLOSE';
-"COBOL"		        return 'COBOL';
-"COMMIT"		    return 'COMMIT';
-"CONTINUE"	        return 'CONTINUE';
 "CREATE"		    return 'CREATE';
-"CURRENT"		    return 'CURRENT';
-"CURSOR"		    return 'CURSOR';
 "DATETIME"          return 'DATETIME';
 "TIME"              return 'TIME';
-"DECIMAL"		    return 'DECIMAL';
-"DECLARE"		    return 'DECLARE';
-"DEFAULT"		    return 'DEFAULT';
-"DELETE"		    return 'DELETE';
-"DESC"		        return 'DESC';
-"DISTINCT"	        return 'DISTINCT';
-"DOUBLE"		    return 'DOUBLE';
-"ESCAPE"		    return 'ESCAPE';
-"EXISTS"		    return 'EXISTS';
-"FETCH"		        return 'FETCH';
-"FLOAT"		        return 'FLOAT';
-"FOR"		        return 'FOR';
-"FOREIGN"		    return 'FOREIGN';
-"FORTRAN"		    return 'FORTRAN';
-"FOUND"		        return 'FOUND';
-"FROM"		        return 'FROM';
-"GRANT"		        return 'GRANT';
-"GROUP"		        return 'GROUP';
-"HAVING"		    return 'HAVING';
-"IN"		        return 'IN';
-"INDICATOR"	        return 'INDICATOR';
+// CRUD
 "INSERT"            return 'INSERT';
-"INTEGER"	        return 'INTEGER';
-"INTO"		        return 'INTO';
-"IS"		        return 'IS';
-"KEY"		        return 'KEY';
-"LANGUAGE"	        return 'LANGUAGE';
-"LIKE"              return 'LIKE';
-"MODULE"		    return 'MODULE';
-"NOT"		        return 'NOT';
-"NULL"		        return 'NULLX';
-"NUMERIC"		    return 'NUMERIC';
-"OF"		        return 'OF';
-"ON"		        return 'ON';
-"OPEN"		        return 'OPEN';
-"OPTION"		    return 'OPTION';
-"OR"		        return 'OR';
-"ORDER"		        return 'ORDER';
-"PASCAL"		    return 'PASCAL';
-"PLI"		        return 'PLI';
-"PRECISION"	        return 'PRECISION';
-"PRIMARY"		    return 'PRIMARY';
-"PRIVILEGES"	    return 'PRIVILEGES';
-"PROCEDURE"	        return 'PROCEDURE';
-"PUBLIC"		    return 'PUBLIC';
-"REAL"		        return 'REAL';
-"REFERENCES"	    return 'REFERENCES';
-"ROLLBACK"	        return 'ROLLBACK';
-"SCHEMA"		    return 'SCHEMA';
 "SELECT"		    return 'SELECT';
-"SET"		        return 'SET';
-"SMALLINT"	        return 'SMALLINT';
-"SOME"		        return 'SOME';
-"SQLCODE"		    return 'SQLCODE';
-"TABLE"		        return 'TABLE';
-"TO"		        return 'TO';
-"UNION"		        return 'UNION';
-"UNIQUE"		    return 'UNIQUE';
 "UPDATE"		    return 'UPDATE';
-"USER"		        return 'USER';
-"VALUES"		    return 'VALUES';
-"VIEW"		        return 'VIEW';
-"WHENEVER"	        return 'WHENEVER';
+"DELETE"		    return 'DELETE';
+// Filters
 "WHERE"		        return 'WHERE';
-"WITH"		        return 'WITH';
-"WORK"		        return 'WORK';
+"DISTINCT"	        return 'DISTINCT';
+"HAVING"		    return 'HAVING';
+// Entityes
+"SCHEMA"		    return 'SCHEMA';
+"TABLE"		        return 'TABLE';
+// Other
+"VALUES"		    return 'VALUES';
+"FROM"		        return 'FROM';
+"INTO"		        return 'INTO';
+"AS"                return 'AS';
+"TO"		        return 'TO';
 {white_space}       /* ignore white spaces */
 {comment}           /* ignore comments */
 {comparators}       return 'COMPARISON';

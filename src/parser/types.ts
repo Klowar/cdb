@@ -29,6 +29,12 @@ export type BinaryExpression = Expression & {
     rParam: Identifier | Literal | Expression;
 }
 
+export type Ammsc = {
+    name: string;
+    params: any[];
+    alias?: string;
+}
+
 export type Statement = {
     type: string;
     schema: string;
@@ -93,6 +99,10 @@ export interface BinaryExpressionConstructor {
     new(obj: { lParam: Identifier | Literal | Expression, rParam: Identifier | Literal | Expression, operator: string }): BinaryExpression;
 }
 
+export interface AmmscConstructor {
+    new(obj: { name: string, params: any[], alias?: string }): Ammsc;
+}
+
 export interface SelectStatementConstructor {
     new(): SelectStatement;
 }
@@ -129,6 +139,8 @@ export type ScopeType = {
     // Expressions
     unaryExpression: UnaryExpressionConstructor;
     binaryExpression: BinaryExpressionConstructor;
+    // Functions
+    ammsc: AmmscConstructor;
     // Statements
     selectStatement: SelectStatementConstructor;
     insertStatement: InsertStatementConstructor;

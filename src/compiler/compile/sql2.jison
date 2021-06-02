@@ -249,6 +249,19 @@ multi_expression:
     |   expression
     ;
 
+function:
+        ammsc '(' multi_identifier ')' {
+            {
+                $$ = new yy.scope.ammsc({ name: $1, params: $3 }); 
+            }
+        }
+    |   ammsc '(' multi_identifier ')' AS NAME {
+            {
+                $$ = new yy.scope.ammsc({ name: $1, params: $3, alias: $6 }); 
+            }
+        }
+    ;
+
 multi_identifier:
         multi_identifier ',' identifier {
             {
@@ -257,7 +270,11 @@ multi_identifier:
                 $$.push($3);
             }
         }
-    |   identifier
+    |   identifier {
+            {
+                $$ = [$1];
+            }
+        }
     ;
 
 identifier:
@@ -308,16 +325,10 @@ ddl_identifier:
             }
         }
     ;
-
-constraint:
-        UNIQUE
-    |   BETWEEN
-    ;
     
 type:
         INTEGER
     |   DOUBLE
-    |   DECIMAL
     |   FLOAT
     |   DATETIME
     |   VARCHAR
