@@ -15,6 +15,7 @@
     "compile": "node_modules/.bin/jison src/compiler/compile/sql2.jison src/compiler/compile/sql.jisonlex"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.170",
     "@types/mocha": "^8.2.0",
     "@types/nanoid": "^2.1.0",
     "@types/node": "^14.14.41",
@@ -25,6 +26,7 @@
     "typescript": "^4.1.2"
   },
   "dependencies": {
+    "lodash": "^4.17.21",
     "nanoid": "^3.1.22"
   }
 }
