@@ -31,7 +31,7 @@ export type BinaryExpression = Expression & {
 
 export type Ammsc = {
     name: string;
-    params: any[];
+    params: Identifier[];
     alias?: string;
 }
 
@@ -53,7 +53,7 @@ export type DropStatement = Statement;
 
 export type SelectStatement = Statement & {
     where: Expression | null;
-    columns: Identifier[];
+    columns: (Identifier | Ammsc)[];
 }
 
 export type InsertStatement = Statement & {

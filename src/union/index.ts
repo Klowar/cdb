@@ -1,8 +1,9 @@
 import { nanoid } from 'nanoid';
 import { createEntity } from '../entity';
 import { CreateStatement } from '../parser';
+import { AmmscStore } from './../entity/functions/index';
 import { Entity } from './../entity/index';
-import { DeleteStatement, InsertStatement, SelectStatement, UpdateStatement } from './../parser/types';
+import { Ammsc, DeleteStatement, InsertStatement, SelectStatement, UpdateStatement } from './../parser/types';
 import { Request } from './../processor/index';
 import { Filter } from './filter';
 
@@ -12,6 +13,7 @@ export type Union = {
     name: string;
     entities: Map<string, Entity>;
     filter: Filter;
+    hasEntity: (name: string) => boolean;
     getEntity: (name: string) => Entity;
     setName: (name: string) => void;
     setId: (id: string) => void;
@@ -28,6 +30,10 @@ function Union(this: Union, entities: Entity[]) {
 
 Union.prototype.getEntity = function (this: Union, name: string) {
     return this.entities.get(name);
+}
+
+Union.prototype.hasEntity = function (this: Union, name: string) {
+    return this.entities.has(name);
 }
 
 Union.prototype.setName = function (this: Union, name: string) {
@@ -54,8 +60,11 @@ Union.prototype.read = async function (this: Union, req: Request<SelectStatement
     console.log(this, "Tries to read union");
     req.filter = await this.filter.processWhere(req.statement);
     const arr = new Array(req.statement.columns.length);
-    for(const entity of req.statement.columns) {
-        arr.push(this.entities.get(entity.name)?.read(req));
+    for (const entity of req.statement.columns) {
+        const target = this.hasEntity(entity.name)
+            ? this.getEntity(entity.name)
+            : AmmscStore.get(entity as Ammsc, this);
+        arr.push(target.read(req));
     }
     return Promise.all(arr);
 }
