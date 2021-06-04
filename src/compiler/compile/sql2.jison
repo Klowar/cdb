@@ -83,14 +83,14 @@ alter_target:
     ;
 
 select_statement:
-        select_keyword multi_identifier FROM select_target { 
+        SELECT select_params FROM select_target { 
             {
                 $$ = new yy.scope.selectStatement();
                 $$.setColumns($2);
                 $$.setTarget($4);
             }
         }
-    |   select_keyword multi_identifier FROM select_target condition_clause { 
+    |   SELECT select_params FROM select_target condition_clause { 
             {
                 $$ = new yy.scope.selectStatement();
                 $$.setColumns($2);
@@ -100,9 +100,23 @@ select_statement:
         }
     ;
 
-select_keyword:
-        SELECT
-    |   FETCH
+select_params:
+        multi_identifier ',' multi_function {
+            {
+                for(const temp of $3)
+                    temp.setIndex(temp.index + $1.length)
+                $$ = $1.concat($3);
+            }
+        }
+    |   multi_function ',' multi_identifier {
+            {
+                for(const temp of $3)
+                    temp.setIndex(temp.index + $1.length)
+                $$ = $1.concat($3);
+            }
+        }
+    |   multi_identifier
+    |   multi_function
     ;
 
 select_target:
@@ -250,27 +264,27 @@ multi_expression:
     ;
 
 function:
-        ammsc '(' multi_identifier ')' {
+        AMMSC '(' multi_identifier ')' {
             {
                 $$ = new yy.scope.ammsc({ name: $1, params: $3 }); 
             }
         }
-    |   ammsc '(' multi_identifier ')' AS NAME {
+    |   AMMSC '(' multi_identifier ')' AS NAME {
             {
                 $$ = new yy.scope.ammsc({ name: $1, params: $3, alias: $6 }); 
             }
         }
     ;
 
-multi_identifier:
-        multi_identifier ',' identifier {
+multi_function:
+        multi_function ',' function {
             {
                 $$ = Array.isArray($1) ? $1 : [$1];
                 $3.setIndex($$.length || 0);
                 $$.push($3);
             }
         }
-    |   identifier {
+    |   function {
             {
                 $$ = [$1];
             }
@@ -322,6 +336,21 @@ ddl_identifier:
     |   NAME sized_type '(' INTNUM ')' {
             {
                 $$ = new yy.scope.typedIdentifier({ name: $1, type: $2, size: $4 })
+            }
+        }
+    ;
+
+multi_identifier:
+        multi_identifier ',' identifier {
+            {
+                $$ = Array.isArray($1) ? $1 : [$1];
+                $3.setIndex($$.length || 0);
+                $$.push($3);
+            }
+        }
+    |   identifier {
+            {
+                $$ = [$1];
             }
         }
     ;
