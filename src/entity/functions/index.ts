@@ -5,6 +5,7 @@ import { AmmscAvg, AmmscAvgName } from './avg';
 import { AmmscCount, AmmscCountName } from './count';
 import { AmmscMax, AmmscMaxName } from './max';
 import { AmmscMin, AmmscMinName } from './min';
+import { AmmscSum, AmmscSumName } from './sum';
 
 
 export type AmmscBase = {
@@ -33,6 +34,8 @@ export const AmmscStore = {
                 return new AmmscMin(ammsc, union);
             case AmmscMaxName:
                 return new AmmscMax(ammsc, union);
+            case AmmscSumName:
+                return new AmmscSum(ammsc, union);
             default:
                 throw new Error("Unknown ammsc");
         }
