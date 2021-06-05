@@ -42,11 +42,12 @@ export type Statement = {
 }
 
 export type CreateStatement = Statement & {
-    columns: TypedIdentifier[]
+    object: string;
+    columns: TypedIdentifier[];
 }
 
 export type AlterStatement = Statement & {
-    expressions: Expression[]
+    expressions: Expression[];
 }
 
 export type DropStatement = Statement;

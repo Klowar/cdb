@@ -36,45 +36,52 @@ dml:
     ;
 
 create_statement:
-        create_keyword create_target simple_name_identifier {
+        CREATE SCHEMA simple_name_identifier {
             {
                 $$ = new yy.scope.createStatement();
+                $$.setObject($2);
                 $$.setTarget($3);
             }
         }
-    |   create_keyword create_target simple_name_identifier '(' multi_identifier ')' {
+    |   CREATE TABLE simple_name_identifier '(' multi_identifier ')' {
             {
                 $$ = new yy.scope.createStatement();
+                $$.setObject($2);
+                $$.setTarget($3);
+                $$.setColumns($5);
+            }
+        }
+    |   CREATE TABLE simple_name_identifier '(' multi_identifier ')' AS table_kind {
+            {
+                $$ = new yy.scope.createStatement();
+                $$.setObject($8);
                 $$.setTarget($3);
                 $$.setColumns($5);
             }
         }
     ;
 
-create_keyword:
-        CREATE
-    |   DEFINE
-    |   DECLARE
-    ;
-
-create_target:
-        TABLE
-    |   SCHEMA
+table_kind:
+        UNIQUE TABLE {
+            {
+                $$ = "UNIQUE TABLE"
+            }
+        }
+    |   LINKED TABLE {
+            {
+                $$ = "LINKED TABLE"
+            }
+        }
     ;
 
 alter_statement:
-        alter_keyword alter_target simple_name_identifier SET multi_expression {
+        ALTER alter_target simple_name_identifier SET multi_expression {
             {
                 $$ = new yy.scope.alterStatement();
                 $$.setTarget($3);
                 $$.setExpressions($5);
             }
         }
-    ;
-
-alter_keyword:
-        ALTER
-    |   CHANGE
     ;
 
 alter_target:
@@ -124,14 +131,14 @@ select_target:
     ;
 
 insert_statement:
-        insert_keyword insert_target VALUES '(' multi_literal ')' {
+        INSERT INTO insert_target VALUES '(' multi_literal ')' {
             {
                 $$ = new yy.scope.insertStatement();
                 $$.setTarget($2);
                 $$.setValues($5);
             }
         }
-    |   insert_keyword insert_target '(' multi_identifier ')' VALUES '(' multi_literal ')' {
+    |   INSERT INTO insert_target '(' multi_identifier ')' VALUES '(' multi_literal ')' {
             {
                 $$ = new yy.scope.insertStatement();
                 $$.setTarget($2);
@@ -141,23 +148,18 @@ insert_statement:
         }
     ;
 
-insert_keyword:
-        INSERT
-    |   INSERT INTO
-    ;
-
 insert_target:
         identifier
     ;
 
 update_statement:
-        update_keyword update_target SET expression {
+        UPDATE update_target SET expression {
             {
                 $$ = new yy.scope.updateStatement();
                 $$.setTarget($2);
             }
         }
-    |   update_keyword update_target SET expression condition_clause {
+    |   UPDATE update_target SET expression condition_clause {
             {
                 $$ = new yy.scope.updateStatement();
                 $$.setTarget($2);
@@ -166,32 +168,24 @@ update_statement:
         }
     ;
 
-update_keyword:
-        UPDATE
-    ;
-
 update_target:
         identifier
     ;
 
 delete_statement:
-        delete_keyword FROM delete_target {
+        DELETE FROM delete_target {
             {
                 $$ = new yy.scope.deleteStatement();
                 $$.setTarget($3);
             }
         }
-    |   delete_keyword FROM delete_target condition_clause {
+    |   DELETE FROM delete_target condition_clause {
             {
                 $$ = new yy.scope.deleteStatement();
                 $$.setTarget($3);
                 $$.setWhere($4);
             }
         }
-    ;
-
-delete_keyword:
-        DELETE
     ;
 
 delete_target:

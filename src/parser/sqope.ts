@@ -129,15 +129,18 @@ createStatement.prototype = new statement({ type: STATEMENTS.DDL.CREATE });
 function createStatement(this: CreateStatement) {
     this.columns = [];
 }
-createStatement.prototype.setColumns = function (columns) {
+createStatement.prototype.setColumns = function (columns: TypedIdentifier[]) {
     this.columns = columns;
+}
+createStatement.prototype.setObject = function (object: string) {
+    this.object = object;
 }
 
 alterStatement.prototype = new statement({ type: STATEMENTS.DDL.ALTER })
 function alterStatement(this: AlterStatement) {
     this.expressions = [];
 }
-alterStatement.prototype.setExpressions = function (expressions) {
+alterStatement.prototype.setExpressions = function (expressions: Expression[]) {
     this.expressions = expressions;
 }
 

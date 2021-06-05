@@ -50,10 +50,14 @@ special_symbols     "*"|","|";"|"."|"("|")"|"="
 // Entityes
 "SCHEMA"		    return 'SCHEMA';
 "TABLE"		        return 'TABLE';
+// Entity options
+"UNIQUE"            return 'UNIQUE';
+"LINKED"            return 'LINKED';
 // Other
 "VALUES"		    return 'VALUES';
 "FROM"		        return 'FROM';
 "INTO"		        return 'INTO';
+"ALL"               return 'ALL';
 "AS"                return 'AS';
 "TO"		        return 'TO';
 {white_space}       /* ignore white spaces */

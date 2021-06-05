@@ -11,3 +11,9 @@ export const STATEMENTS = {
         DELETE: 'delete'
     }
 };
+
+export const TABLE_KIND = {
+    TABLE: 'TABLE',
+    UNIQUE_TABLE: 'UNIQUE TABLE',
+    LINKED_TABLE: 'LINKED TABLE'
+};
