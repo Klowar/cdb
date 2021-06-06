@@ -1,6 +1,5 @@
 import { Entity } from './../entity/index';
 import { DeleteStatement, InsertStatement, SelectStatement, UpdateStatement } from './../parser/types';
-import { Request } from './../processor/index';
 import { Filter } from './filter';
 
 
@@ -13,10 +12,10 @@ export type Union = {
     getEntity: (name: string) => Entity;
     setName: (name: string) => void;
     setId: (id: string) => void;
-    write: (statement: Request<InsertStatement>) => Promise<any>;
-    update: (statement: Request<UpdateStatement>) => Promise<any>;
-    read: (statement: Request<SelectStatement>) => Promise<any>;
-    delete: (statement: Request<DeleteStatement>) => Promise<any>;
+    write: (statement: InsertStatement) => Promise<any>;
+    update: (statement: UpdateStatement) => Promise<any>;
+    read: (statement: SelectStatement) => Promise<any>;
+    delete: (statement: DeleteStatement) => Promise<any>;
 }
 
 export function Union(this: Union, entities: Entity[]) {
@@ -40,18 +39,18 @@ Union.prototype.setId = function (this: Union, id: string) {
     this.id = id;
 }
 
-Union.prototype.write = async function (this: Union, req: Request<InsertStatement>) {
+Union.prototype.write = async function (this: Union, req: InsertStatement) {
     throw new Error("Unrealized Union type");
 }
 
-Union.prototype.update = function (this: Union, req: Request<UpdateStatement>) {
+Union.prototype.update = function (this: Union, req: UpdateStatement) {
     throw new Error("Unrealized Union type");
 }
 
-Union.prototype.read = async function (this: Union, req: Request<SelectStatement>) {
+Union.prototype.read = async function (this: Union, req: SelectStatement) {
     throw new Error("Unrealized Union type");
 }
 
-Union.prototype.delete = function (this: Union, req: Request<DeleteStatement>) {
+Union.prototype.delete = function (this: Union, req: DeleteStatement) {
     throw new Error("Unrealized Union type");
 }

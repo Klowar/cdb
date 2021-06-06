@@ -1,8 +1,6 @@
 import { nanoid } from 'nanoid';
-import { Request } from '../processor';
 import { Cache, newCache } from './../cache/index';
-import { DeleteStatement, InsertStatement, Literal, SelectStatement, TypedIdentifier, UpdateStatement } from './../parser/types';
-import { castTo } from './util';
+import { TypedIdentifier } from './../parser/types';
 
 
 
@@ -13,18 +11,22 @@ export type Entity = {
     id: string;
     setName: (name: string) => void;
     setId: (id: string) => void;
-    setType: (type: string) => void;
+    getType: () => string;
     getIndex: () => number;
     setIndex: (index: number) => void;
-    getIndices: (value: Literal) => Promise<number[]>;
-    write: (request: Request<InsertStatement>) => Promise<any>;
-    update: (statement: Request<UpdateStatement>) => Promise<any>;
-    read: (statement: Request<SelectStatement>) => Promise<any>;
-    delete: (statement: Request<DeleteStatement>) => Promise<any>;
+    getIndices: (value: string | number) => Promise<number[]>;
+    write: (data: string | number) => Promise<any>;
+    update: (records: number[], data: string | number) => Promise<any>;
+    read: (records: number[]) => Promise<any>;
+    delete: (records: number[]) => Promise<any>;
 }
 
 function Entity(this: Entity, cache: Cache) {
     this.cache = cache;
+}
+
+Entity.prototype.getType = function (this: Entity, name: string) {
+    return this.cache.getDataType();
 }
 
 Entity.prototype.setName = function (this: Entity, name: string) {
@@ -43,25 +45,25 @@ Entity.prototype.setIndex = function (this: Entity, index: number) {
     this.index = index;
 }
 
-Entity.prototype.getIndices = async function (this: Entity, value: Literal) {
-    return this.cache.getIndices(castTo(this.cache.getDataType(), value));
+Entity.prototype.getIndices = async function (this: Entity, data: string | number) {
+    return this.cache.getIndices(data);
 }
 
-Entity.prototype.write = function (this: Entity, req: Request<InsertStatement>) {
+Entity.prototype.write = function (this: Entity, data: string | number) {
     console.log(this, "Tries to write entity");
-    return this.cache.write(castTo(this.cache.getDataType(), req.statement.values[this.index]));
+    return this.cache.write(data);
 }
 
-Entity.prototype.update = function (this: Entity, req: Request<UpdateStatement>) {
+Entity.prototype.update = function (this: Entity, records: number[], data: string | number) {
     console.log(this, "Tries to update entity");
 }
 
-Entity.prototype.read = function (this: Entity, req: Request<SelectStatement>) {
+Entity.prototype.read = function (this: Entity, records: number[]) {
     console.log(this, "Tries to read entity");
-    return this.cache.read(req.filter);
+    return this.cache.read(records);
 }
 
-Entity.prototype.delete = function (this: Entity, req: Request<DeleteStatement>) {
+Entity.prototype.delete = function (this: Entity, records: number[]) {
     console.log(this, "Tries to read entity");
 }
 

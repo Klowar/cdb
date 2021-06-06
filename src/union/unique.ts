@@ -3,9 +3,10 @@ import { createEntity } from '../entity';
 import { CreateStatement } from '../parser';
 import { AmmscStore } from './../entity/functions/index';
 import { Entity } from './../entity/index';
-import { Ammsc, DeleteStatement, InsertStatement, SelectStatement, UpdateStatement } from './../parser/types';
-import { Request } from './../processor/index';
+import { Ammsc, BinaryExpression, DeleteStatement, Identifier, InsertStatement, SelectStatement, UpdateStatement } from './../parser/types';
+import { planarize } from './filter';
 import { Union } from './index';
+import { castTo } from './util';
 
 
 export type UniqueUnion = Union;
@@ -15,33 +16,37 @@ function UniqueUnion(this: UniqueUnion, entities: Entity[]) {
     Union.call(this, entities);
 }
 
-UniqueUnion.prototype.write = async function (this: UniqueUnion, req: Request<InsertStatement>) {
+UniqueUnion.prototype.write = async function (this: UniqueUnion, statement: InsertStatement) {
     console.log(this, "Tries to write UniqueUnion");
-    const arr = new Array(req.statement.values.length);
+    const arr = new Array(statement.values.length);
     for (const entity of this.entities.values())
-        arr.push(entity.write(req));
+        arr.push(entity.write(castTo(entity.getType(), statement.values[entity.index]).value));
     return Promise.all(arr);
 }
 
-UniqueUnion.prototype.update = function (this: UniqueUnion, req: Request<UpdateStatement>) {
+UniqueUnion.prototype.update = async function (this: UniqueUnion, statement: UpdateStatement) {
     console.log(this, "Tries to update UniqueUnion");
+    // const planeWhere = planarize(statement.where as BinaryExpression);
+    // for (const biExp of planeWhere) {
+    //     this.getEntity((biExp.lParam as Identifier).name).update();
+    // }
 }
 
-UniqueUnion.prototype.read = async function (this: UniqueUnion, req: Request<SelectStatement>) {
+UniqueUnion.prototype.read = async function (this: UniqueUnion, statement: SelectStatement) {
     console.log(this, "Tries to read UniqueUnion");
-    req.filter = await this.filter.processWhere(req.statement);
-    const arr = new Array(req.statement.columns.length);
-    for (const entity of req.statement.columns) {
+    const filter = await this.filter.processWhere(statement);
+    const arr = new Array(statement.columns.length);
+    for (const entity of statement.columns) {
         const target = this.hasEntity(entity.name)
             ? this.getEntity(entity.name)
             : AmmscStore.get(entity as Ammsc, this);
-        arr.push(target.read(req));
+        arr.push(target.read(filter));
     }
     return Promise.all(arr);
 }
 
-UniqueUnion.prototype.delete = function (this: UniqueUnion, req: Request<DeleteStatement>) {
-    console.log(this, "Tries to delete unioun");
+UniqueUnion.prototype.delete = function (this: UniqueUnion, req: DeleteStatement) {
+    console.log(this, "Tries to delete UniqueUnion");
 }
 
 

@@ -4,8 +4,9 @@ import { createEntity } from '../entity';
 import { CreateStatement } from '../parser';
 import { AmmscStore } from './../entity/functions/index';
 import { Entity } from './../entity/index';
-import { Ammsc, DeleteStatement, InsertStatement, SelectStatement, UpdateStatement } from './../parser/types';
-import { Request } from './../processor/index';
+import { Ammsc, BinaryExpression, DeleteStatement, Identifier, InsertStatement, SelectStatement, UpdateStatement } from './../parser/types';
+import { planarize } from './filter';
+import { castTo } from './util';
 
 
 export type LinkedUnion = Union;
@@ -15,33 +16,37 @@ function LinkedUnion(this: LinkedUnion, entities: Entity[]) {
     Union.call(this, entities);
 }
 
-LinkedUnion.prototype.write = async function (this: LinkedUnion, req: Request<InsertStatement>) {
+LinkedUnion.prototype.write = async function (this: LinkedUnion, statement: InsertStatement) {
     console.log(this, "Tries to write LinkedUnion");
-    const arr = new Array(req.statement.values.length);
+    const arr = new Array(statement.values.length);
     for (const entity of this.entities.values())
-        arr.push(entity.write(req));
+        arr.push(entity.write(castTo(entity.getType(), statement.values[entity.index]).value));
     return Promise.all(arr);
 }
 
-LinkedUnion.prototype.update = function (this: LinkedUnion, req: Request<UpdateStatement>) {
+LinkedUnion.prototype.update = async function (this: LinkedUnion, statement: UpdateStatement) {
     console.log(this, "Tries to update LinkedUnion");
+    // const planeWhere = planarize(statement.where as BinaryExpression);
+    // for (const biExp of planeWhere) {
+    //     this.getEntity((biExp.lParam as Identifier).name).update();
+    // }
 }
 
-LinkedUnion.prototype.read = async function (this: LinkedUnion, req: Request<SelectStatement>) {
+LinkedUnion.prototype.read = async function (this: LinkedUnion, statement: SelectStatement) {
     console.log(this, "Tries to read LinkedUnion");
-    req.filter = await this.filter.processWhere(req.statement);
-    const arr = new Array(req.statement.columns.length);
-    for (const entity of req.statement.columns) {
+    const filter = await this.filter.processWhere(statement);
+    const arr = new Array(statement.columns.length);
+    for (const entity of statement.columns) {
         const target = this.hasEntity(entity.name)
             ? this.getEntity(entity.name)
             : AmmscStore.get(entity as Ammsc, this);
-        arr.push(target.read(req));
+        arr.push(target.read(filter));
     }
     return Promise.all(arr);
 }
 
-LinkedUnion.prototype.delete = function (this: LinkedUnion, req: Request<DeleteStatement>) {
-    console.log(this, "Tries to delete unioun");
+LinkedUnion.prototype.delete = function (this: LinkedUnion, req: DeleteStatement) {
+    console.log(this, "Tries to delete LinkedUnion");
 }
 
 

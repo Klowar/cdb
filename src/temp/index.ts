@@ -1,7 +1,5 @@
 import { VirtualFile } from '../data';
 import { createMetaFile, MetaFile } from './../meta/index';
-import { Literal, UpdateStatement } from './../parser/types';
-import { Request } from './../processor/index';
 import { DEFAULT_LOCK_SIZE } from './constants';
 import { StreamJob } from './job';
 
@@ -22,10 +20,11 @@ export type TemporaryFile = {
     setBlockSize: (size: number) => void;
     getBlockSize: () => number;
     setTarget: (target: VirtualFile) => void;
-    getIndices: (value: Literal) => Promise<number[]>;
-    write: (statement: Literal) => Promise<any>;
-    update: (statement: Request<UpdateStatement>) => Promise<any>;
-    read: (statement: number[] | undefined) => Promise<any>;
+    getIndices: (value: string | number) => Promise<number[]>;
+    write: (data: string | number) => Promise<any>;
+    update: (records: number[] | undefined, data: string | number) => Promise<any>;
+    read: (records: number[] | undefined) => Promise<any>;
+    delete: (records: number[]) => Promise<any>;
 }
 
 function TemporaryFile(this: TemporaryFile, vf: MetaFile) {
@@ -60,22 +59,26 @@ TemporaryFile.prototype.setTarget = function (this: TemporaryFile, target: MetaF
     this.target = target;
 }
 
-TemporaryFile.prototype.getIndices = async function (this: TemporaryFile, value: Literal) {
-    return this.target.getIndices(value.value);
+TemporaryFile.prototype.getIndices = async function (this: TemporaryFile, data: string | number) {
+    return this.target.getIndices(data);
 }
 
-TemporaryFile.prototype.write = async function (this: TemporaryFile, data: Literal) {
+TemporaryFile.prototype.write = async function (this: TemporaryFile, data: string | number) {
     console.log(this, "Tries to write temp file");
-    return this.vf.write(data.value);
+    return this.vf.write(data);
 }
 
-TemporaryFile.prototype.read = async function (this: TemporaryFile, req: number[] | undefined) {
+TemporaryFile.prototype.read = async function (this: TemporaryFile, records: number[] | undefined) {
     console.log(this, "Tries to read temp file");
-    if (req === undefined) return new Promise(() => []);
-    return Promise.all([this.target.read(req.filter(_ => _ > this.streamOffset)), this.vf.read(req)]);
+    if (records === undefined) return new Promise(() => []);
+    return Promise.all([this.target.read(records.filter(_ => _ > this.streamOffset)), this.vf.read(records)]);
 }
 
-TemporaryFile.prototype.delete = async function (this: TemporaryFile, offset: number, amount: number) {
+TemporaryFile.prototype.update = async function (this: TemporaryFile, records: number[] | undefined, data: string | number) {
+    console.log(this, "Tries to update temp file");
+}
+
+TemporaryFile.prototype.delete = async function (this: TemporaryFile, records: number[]) {
     console.log(this, "Tries to delete temp file");
 }
 

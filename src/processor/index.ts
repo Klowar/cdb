@@ -4,15 +4,6 @@ import { STATEMENTS, TABLE_KIND } from './../parser/constants';
 import { AlterStatement, CreateStatement, DeleteStatement, DropStatement, InsertStatement, Root, SelectStatement, Statement, UpdateStatement } from './../parser/types';
 import { Union } from './../union/index';
 
-export type Request<T> = {
-    statement: T,
-    filter?: number[]
-}
-
-function Request(this: Request<Statement>, statement: Statement) {
-    this.statement = statement;
-}
-
 export type Processor = {
     unions: Map<string, Union>;
     addUnion: (union: Union) => Promise<any>;
@@ -89,13 +80,13 @@ Processor.prototype.alter = function (this: Processor, query: AlterStatement) {
 
 Processor.prototype.select = function (this: Processor, query: SelectStatement) {
     console.log("process select query", query);
-    if (query.target) return this.unions.get(query.target.name)?.read(new Request(query));
+    if (query.target) return this.unions.get(query.target.name)?.read(query);
     else return new Promise(res => res("No read target"));
 }
 
 Processor.prototype.insert = function (this: Processor, query: InsertStatement) {
     console.log("process insert query", query);
-    if (query.target) return this.unions.get(query.target.name)?.write(new Request(query));
+    if (query.target) return this.unions.get(query.target.name)?.write(query);
     else return new Promise(res => res("No write target"));
 }
 

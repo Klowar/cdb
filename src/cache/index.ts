@@ -1,6 +1,5 @@
 import { getBlockSize } from '../entity/util';
-import { DeleteStatement, Literal, TypedIdentifier, UpdateStatement } from './../parser/types';
-import { Request } from './../processor/index';
+import { Literal, TypedIdentifier } from './../parser/types';
 import { createTemporaryFile, TemporaryFile } from './../temp/index';
 
 
@@ -9,11 +8,11 @@ export type Cache = {
     data: Map<string, any>;
     tf: TemporaryFile;
     getDataType: () => string;
-    getIndices: (value: Literal) => Promise<number[]>;
-    write: (statement: Literal) => Promise<any>;
-    update: (statement: Request<UpdateStatement>) => Promise<any>;
-    read: (statement: number[] | undefined) => Promise<any>;
-    delete: (statement: Request<DeleteStatement>) => Promise<any>;
+    getIndices: (data: string | number) => Promise<number[]>;
+    write: (data: string | number) => Promise<any>;
+    update: (records: number[], data: Literal) => Promise<any>;
+    read: (records: number[] | undefined) => Promise<any>;
+    delete: (records: number[]) => Promise<any>;
 }
 
 function Cache(this: Cache, tf: TemporaryFile) {
@@ -25,25 +24,25 @@ Cache.prototype.getDataType = function (this: Cache) {
     return this.tf.getDataType();
 }
 
-Cache.prototype.getIndices = async function (this: Cache, value: Literal) {
-    return this.tf.getIndices(value);
+Cache.prototype.getIndices = async function (this: Cache, data: string | number) {
+    return this.tf.getIndices(data);
 }
 
-Cache.prototype.write = function (this: Cache, req: Literal) {
+Cache.prototype.write = function (this: Cache, data: string | number) {
     console.log(this, "Tries to write cache");
-    return this.tf.write(req);
+    return this.tf.write(data);
 }
 
-Cache.prototype.update = function (this: Cache, req: Request<UpdateStatement>) {
+Cache.prototype.update = function (this: Cache, records: number[] | undefined, data: string | number) {
     console.log(this, "Tries to update cache");
 }
 
-Cache.prototype.read = function (this: Cache, req: number[] | undefined) {
+Cache.prototype.read = function (this: Cache, records: number[] | undefined) {
     console.log(this, "Tries to read cache");
-    return this.tf.read(req);
+    return this.tf.read(records);
 }
 
-Cache.prototype.delete = function (this: Cache, req: Request<DeleteStatement>) {
+Cache.prototype.delete = function (this: Cache, records: number[]) {
     console.log(this, "Tries to delete cache");
 }
 

@@ -1,6 +1,4 @@
 import { createVirtualFile, VirtualFile } from './../data/index';
-import { DeleteStatement, UpdateStatement } from './../parser/types';
-import { Request } from './../processor/index';
 import { ENCODING_UTF_8 } from './constants';
 import { getReader, getWriter } from './util';
 
@@ -25,9 +23,10 @@ export type MetaFile = {
     getOffset: (value: string | number) => Promise<number>;
     write: (statement: string | number) => Promise<any>;
     writeOffset: (offset: number) => Promise<any>;
-    update: (statement: Request<UpdateStatement>) => Promise<any>;
+    update: (records: number[], data: string | number) => Promise<any>;
     readRange: (start: number, end: number) => Promise<any>;
-    read: (statement: number[] | undefined) => Promise<any>;
+    read: (records: number[] | undefined) => Promise<any>;
+    delete: (records: number[]) => Promise<any>;
 }
 
 function MetaFile(this: MetaFile, vf: VirtualFile) {
@@ -91,7 +90,7 @@ MetaFile.prototype.writeOffset = async function (this: MetaFile, offset: number)
     return this.vf.writeOffset(offset).then(() => ++this.blockAmount);
 }
 
-MetaFile.prototype.update = function (this: MetaFile, req: Request<UpdateStatement>) {
+MetaFile.prototype.update = function (this: MetaFile, records: number[], data: string | number) {
     console.log(this, "Tries to write to meta file");
 }
 
@@ -114,7 +113,7 @@ MetaFile.prototype.readRange = async function (this: MetaFile, start: number, en
     return Promise.all(promises)
 }
 
-MetaFile.prototype.delete = function (this: MetaFile, req: Request<DeleteStatement>) {
+MetaFile.prototype.delete = function (this: MetaFile, records: number[]) {
     console.log(this, "Tries to delete the meta file");
 }
 

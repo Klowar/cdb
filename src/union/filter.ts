@@ -3,6 +3,7 @@ import scope from '../parser/sqope';
 import { BinaryExpression, DeleteStatement, SelectStatement, UpdateStatement } from '../parser/types';
 import { intersection } from '../util';
 import { Identifier, Literal } from './../parser/types';
+import { castTo } from './util';
 
 export type Filter = {
     union: Union,
@@ -15,17 +16,24 @@ export function Filter(this: Filter, union: Union) {
 
 Filter.prototype.processWhere = async function (this: Filter, statement: SelectStatement | UpdateStatement | DeleteStatement) {
     if (statement.where == null) return [];
-    let where = statement.where as BinaryExpression;
     // Planarize
-    const planeExpression: BinaryExpression[] = [];
-    while (where.rParam instanceof scope.prototype.binaryExpression) {
-        planeExpression.push(where.rParam as BinaryExpression);
-        where = where.lParam as BinaryExpression;
-    }
-    planeExpression.push(where);
+    const planeExpression: BinaryExpression[] = planarize(statement.where as BinaryExpression);
     const entityIndicies = await Promise.all(
-        planeExpression.map((_) => this.union.getEntity((_.lParam as Identifier).name).getIndices(_.rParam as Literal))
+        planeExpression.map((_) => {
+            const entity = this.union.getEntity((_.lParam as Identifier).name);
+            return entity.getIndices(castTo(entity.getType(), _.rParam as Literal).value);
+        })
     );
 
     return entityIndicies.reduce((p, c) => intersection(p, c));
+}
+
+export function planarize(expression: BinaryExpression) {
+    const planeExpression: BinaryExpression[] = [];
+    while (expression.rParam instanceof scope.prototype.binaryExpression) {
+        planeExpression.push(expression.rParam as BinaryExpression);
+        expression = expression.lParam as BinaryExpression;
+    }
+    planeExpression.push(expression);
+    return planeExpression;
 }

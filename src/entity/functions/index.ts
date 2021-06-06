@@ -1,5 +1,4 @@
-import { Request } from '../../processor';
-import { Ammsc, SelectStatement } from './../../parser/types';
+import { Ammsc } from './../../parser/types';
 import { Union } from './../../union/index';
 import { AmmscAvg, AmmscAvgName } from './avg';
 import { AmmscCount, AmmscCountName } from './count';
@@ -11,7 +10,7 @@ import { AmmscSum, AmmscSumName } from './sum';
 export type AmmscBase = {
     ammsc: Ammsc;
     target: Union;
-    read: (statement: Request<SelectStatement>) => Promise<any>;
+    read: (records: number[]) => Promise<any>;
 };
 
 export function AmmscBase(this: AmmscBase, ammsc: Ammsc, union: Union) {
@@ -19,7 +18,7 @@ export function AmmscBase(this: AmmscBase, ammsc: Ammsc, union: Union) {
     this.target = union;
 }
 
-AmmscBase.prototype.read = async function (this: AmmscBase, req: Request<SelectStatement>) {
+AmmscBase.prototype.read = async function (this: AmmscBase, records: number[]) {
     throw new Error("Unrealized ammsc");
 }
 
