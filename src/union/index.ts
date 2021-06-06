@@ -1,9 +1,5 @@
-import { nanoid } from 'nanoid';
-import { createEntity } from '../entity';
-import { CreateStatement } from '../parser';
-import { AmmscStore } from './../entity/functions/index';
 import { Entity } from './../entity/index';
-import { Ammsc, DeleteStatement, InsertStatement, SelectStatement, UpdateStatement } from './../parser/types';
+import { DeleteStatement, InsertStatement, SelectStatement, UpdateStatement } from './../parser/types';
 import { Request } from './../processor/index';
 import { Filter } from './filter';
 
@@ -23,7 +19,7 @@ export type Union = {
     delete: (statement: Request<DeleteStatement>) => Promise<any>;
 }
 
-function Union(this: Union, entities: Entity[]) {
+export function Union(this: Union, entities: Entity[]) {
     this.entities = new Map(entities.map(_ => [_.name, _]));
     this.filter = new Filter(this);
 }
@@ -45,47 +41,17 @@ Union.prototype.setId = function (this: Union, id: string) {
 }
 
 Union.prototype.write = async function (this: Union, req: Request<InsertStatement>) {
-    console.log(this, "Tries to write union");
-    const arr = new Array(req.statement.values.length);
-    for (const entity of this.entities.values())
-        arr.push(entity.write(req));
-    return Promise.all(arr);
+    throw new Error("Unrealized Union type");
 }
 
 Union.prototype.update = function (this: Union, req: Request<UpdateStatement>) {
-    console.log(this, "Tries to update union");
+    throw new Error("Unrealized Union type");
 }
 
 Union.prototype.read = async function (this: Union, req: Request<SelectStatement>) {
-    console.log(this, "Tries to read union");
-    req.filter = await this.filter.processWhere(req.statement);
-    const arr = new Array(req.statement.columns.length);
-    for (const entity of req.statement.columns) {
-        const target = this.hasEntity(entity.name)
-            ? this.getEntity(entity.name)
-            : AmmscStore.get(entity as Ammsc, this);
-        arr.push(target.read(req));
-    }
-    return Promise.all(arr);
+    throw new Error("Unrealized Union type");
 }
 
 Union.prototype.delete = function (this: Union, req: Request<DeleteStatement>) {
-    console.log(this, "Tries to delete unioun");
-}
-
-
-export function getUnion(ents: Entity[]): Promise<Union> {
-    const union = new Union(ents);
-
-    return new Promise((res) => res(union));
-}
-
-export function createUnion(req: CreateStatement): Promise<Union> {
-    const columns: Entity[] = [];
-    for (const column of req.columns)
-        columns.push(createEntity(column));
-    const union = new Union(columns);
-    union.setName(req.target?.name);
-    union.setId(nanoid());
-    return new Promise((res) => res(union));
+    throw new Error("Unrealized Union type");
 }
