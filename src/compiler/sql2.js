@@ -174,8 +174,8 @@ case 26:
 
             {
                 this.$ = new yy.scope.insertStatement();
-                this.$.setTarget($$[$0-5]);
-                this.$.setValues($$[$0-2]);
+                this.$.setTarget($$[$0-4]);
+                this.$.setValues($$[$0-1]);
             }
         
 break;
@@ -183,9 +183,9 @@ case 27:
 
             {
                 this.$ = new yy.scope.insertStatement();
-                this.$.setTarget($$[$0-8]);
-                this.$.setColumns($$[$0-6]);
-                this.$.setValues($$[$0-2]);
+                this.$.setTarget($$[$0-7]);
+                this.$.setColumns($$[$0-5]);
+                this.$.setValues($$[$0-1]);
             }
         
 break;
@@ -270,7 +270,7 @@ case 50: case 62:
             }
         
 break;
-case 51: case 63:
+case 51: case 63: case 71:
 
             {
                 this.$ = [$$[$0]];

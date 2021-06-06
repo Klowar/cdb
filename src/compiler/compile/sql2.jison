@@ -134,16 +134,16 @@ insert_statement:
         INSERT INTO insert_target VALUES '(' multi_literal ')' {
             {
                 $$ = new yy.scope.insertStatement();
-                $$.setTarget($2);
-                $$.setValues($5);
+                $$.setTarget($3);
+                $$.setValues($6);
             }
         }
     |   INSERT INTO insert_target '(' multi_identifier ')' VALUES '(' multi_literal ')' {
             {
                 $$ = new yy.scope.insertStatement();
-                $$.setTarget($2);
-                $$.setColumns($4);
-                $$.setValues($8);
+                $$.setTarget($3);
+                $$.setColumns($5);
+                $$.setValues($9);
             }
         }
     ;
@@ -368,7 +368,11 @@ multi_literal:
                 $$.push($3);
             }
         }
-    |   literal
+    |   literal {
+            {
+                $$ = [$1];
+            }
+        }
     ;
 
 literal:
