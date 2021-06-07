@@ -1,7 +1,7 @@
 import { createLinkedUnion } from '../union/linked';
 import { createUniqueUnion } from '../union/unique';
 import { STATEMENTS, TABLE_KIND } from './../parser/constants';
-import { AlterStatement, CreateStatement, DeleteStatement, DropStatement, InsertStatement, Root, SelectStatement, Statement, UpdateStatement } from './../parser/types';
+import { AlterStatement, CreateStatement, DeleteStatement, DropStatement, InsertStatement, Root, SelectStatement, UpdateStatement } from './../parser/types';
 import { Union } from './../union/index';
 
 export type Processor = {
@@ -33,8 +33,10 @@ Processor.prototype.process = function (this: Processor, query: Root) {
             return this.insert(query.statement as InsertStatement);
         case STATEMENTS.DML.SELECT:
             return this.select(query.statement as SelectStatement);
+        case STATEMENTS.DML.UPDATE:
+            return this.update(query.statement as UpdateStatement);
         default:
-            return Error("No method realized");
+            throw new Error("No method realized");
     }
 }
 
@@ -92,6 +94,8 @@ Processor.prototype.insert = function (this: Processor, query: InsertStatement) 
 
 Processor.prototype.update = function (this: Processor, query: UpdateStatement) {
     console.log("process update query", query);
+    if (query.target) return this.unions.get(query.target.name)?.update(query);
+    else return new Promise(res => res("No write target"));
 }
 
 Processor.prototype.delete = function (this: Processor, query: DeleteStatement) {

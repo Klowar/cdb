@@ -157,12 +157,14 @@ update_statement:
             {
                 $$ = new yy.scope.updateStatement();
                 $$.setTarget($2);
+                $$.setExpression($4);
             }
         }
     |   UPDATE update_target SET expression condition_clause {
             {
                 $$ = new yy.scope.updateStatement();
                 $$.setTarget($2);
+                $$.setExpression($4);
                 $$.setWhere($5);
             }
         }
@@ -254,7 +256,11 @@ multi_expression:
                 $$.push($3);
             }
         }
-    |   expression
+    |   expression {
+            {
+                $$ = [$1];
+            }
+        }
     ;
 
 function:

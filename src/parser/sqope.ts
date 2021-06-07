@@ -137,11 +137,9 @@ createStatement.prototype.setObject = function (object: string) {
 }
 
 alterStatement.prototype = new statement({ type: STATEMENTS.DDL.ALTER })
-function alterStatement(this: AlterStatement) {
-    this.expressions = [];
-}
-alterStatement.prototype.setExpressions = function (expressions: Expression[]) {
-    this.expressions = expressions;
+function alterStatement(this: AlterStatement) {}
+alterStatement.prototype.setExpression = function (expression: BinaryExpression) {
+    this.expression = expression;
 }
 
 dropStatement.prototype = new statement({ type: STATEMENTS.DDL.DROP })
@@ -188,13 +186,12 @@ insertStatement.prototype.setColumns = function (columns) {
 updateStatement.prototype = new statement({ type: STATEMENTS.DML.UPDATE });
 function updateStatement(this: UpdateStatement) {
     this.where = null;
-    this.expressions = []
 }
 updateStatement.prototype.setWhere = function (where) {
     this.where = where;
 }
-updateStatement.prototype.setExpressions = function (expressions) {
-    this.expressions = expressions;
+updateStatement.prototype.setExpression = function (expression: BinaryExpression) {
+    this.expression = expression;
 }
 
 

@@ -47,13 +47,13 @@ export type CreateStatement = Statement & {
 }
 
 export type AlterStatement = Statement & {
-    expressions: Expression[];
+    expression: BinaryExpression;
 }
 
 export type DropStatement = Statement;
 
 export type SelectStatement = Statement & {
-    where: Expression | null;
+    where: BinaryExpression | null;
     columns: (Identifier | Ammsc)[];
 }
 
@@ -63,12 +63,12 @@ export type InsertStatement = Statement & {
 }
 
 export type UpdateStatement = Statement & {
-    where: Expression | null;
-    expressions: Expression[];
+    where: BinaryExpression | null;
+    expression: BinaryExpression;
 }
 
 export type DeleteStatement = Statement & {
-    where: Expression | null;
+    where: BinaryExpression | null;
 }
 
 export type Root = {

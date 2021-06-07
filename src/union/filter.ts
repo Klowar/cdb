@@ -20,8 +20,11 @@ Filter.prototype.processWhere = async function (this: Filter, statement: SelectS
     const planeExpression: BinaryExpression[] = planarize(statement.where as BinaryExpression);
     const entityIndicies = await Promise.all(
         planeExpression.map((_) => {
-            const entity = this.union.getEntity((_.lParam as Identifier).name);
-            return entity.getIndices(castTo(entity.getType(), _.rParam as Literal).value);
+            const target = _.lParam as Identifier;
+            const literal = _.rParam as Literal;
+            if (target.name == this.union.name) return [Number(literal.value)];
+            const entity = this.union.getEntity(target.name);
+            return entity.getIndices(castTo(entity.getType(), literal).value);
         })
     );
 

@@ -93,9 +93,13 @@ MetaFile.prototype.writeOffset = async function (this: MetaFile, offset: number)
 MetaFile.prototype.update = async function (this: MetaFile, records: number[], data: string | number) {
     console.log(this, "Tries to write to meta file");
     let offset = await this.getOffset(data);
-    if (offset == -1)
-        offset = await this.vf.write(this.offset, data).then(_ => this.offset + _);
-    return Promise.all(records.map(_ => this.vf.write(offset, _)));
+    if (offset == -1) {
+        offset = this.offset;
+        await this.vf.write(this.offset, data)
+            .then(_ => this.offset += _)
+            .then(() => ++this.blockAmount);
+    }
+    return Promise.all(records.map(_ => this.vf.writeOffset(offset, _).then(() => _)));
 }
 
 MetaFile.prototype.read = async function (this: MetaFile, req: number[] | undefined) {

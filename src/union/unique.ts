@@ -28,9 +28,9 @@ UniqueUnion.prototype.write = async function (this: UniqueUnion, statement: Inse
 UniqueUnion.prototype.update = async function (this: UniqueUnion, statement: UpdateStatement) {
     console.log(this, "Tries to update UniqueUnion");
     const filter = await this.filter.processWhere(statement);
-    const planeWhere = planarize(statement.where as BinaryExpression);
-    const arr = new Array(planeWhere.length);
-    for (const biExp of planeWhere) {
+    const planeExpr = planarize(statement.expression);
+    const arr = new Array(planeExpr.length);
+    for (const biExp of planeExpr) {
         const entity = this.getEntity((biExp.lParam as Identifier).name);
         arr[entity.getIndex()] = entity.update(filter, castTo(entity.getType(), biExp.rParam as Literal).value);
     }

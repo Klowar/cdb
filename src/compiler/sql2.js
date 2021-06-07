@@ -194,6 +194,7 @@ case 29:
             {
                 this.$ = new yy.scope.updateStatement();
                 this.$.setTarget($$[$0-2]);
+                this.$.setExpression($$[$0]);
             }
         
 break;
@@ -202,6 +203,7 @@ case 30:
             {
                 this.$ = new yy.scope.updateStatement();
                 this.$.setTarget($$[$0-3]);
+                this.$.setExpression($$[$0-1]);
                 this.$.setWhere($$[$0]);
             }
         
@@ -247,6 +249,13 @@ case 46: case 70:
             }
         
 break;
+case 47: case 51: case 63: case 71:
+
+            {
+                this.$ = [$$[$0]];
+            }
+        
+break;
 case 48:
 
             {
@@ -267,13 +276,6 @@ case 50: case 62:
                 this.$ = Array.isArray($$[$0-2]) ? $$[$0-2] : [$$[$0-2]];
                 $$[$0].setIndex(this.$.length || 0);
                 this.$.push($$[$0]);
-            }
-        
-break;
-case 51: case 63: case 71:
-
-            {
-                this.$ = [$$[$0]];
             }
         
 break;
