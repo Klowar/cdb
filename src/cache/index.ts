@@ -10,7 +10,7 @@ export type Cache = {
     getDataType: () => string;
     getIndices: (data: string | number) => Promise<number[]>;
     write: (data: string | number) => Promise<any>;
-    update: (records: number[], data: Literal) => Promise<any>;
+    update: (records: number[], data: string | number) => Promise<any>;
     read: (records: number[] | undefined) => Promise<any>;
     delete: (records: number[]) => Promise<any>;
 }
@@ -33,8 +33,9 @@ Cache.prototype.write = function (this: Cache, data: string | number) {
     return this.tf.write(data);
 }
 
-Cache.prototype.update = function (this: Cache, records: number[] | undefined, data: string | number) {
+Cache.prototype.update = function (this: Cache, records: number[], data: string | number) {
     console.log(this, "Tries to update cache");
+    return this.tf.update(records, data);
 }
 
 Cache.prototype.read = function (this: Cache, records: number[] | undefined) {

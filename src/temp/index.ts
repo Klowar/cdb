@@ -22,7 +22,7 @@ export type TemporaryFile = {
     setTarget: (target: VirtualFile) => void;
     getIndices: (value: string | number) => Promise<number[]>;
     write: (data: string | number) => Promise<any>;
-    update: (records: number[] | undefined, data: string | number) => Promise<any>;
+    update: (records: number[], data: string | number) => Promise<any>;
     read: (records: number[] | undefined) => Promise<any>;
     delete: (records: number[]) => Promise<any>;
 }
@@ -71,11 +71,12 @@ TemporaryFile.prototype.write = async function (this: TemporaryFile, data: strin
 TemporaryFile.prototype.read = async function (this: TemporaryFile, records: number[] | undefined) {
     console.log(this, "Tries to read temp file");
     if (records === undefined) return new Promise(() => []);
-    return Promise.all([this.target.read(records.filter(_ => _ > this.streamOffset)), this.vf.read(records)]);
+    return Promise.all([this.vf.read(records.filter(_ => _ > this.streamOffset)), this.target.read(records)]);
 }
 
-TemporaryFile.prototype.update = async function (this: TemporaryFile, records: number[] | undefined, data: string | number) {
+TemporaryFile.prototype.update = async function (this: TemporaryFile, records: number[], data: string | number) {
     console.log(this, "Tries to update temp file");
+    return this.target.update(records, data);
 }
 
 TemporaryFile.prototype.delete = async function (this: TemporaryFile, records: number[]) {

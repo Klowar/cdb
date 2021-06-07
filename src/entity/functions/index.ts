@@ -11,11 +11,16 @@ export type AmmscBase = {
     ammsc: Ammsc;
     target: Union;
     read: (records: number[]) => Promise<any>;
+    getIndex: () => number;
 };
 
 export function AmmscBase(this: AmmscBase, ammsc: Ammsc, union: Union) {
     this.ammsc = ammsc;
     this.target = union;
+}
+
+AmmscBase.prototype.getIndex = function (this: AmmscBase) {
+    return this.target.getEntity(this.ammsc.params[0].name);
 }
 
 AmmscBase.prototype.read = async function (this: AmmscBase, records: number[]) {

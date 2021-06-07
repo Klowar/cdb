@@ -26,7 +26,7 @@ export type VirtualFile = {
     readIndices: (offset: number, value: string | number) => Promise<any>;
     findOffset: (value: string | number, blockSize: number) => Promise<number>;
     write: (offset: number, data: string | number) => Promise<any>;
-    writeOffset: (offset: number) => Promise<any>;
+    writeOffset: (offset: number, record?: number) => Promise<any>;
     read: (record: number) => Promise<{ bytesRead: number; buffer: Buffer; }>;
     delete: (offset: number, amount: number) => Promise<any>;
 }
@@ -61,10 +61,10 @@ VirtualFile.prototype.write = async function (this: VirtualFile, offset: number,
     return this.writer.write(offset, data);
 }
 
-VirtualFile.prototype.writeOffset = async function (this: VirtualFile, offset: number) {
+VirtualFile.prototype.writeOffset = async function (this: VirtualFile, offset: number, record?: number) {
     const offsetBuffer = Buffer.allocUnsafe(4);
     offsetBuffer.writeUInt32BE(offset);
-    return this.offsetFile.write(offsetBuffer);
+    return this.offsetFile.write(offsetBuffer, 0, 4, record == null ? record : record * 4);
 }
 
 VirtualFile.prototype.read = async function (this: VirtualFile, record: number) {

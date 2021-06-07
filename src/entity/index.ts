@@ -56,6 +56,7 @@ Entity.prototype.write = function (this: Entity, data: string | number) {
 
 Entity.prototype.update = function (this: Entity, records: number[], data: string | number) {
     console.log(this, "Tries to update entity");
+    return this.cache.update(records, data);
 }
 
 Entity.prototype.read = function (this: Entity, records: number[]) {
