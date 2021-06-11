@@ -1,3 +1,6 @@
+export type KeyValue = { [key: string]: KeyValue | string }
+export type Option = KeyValue;
+
 export type Literal = {
     value: string | number;
 }
@@ -42,7 +45,7 @@ export type Statement = {
 }
 
 export type CreateStatement = Statement & {
-    object: string;
+    options: Option;
     columns: TypedIdentifier[];
 }
 
@@ -133,6 +136,8 @@ export interface CreateStatementConstructor {
 }
 
 export type ScopeType = {
+    const: KeyValue;
+    //
     literal: LiteralConstructor;
     ast_root: RootConstructor;
     identifier: IdentifierConstructor;

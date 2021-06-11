@@ -12,8 +12,11 @@ export const STATEMENTS = {
     }
 };
 
-export const TABLE_KIND = {
-    TABLE: 'TABLE',
-    UNIQUE_TABLE: 'UNIQUE TABLE',
-    LINKED_TABLE: 'LINKED TABLE'
+export const CREATE_OPTIONS = {
+    MODE: 'MODE'
+}
+
+export const TABLE_MODE = {
+    UNIQUE: 'UNIQUE',
+    LINKED: 'LINKED'
 };

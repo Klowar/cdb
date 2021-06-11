@@ -39,39 +39,31 @@ create_statement:
         CREATE SCHEMA simple_name_identifier {
             {
                 $$ = new yy.scope.createStatement();
-                $$.setObject($2);
                 $$.setTarget($3);
+                $$.setOption(yy.scope.const.MODE, yy.scope.const.UNIQUE);
             }
         }
     |   CREATE TABLE simple_name_identifier '(' multi_identifier ')' {
             {
                 $$ = new yy.scope.createStatement();
-                $$.setObject($2);
                 $$.setTarget($3);
                 $$.setColumns($5);
+                $$.setOption(yy.scope.const.MODE, yy.scope.const.UNIQUE);
             }
         }
     |   CREATE TABLE simple_name_identifier '(' multi_identifier ')' AS table_kind {
             {
                 $$ = new yy.scope.createStatement();
-                $$.setObject($8);
                 $$.setTarget($3);
                 $$.setColumns($5);
+                $$.setOption(yy.scope.const.MODE, $8);
             }
         }
     ;
 
 table_kind:
-        UNIQUE TABLE {
-            {
-                $$ = "UNIQUE TABLE"
-            }
-        }
-    |   LINKED TABLE {
-            {
-                $$ = "LINKED TABLE"
-            }
-        }
+        UNIQUE
+    |   LINKED
     ;
 
 alter_statement:

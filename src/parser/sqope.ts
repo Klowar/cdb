@@ -1,15 +1,13 @@
-import { STATEMENTS } from './constants';
+import { CREATE_OPTIONS, STATEMENTS, TABLE_MODE } from './constants';
 import { AlterStatement, Ammsc, BinaryExpression, CreateStatement, DeleteStatement, DropStatement, Expression, Identifier, InsertStatement, Literal, Root, ScopeType, SelectStatement, Statement, TypedIdentifier, UnaryExpression, UpdateStatement } from './types';
 /** ast tree wrapper */
 
 // Some parameter like static strings, numbers in query
-literal.prototype = Object.create(null);
 function literal(this: Literal, value: string | number) {
     this.value = value;
 }
 
 // Column names, table names and other named things
-identifier.prototype = Object.create(null);
 function identifier(this: Identifier, obj?: { name: string, index?: number, alias?: string, scope?: Identifier }) {
     if (obj !== undefined) {
         this.name = obj.name;
@@ -18,20 +16,19 @@ function identifier(this: Identifier, obj?: { name: string, index?: number, alia
         this.index = obj.index || 0;
     }
 }
-identifier.prototype.setName = function (name) {
+identifier.prototype.setName = function (this: Identifier, name: string) {
     this.name = name;
 }
-identifier.prototype.setAlias = function (alias) {
+identifier.prototype.setAlias = function (this: Identifier, alias: string) {
     this.alias = alias;
 }
-identifier.prototype.setScope = function (scope) {
+identifier.prototype.setScope = function (this: Identifier, scope: Identifier) {
     this.scope = scope;
 }
-identifier.prototype.setIndex = function (index) {
+identifier.prototype.setIndex = function (this: Identifier, index: number) {
     this.index = index;
 }
 
-typedIdentifier.prototype = Object.create(null);
 function typedIdentifier(this: TypedIdentifier, obj?: { name: string, type: string, size?: number, index?: number }) {
     if (obj !== undefined) {
         this.name = obj.name;
@@ -40,13 +37,13 @@ function typedIdentifier(this: TypedIdentifier, obj?: { name: string, type: stri
         this.index = obj.index || 0;
     }
 }
-typedIdentifier.prototype.setName = function (name) {
+typedIdentifier.prototype.setName = function (this: TypedIdentifier, name: string) {
     this.name = name;
 }
-typedIdentifier.prototype.setType = function (type) {
+typedIdentifier.prototype.setType = function (this: TypedIdentifier, type: string) {
     this.type = type;
 }
-typedIdentifier.prototype.setIndex = function (index) {
+typedIdentifier.prototype.setIndex = function (this: TypedIdentifier, index: number) {
     this.index = index;
 }
 
@@ -56,10 +53,10 @@ function ast_root(this: Root) {
     this.objects = [];
     this.statement = null;
 }
-ast_root.prototype.setStatement = function (statement) {
+ast_root.prototype.setStatement = function (this: Root, statement: Statement) {
     this.statement = statement;
 }
-ast_root.prototype.add = function (some) {
+ast_root.prototype.add = function (this: Root, some: Statement | Identifier | Expression | Literal) {
     this.objects.push(some);
 }
 
@@ -67,7 +64,7 @@ ast_root.prototype.add = function (some) {
 function expression(this: Expression, obj: { operator: string }) {
     this.operator = obj.operator;
 }
-expression.prototype.setOperator = function (operator: string) {
+expression.prototype.setOperator = function (this: Expression, operator: string) {
     this.operator = operator;
 }
 
@@ -88,13 +85,13 @@ function binaryExpression(this: BinaryExpression, obj: { lParam: Identifier | Li
     this.rParam = obj.rParam;
     this.operator = obj.operator;
 }
-binaryExpression.prototype.setLParam = function (lParam: typeof literal | typeof identifier) {
+binaryExpression.prototype.setLParam = function (this: BinaryExpression, lParam: Literal | Identifier | Expression) {
     this.lParam = lParam;
 }
-binaryExpression.prototype.setRParam = function (rParam: typeof literal | typeof identifier) {
+binaryExpression.prototype.setRParam = function (this: BinaryExpression, rParam: Literal | Identifier | Expression) {
     this.rParam = rParam;
 }
-binaryExpression.prototype.setOperator = function (operator: string) {
+binaryExpression.prototype.setOperator = function (this: BinaryExpression, operator: string) {
     this.operator = operator;
 }
 
@@ -112,10 +109,10 @@ function statement(this: Statement, obj: { type: string }) {
     this.schema = DEFAULT_SCHEMA;
 }
 statement.prototype = {
-    setTarget: function (target) {
+    setTarget: function (this: Statement, target: Identifier) {
         this.target = target;
     },
-    setSchema: function (schema) {
+    setSchema: function (this: Statement, schema: string) {
         this.schema = schema;
     },
     setType: function () {
@@ -127,18 +124,20 @@ statement.prototype = {
 
 createStatement.prototype = new statement({ type: STATEMENTS.DDL.CREATE });
 function createStatement(this: CreateStatement) {
+    this.options = {};
     this.columns = [];
 }
-createStatement.prototype.setColumns = function (columns: TypedIdentifier[]) {
+createStatement.prototype.setColumns = function (this: CreateStatement, columns: TypedIdentifier[]) {
     this.columns = columns;
 }
-createStatement.prototype.setObject = function (object: string) {
-    this.object = object;
+createStatement.prototype.setOption = function (this: CreateStatement, key: string, option: string) {
+    this.options[key] = option;
 }
 
 alterStatement.prototype = new statement({ type: STATEMENTS.DDL.ALTER })
-function alterStatement(this: AlterStatement) {}
-alterStatement.prototype.setExpression = function (expression: BinaryExpression) {
+function alterStatement(this: AlterStatement) { }
+
+alterStatement.prototype.setExpression = function (this: AlterStatement, expression: BinaryExpression) {
     this.expression = expression;
 }
 
@@ -152,13 +151,13 @@ function selectStatement(this: SelectStatement) {
     this.where = null;
     this.columns = [];
 }
-selectStatement.prototype.setWhere = function (where) {
+selectStatement.prototype.setWhere = function (this: SelectStatement, where: BinaryExpression) {
     this.where = where;
 }
-selectStatement.prototype.addColumn = function (elem) {
+selectStatement.prototype.addColumn = function (this: SelectStatement, elem: Identifier) {
     this.columns.push(elem);
 }
-selectStatement.prototype.setColumns = function (columns) {
+selectStatement.prototype.setColumns = function (this: SelectStatement, columns: Identifier[]) {
     this.columns = columns;
 }
 
@@ -168,16 +167,16 @@ function insertStatement(this: InsertStatement) {
     this.values = [];
     this.columns = [];
 }
-insertStatement.prototype.addValue = function (value) {
+insertStatement.prototype.addValue = function (this: InsertStatement, value: Literal) {
     this.values.push(value);
 }
-insertStatement.prototype.setValues = function (values) {
+insertStatement.prototype.setValues = function (this: InsertStatement, values: Literal[]) {
     this.values = values;
 }
-insertStatement.prototype.addColumn = function (column) {
+insertStatement.prototype.addColumn = function (this: InsertStatement, column: Identifier) {
     this.columns.push(column);
 }
-insertStatement.prototype.setColumns = function (columns) {
+insertStatement.prototype.setColumns = function (this: InsertStatement, columns: Identifier[]) {
     this.columns = columns;
 }
 
@@ -187,10 +186,10 @@ updateStatement.prototype = new statement({ type: STATEMENTS.DML.UPDATE });
 function updateStatement(this: UpdateStatement) {
     this.where = null;
 }
-updateStatement.prototype.setWhere = function (where) {
+updateStatement.prototype.setWhere = function (this: UpdateStatement, where: BinaryExpression) {
     this.where = where;
 }
-updateStatement.prototype.setExpression = function (expression: BinaryExpression) {
+updateStatement.prototype.setExpression = function (this: UpdateStatement, expression: BinaryExpression) {
     this.expression = expression;
 }
 
@@ -199,13 +198,14 @@ deleteStatement.prototype = new statement({ type: STATEMENTS.DML.DELETE })
 function deleteStatement(this: DeleteStatement) {
     this.where = null;
 }
-deleteStatement.prototype.setWhere = function (where) {
+deleteStatement.prototype.setWhere = function (this: DeleteStatement, where: BinaryExpression) {
     this.where = where;
 }
 
 export default function scope(this: ScopeType) {
 }
 
+scope.prototype.const = Object.assign({}, STATEMENTS, TABLE_MODE, CREATE_OPTIONS);
 scope.prototype.literal = literal;
 scope.prototype.ast_root = ast_root;
 scope.prototype.identifier = identifier;
