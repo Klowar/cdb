@@ -40,7 +40,7 @@ StreamJob.prototype.check = async function (this: StreamJob) {
     for (const value of data) {
         const offset = await this.file.target.getOffset(value);
         if (offset === -1) this.file.target.write(value);
-        else this.file.target.writeOffset(offset);
+        else this.file.target.writeRecord(offset, value);
     }
     this.file.streamOffset = end;
     console.log("Stream job check done");

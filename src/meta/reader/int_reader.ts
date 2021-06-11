@@ -1,8 +1,7 @@
+import { Reader } from '.';
 import { containNumber } from '../util';
-import { DEFAULT_READ_STEP } from './../../data/constants';
 import { VirtualFile } from './../../data/index';
 import { MetaFile } from './../index';
-import { Reader } from './reader';
 
 
 
@@ -11,6 +10,7 @@ export type IntReader = Reader<number>;
 export function IntReader(this: IntReader, mf: MetaFile, vf: VirtualFile) {
     this.mf = mf;
     this.vf = vf;
+    this.recordSize = 4;
 }
 
 IntReader.prototype.read = async function (this: IntReader, record: number): Promise<number> {

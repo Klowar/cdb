@@ -1,11 +1,12 @@
 import { createVirtualFile, VirtualFile } from './../data/index';
 import { ENCODING_UTF_8 } from './constants';
-import { getReader, getWriter } from './util';
+import { getReader, getUpdater, getWriter } from './util';
 
 
 
 export type MetaFile = {
     vf: VirtualFile;
+    mode: string;
     dataType: string;
     blockSize: number;
     blockAmount: number;
@@ -13,6 +14,7 @@ export type MetaFile = {
     encoding: BufferEncoding;
     getDataType: () => string;
     setDataType: (dataType: string) => void;
+    setMode: (mode: string) => void;
     getBlockSize: () => number;
     setBlockSize: (size: number) => void;
     getBlockAmount: () => number;
@@ -21,8 +23,8 @@ export type MetaFile = {
     getEncoding: () => BufferEncoding;
     getIndices: (value: string | number) => Promise<number[]>;
     getOffset: (value: string | number) => Promise<number>;
-    write: (statement: string | number) => Promise<any>;
-    writeOffset: (offset: number) => Promise<any>;
+    write: (statement: string | number) => Promise<number>;
+    writeRecord: (offset: number, data: string | number, record?: number) => Promise<any>;
     update: (records: number[], data: string | number) => Promise<any>;
     readRange: (start: number, end: number) => Promise<any>;
     read: (records: number[] | undefined) => Promise<any>;
@@ -45,6 +47,11 @@ MetaFile.prototype.setDataType = function (this: MetaFile, dataType: string) {
     this.dataType = dataType;
     this.vf.writer = getWriter(dataType, this);
     this.vf.reader = getReader(dataType, this);
+}
+
+MetaFile.prototype.setMode = function (this: MetaFile, mode: string) {
+    this.mode = mode;
+    this.vf.updater = getUpdater(mode, this);
 }
 
 MetaFile.prototype.getBlockSize = function (this: MetaFile) {
@@ -86,20 +93,13 @@ MetaFile.prototype.write = async function (this: MetaFile, lit: string | number)
         .then(() => ++this.blockAmount);
 }
 
-MetaFile.prototype.writeOffset = async function (this: MetaFile, offset: number) {
-    return this.vf.writeOffset(offset).then(() => ++this.blockAmount);
+MetaFile.prototype.writeRecord = async function (this: MetaFile, offset: number, data: string | number, record?: number) {
+    return this.vf.writeRecord(offset, data, record || this.blockAmount).then(() => ++this.blockAmount);
 }
 
 MetaFile.prototype.update = async function (this: MetaFile, records: number[], data: string | number) {
     console.log(this, "Tries to write to meta file");
-    let offset = await this.getOffset(data);
-    if (offset == -1) {
-        offset = this.offset;
-        await this.vf.write(this.offset, data)
-            .then(_ => this.offset += _)
-            .then(() => ++this.blockAmount);
-    }
-    return Promise.all(records.map(_ => this.vf.writeOffset(offset, _).then(() => _)));
+    return this.vf.update(records, data);
 }
 
 MetaFile.prototype.read = async function (this: MetaFile, req: number[] | undefined) {

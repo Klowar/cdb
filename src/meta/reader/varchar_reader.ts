@@ -1,8 +1,7 @@
+import { Reader } from '.';
 import { containLength } from '../util';
-import { DEFAULT_READ_STEP } from './../../data/constants';
 import { VirtualFile } from './../../data/index';
 import { MetaFile } from './../index';
-import { Reader } from './reader';
 
 
 
@@ -13,6 +12,7 @@ export type VarCharReader = Omit<Reader<string>, 'findOffset'> & {
 export function VarCharReader(this: VarCharReader, mf: MetaFile, vf: VirtualFile) {
     this.mf = mf;
     this.vf = vf;
+    this.recordSize = 8;
 }
 
 VarCharReader.prototype.read = async function (this: VarCharReader, record: number): Promise<string> {

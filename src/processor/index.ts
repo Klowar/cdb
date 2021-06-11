@@ -1,8 +1,6 @@
-import { createLinkedUnion } from '../union/linked';
-import { createUniqueUnion } from '../union/unique';
-import { STATEMENTS, TABLE_KIND } from './../parser/constants';
+import { STATEMENTS } from './../parser/constants';
 import { AlterStatement, CreateStatement, DeleteStatement, DropStatement, InsertStatement, Root, SelectStatement, UpdateStatement } from './../parser/types';
-import { Union } from './../union/index';
+import { createUnion, Union } from './../union/index';
 
 export type Processor = {
     unions: Map<string, Union>;
@@ -59,15 +57,7 @@ Processor.prototype.remove = function (this: Processor, name: string) {
 Processor.prototype.create = function (this: Processor, query: CreateStatement) {
     console.log("process create query", query);
     if (query.target?.name && this.unions.has(query.target?.name)) return "Table already exists";
-    switch (query.object) {
-        case TABLE_KIND.TABLE:
-        case TABLE_KIND.UNIQUE_TABLE:
-            return createUniqueUnion(query).then((union) => this.addUnion(union));
-        case TABLE_KIND.LINKED_TABLE:
-            return createLinkedUnion(query).then((union) => this.addUnion(union));
-        default:
-            throw new Error("Unknown object to create");
-    }
+    return createUnion(query).then((union) => this.addUnion(union));
 }
 
 Processor.prototype.drop = function (this: Processor, query: DropStatement) {

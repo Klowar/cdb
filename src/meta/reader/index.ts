@@ -1,11 +1,12 @@
-import { VirtualFile } from './../../data/index';
-import { MetaFile } from './../index';
+import { VirtualFile } from '../../data/index';
+import { MetaFile } from '../index';
 
 
 
 export type Reader<T> = {
     mf: MetaFile;
     vf: VirtualFile;
+    recordSize: number;
     read: (record: number) => Promise<T>;
     findOffset: (data: T) => Promise<number>;
     readIndices: (offset: number, value: any) => Promise<number[]>;

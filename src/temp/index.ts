@@ -1,5 +1,6 @@
-import { VirtualFile } from '../data';
 import { createMetaFile, MetaFile } from './../meta/index';
+import { CREATE_OPTIONS, TABLE_MODE } from './../parser/constants';
+import { Option } from './../parser/types';
 import { DEFAULT_LOCK_SIZE } from './constants';
 import { StreamJob } from './job';
 
@@ -19,7 +20,7 @@ export type TemporaryFile = {
     setDataType: (dataType: string) => void;
     setBlockSize: (size: number) => void;
     getBlockSize: () => number;
-    setTarget: (target: VirtualFile) => void;
+    setTarget: (target: MetaFile) => void;
     getIndices: (value: string | number) => Promise<number[]>;
     write: (data: string | number) => Promise<any>;
     update: (records: number[], data: string | number) => Promise<any>;
@@ -85,14 +86,24 @@ TemporaryFile.prototype.delete = async function (this: TemporaryFile, records: n
 
 
 export function getTemporaryFile(mf: MetaFile): TemporaryFile {
-    const tf = new TemporaryFile(mf);
+    const tf: TemporaryFile = new TemporaryFile(mf);
     tf.setTarget(createMetaFile());
 
     return tf;
 }
 
-export function createTemporaryFile(): TemporaryFile {
-    const tf = new TemporaryFile(createMetaFile());
+export function createTemporaryFile(options?: Option): TemporaryFile {
+    const tf: TemporaryFile = new TemporaryFile(createMetaFile());
     tf.setTarget(createMetaFile());
+    tf.vf.setMode(
+        options != null
+            ? options[CREATE_OPTIONS.MODE] as string
+            : TABLE_MODE.UNIQUE
+    );
+    tf.target.setMode(
+        options != null
+            ? options[CREATE_OPTIONS.MODE] as string
+            : TABLE_MODE.UNIQUE
+    );
     return tf;
 }

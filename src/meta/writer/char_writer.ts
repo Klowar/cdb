@@ -1,6 +1,6 @@
+import { Writer } from '.';
 import { VirtualFile } from './../../data/index';
 import { MetaFile } from './../index';
-import { Writer } from './writer';
 
 
 
@@ -9,6 +9,7 @@ export type CharWriter = Writer<string>;
 export function CharWriter(this: CharWriter, mf: MetaFile, vf: VirtualFile) {
     this.mf = mf;
     this.vf = vf;
+    this.recordSize = 4;
 }
 
 CharWriter.prototype.write = async function (this: CharWriter, offset: number, data: string): Promise<number> {
@@ -24,3 +25,9 @@ CharWriter.prototype.write = async function (this: CharWriter, offset: number, d
     ).then(() => this.mf.blockSize);
 }
 
+CharWriter.prototype.writeRecord = async function (this: CharWriter, offset: number, data: string, record: number) {
+    const offsetBuffer = Buffer.allocUnsafe(4);
+    offsetBuffer.writeUInt32BE(offset);
+    return this.vf.offsetFile.write(offsetBuffer, 0, this.mf.blockSize, record * 4) // Append to offset file
+        .then(() => this.mf.blockSize);
+}

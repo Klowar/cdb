@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 import { Cache, newCache } from './../cache/index';
-import { TypedIdentifier } from './../parser/types';
+import { TypedIdentifier, Option } from './../parser/types';
 
 
 
@@ -74,8 +74,8 @@ export function getEntity(cache: Cache): Entity {
     return vf;
 }
 
-export function createEntity(req: TypedIdentifier): Entity {
-    const cache = newCache(req);
+export function createEntity(req: TypedIdentifier, options?: Option): Entity {
+    const cache = newCache(req, options);
     const entity = new Entity(cache);
     entity.setIndex(req.index);
     entity.setName(req.name);

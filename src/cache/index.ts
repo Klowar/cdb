@@ -1,5 +1,5 @@
 import { getBlockSize } from '../entity/util';
-import { Literal, TypedIdentifier } from './../parser/types';
+import { Literal, TypedIdentifier, Option } from './../parser/types';
 import { createTemporaryFile, TemporaryFile } from './../temp/index';
 
 
@@ -52,8 +52,8 @@ export function getCache(tf: TemporaryFile): Cache | null {
     return new Cache(tf);
 }
 
-export function newCache(req: TypedIdentifier): Cache {
-    const tf = createTemporaryFile();
+export function newCache(req: TypedIdentifier, options?: Option): Cache {
+    const tf = createTemporaryFile(options);
     tf.setDataType(req.type);
     tf.setBlockSize(req.size ? Number(req.size) : getBlockSize(req.type));
     return new Cache(tf);

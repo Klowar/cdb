@@ -1,8 +1,7 @@
+import { Reader } from '.';
 import { containString } from '../util';
-import { DEFAULT_READ_STEP } from './../../data/constants';
 import { VirtualFile } from './../../data/index';
 import { MetaFile } from './../index';
-import { Reader } from './reader';
 
 
 
@@ -11,6 +10,7 @@ export type CharReader = Reader<string>;
 export function CharReader(this: CharReader, mf: MetaFile, vf: VirtualFile) {
     this.mf = mf;
     this.vf = vf;
+    this.recordSize = 4;
 }
 
 CharReader.prototype.read = async function (this: CharReader, record: number): Promise<string> {
