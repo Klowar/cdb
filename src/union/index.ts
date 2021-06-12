@@ -2,7 +2,7 @@ import { uniqBy } from 'lodash';
 import { nanoid } from 'nanoid';
 import { AmmscBase, AmmscStore } from './../entity/functions/index';
 import { createEntity, Entity } from './../entity/index';
-import { Ammsc, BinaryExpression, CreateStatement, DeleteStatement, Identifier, InsertStatement, Literal, SelectStatement, UpdateStatement } from './../parser/types';
+import { Ammsc, CreateStatement, DeleteStatement, Identifier, InsertStatement, Literal, SelectStatement, UpdateStatement } from './../parser/types';
 import { Filter, planarize } from './filter';
 import { castTo } from './util';
 
@@ -53,7 +53,9 @@ Union.prototype.write = async function (this: Union, statement: InsertStatement)
 
 Union.prototype.update = async function (this: Union, statement: UpdateStatement) {
     console.log(this, "Tries to update Union");
-    const filter = await this.filter.processWhere(statement);
+    const filter = statement.where != null
+        ? await this.filter.processWhere(statement.where)
+        : [];
     const planeExpr = uniqBy(planarize(statement.expression), (_) => (_.lParam as Identifier).name);
     const arr = new Array(planeExpr.length);
     for (const biExp of planeExpr) {
@@ -65,7 +67,9 @@ Union.prototype.update = async function (this: Union, statement: UpdateStatement
 
 Union.prototype.read = async function (this: Union, statement: SelectStatement) {
     console.log(this, "Tries to read Union");
-    const filter = await this.filter.processWhere(statement);
+    const filter = statement.where != null
+        ? await this.filter.processWhere(statement.where)
+        : [];
     const arr = new Array(statement.columns.length);
     for (const entity of statement.columns) {
         const target: AmmscBase | Entity = this.hasEntity(entity.name)

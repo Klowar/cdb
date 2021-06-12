@@ -28,6 +28,6 @@ CharWriter.prototype.write = async function (this: CharWriter, offset: number, d
 CharWriter.prototype.writeRecord = async function (this: CharWriter, offset: number, data: string, record: number) {
     const offsetBuffer = Buffer.allocUnsafe(4);
     offsetBuffer.writeUInt32BE(offset);
-    return this.vf.offsetFile.write(offsetBuffer, 0, this.mf.blockSize, record * 4) // Append to offset file
+    return this.vf.offsetFile.write(offsetBuffer, 0, 4, record * 4) // Append to offset file
         .then(() => this.mf.blockSize);
 }

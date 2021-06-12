@@ -25,7 +25,7 @@ IntWriter.prototype.write = async function (this: IntWriter, offset: number, dat
     ).then(() => 4);
 }
 
-Writer.prototype.writeRecord = async function (this: IntWriter, offset: number, data: number, record: number) {
+IntWriter.prototype.writeRecord = async function (this: IntWriter, offset: number, data: number, record: number) {
     const offsetBuffer = Buffer.allocUnsafe(4);
     offsetBuffer.writeUInt32BE(offset);
     return this.vf.offsetFile.write(offsetBuffer, 0, 4, record * 4) // Override offset on position

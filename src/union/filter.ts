@@ -7,17 +7,16 @@ import { castTo } from './util';
 
 export type Filter = {
     union: Union,
-    processWhere: (statement: SelectStatement | UpdateStatement | DeleteStatement) => Promise<number[]>;
+    processWhere: (where: BinaryExpression) => Promise<number[]>;
 }
 
 export function Filter(this: Filter, union: Union) {
     this.union = union;
 }
 
-Filter.prototype.processWhere = async function (this: Filter, statement: SelectStatement | UpdateStatement | DeleteStatement) {
-    if (statement.where == null) return [];
+Filter.prototype.processWhere = async function (this: Filter, where: BinaryExpression) {
     // Planarize
-    const planeExpression: BinaryExpression[] = planarize(statement.where as BinaryExpression);
+    const planeExpression: BinaryExpression[] = planarize(where as BinaryExpression);
     const entityIndicies = await Promise.all(
         planeExpression.map((_) => {
             const target = _.lParam as Identifier;
