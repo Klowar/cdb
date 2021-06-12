@@ -8,6 +8,7 @@ export type Reader<T> = {
     vf: VirtualFile;
     recordSize: number;
     read: (record: number) => Promise<T>;
+    readRecord: (record: number) => Promise<[number, number]>; // [offset, length]
     findOffset: (data: T) => Promise<number>;
     readIndices: (offset: number, value: any) => Promise<number[]>;
 }

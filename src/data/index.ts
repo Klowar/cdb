@@ -31,6 +31,7 @@ export type VirtualFile = {
     write: (offset: number, data: string | number) => Promise<any>;
     writeRecord: (offset: number, data: string | number, record: number) => Promise<any>;
     read: (record: number) => Promise<string | number>;
+    readRecord: (record: number) => Promise<[number, number]>;
     update: (records: number[], data: string | number) => Promise<number[]>;
     delete: (offset: number, amount: number) => Promise<any>;
 }
@@ -76,6 +77,11 @@ VirtualFile.prototype.writeRecord = async function (this: VirtualFile, offset: n
 VirtualFile.prototype.read = async function (this: VirtualFile, record: number) {
     console.log("Read data layer");
     return this.reader.read(record);
+}
+
+VirtualFile.prototype.readRecord = async function (this: VirtualFile, record: number) {
+    console.log("Read data layer");
+    return this.reader.readRecord(record);
 }
 
 VirtualFile.prototype.update = async function (this: VirtualFile, records: number[], data: string | number) {

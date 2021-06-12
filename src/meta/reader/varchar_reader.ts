@@ -22,6 +22,11 @@ VarCharReader.prototype.read = async function (this: VarCharReader, record: numb
     return data.buffer.toString(this.mf.getEncoding());
 }
 
+VarCharReader.prototype.readRecord = async function (this: VarCharReader, record: number): Promise<[number, number]> {
+    return this.vf.offsetFile.read(Buffer.allocUnsafe(8), 0, 8, record * 8)
+        .then((buf) => [buf.buffer.readUInt32LE(), buf.buffer.readUInt32BE(4)]);
+}
+
 VarCharReader.prototype.findOffset = async function (this: VarCharReader, data: string): Promise<number> {
     const buffer = Buffer.allocUnsafe(128 * 8);
     let offset = 0;

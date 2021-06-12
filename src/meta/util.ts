@@ -1,3 +1,4 @@
+import { LinkedUpdater } from './updater/linked';
 import { MetaFile } from ".";
 import { TABLE_MODE } from './../parser/constants';
 import { CharReader } from './reader/char_reader';
@@ -39,8 +40,9 @@ export function getWriter(type: string, mf: MetaFile) {
 export function getUpdater(mode: string, mf: MetaFile) {
     switch (mode) {
         case TABLE_MODE.UNIQUE:
-        case TABLE_MODE.LINKED:
             return new UniqueUpdater(mf, mf.vf);
+        case TABLE_MODE.LINKED:
+            return new LinkedUpdater(mf, mf.vf);
         default:
             throw new Error("Unknown mode " + mode);
     }

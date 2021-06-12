@@ -20,6 +20,10 @@ CharReader.prototype.read = async function (this: CharReader, record: number): P
     return data.buffer.toString(this.mf.getEncoding());
 }
 
+CharReader.prototype.readRecord = async function (this: CharReader, record: number): Promise<[number, number]> {
+    return this.vf.offsetFile.read(Buffer.allocUnsafe(4), 0, 4, record * 4)
+        .then((buf) => [buf.buffer.readUInt32BE(), this.mf.blockSize]);
+}
 
 CharReader.prototype.findOffset = async function (this: CharReader, data: string): Promise<number> {
     const buffer = Buffer.allocUnsafe(128 * this.mf.getBlockSize());

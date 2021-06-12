@@ -19,6 +19,11 @@ IntReader.prototype.read = async function (this: IntReader, record: number): Pro
     return data.buffer.readInt32BE();
 }
 
+IntReader.prototype.readRecord = async function (this: IntReader, record: number): Promise<[number, number]> {
+    return this.vf.offsetFile.read(Buffer.allocUnsafe(4), 0, 4, record * 4)
+        .then((buf) => [buf.buffer.readUInt32BE(), 4]);
+}
+
 IntReader.prototype.findOffset = async function (this: IntReader, data: number): Promise<number> {
     const buffer = Buffer.allocUnsafe(128 * 4);
     let offset = 0;
