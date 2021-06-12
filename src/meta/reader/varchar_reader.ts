@@ -5,9 +5,7 @@ import { MetaFile } from './../index';
 
 
 
-export type VarCharReader = Omit<Reader<string>, 'findOffset'> & {
-    findOffset: (data: string) => Promise<number[]>;
-};
+export type VarCharReader = Reader<string>;
 
 export function VarCharReader(this: VarCharReader, mf: MetaFile, vf: VirtualFile) {
     this.mf = mf;
@@ -24,7 +22,7 @@ VarCharReader.prototype.read = async function (this: VarCharReader, record: numb
     return data.buffer.toString(this.mf.getEncoding());
 }
 
-VarCharReader.prototype.findOffset = async function (this: VarCharReader, data: string): Promise<number[]> {
+VarCharReader.prototype.findOffset = async function (this: VarCharReader, data: string): Promise<number> {
     const buffer = Buffer.allocUnsafe(128 * 8);
     let offset = 0;
     let additionalOffset: number[] = [];
@@ -32,30 +30,31 @@ VarCharReader.prototype.findOffset = async function (this: VarCharReader, data: 
 
     while (read.bytesRead > 0 && additionalOffset.length == 0) {
         offset += read.bytesRead;
-        additionalOffset = containLength(read.buffer, read.bytesRead, data.length, 4);
+        additionalOffset = containLength(read.buffer, read.bytesRead, data.length);
         if (additionalOffset.length != 0) {
             const candidat = await this.vf.dataFile.read(Buffer.allocUnsafe(additionalOffset[1]), 0, additionalOffset[1], additionalOffset[0]);
             const candidatString = candidat.buffer.toString(this.mf.encoding);
             if (candidatString == data)
-                return additionalOffset;
+                return additionalOffset[0];
         }
         else additionalOffset.length = 0;
+        // iteration
         read = await this.vf.offsetFile.read(buffer, 0, buffer.byteLength, offset);
     }
 
-    return additionalOffset;
+    return -1;
 }
 
 VarCharReader.prototype.readIndices = async function (this: VarCharReader, offset: number, value: string) {
     const indices: number[] = [];
-    const dataOffset: number[] = await this.findOffset(value);
-    if (dataOffset.length == 0) return indices;
+    const dataOffset = await this.findOffset(value);
+    if (dataOffset == -1) return indices;
 
     const buffer = Buffer.allocUnsafe(8 * 128);
     let read = await this.vf.offsetFile.read(buffer, 0, buffer.length, offset);
     while (read.bytesRead > 0) {
         for (let i = 0; i < read.bytesRead; i += 8)
-            if (buffer.readInt32BE(i) === dataOffset[0])
+            if (buffer.readInt32BE(i) === dataOffset)
                 indices.push(i / 8);
         offset += read.bytesRead;
         read = await this.vf.offsetFile.read(buffer, 0, buffer.length, offset);

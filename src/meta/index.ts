@@ -83,11 +83,11 @@ MetaFile.prototype.getIndices = async function (this: MetaFile, value: number | 
 }
 
 MetaFile.prototype.getOffset = async function (this: MetaFile, value: number | string) {
-    return this.vf.findOffset(value, this.blockSize);
+    return this.vf.findOffset(value);
 }
 
 MetaFile.prototype.write = async function (this: MetaFile, lit: string | number) {
-    console.log(this, "Tries to write to meta file");
+    console.log("Write to meta file");
     return this.vf.write(this.offset, lit)
         .then((size) => this.offset += size)
         .then(() => ++this.blockAmount);
@@ -98,12 +98,12 @@ MetaFile.prototype.writeRecord = async function (this: MetaFile, offset: number,
 }
 
 MetaFile.prototype.update = async function (this: MetaFile, records: number[], data: string | number) {
-    console.log(this, "Tries to write to meta file");
+    console.log("Write to meta file");
     return this.vf.update(records, data);
 }
 
 MetaFile.prototype.read = async function (this: MetaFile, req: number[] | undefined) {
-    console.log(this, "Tries to read the meta file");
+    console.log("Read the meta file");
     if (req === undefined) return new Promise(() => []);
     // TODO: Change read strategy
     return Promise.all(
@@ -112,7 +112,7 @@ MetaFile.prototype.read = async function (this: MetaFile, req: number[] | undefi
 }
 
 MetaFile.prototype.readRange = async function (this: MetaFile, start: number, end: number) {
-    console.log(this, "Tries to read the meta file");
+    console.log("ReadRange the meta file");
     // TODO: Change read strategy
     const promises: Promise<any>[] = new Array(end - start);
     for (let i = start; i < end; i++)
@@ -122,7 +122,7 @@ MetaFile.prototype.readRange = async function (this: MetaFile, start: number, en
 }
 
 MetaFile.prototype.delete = function (this: MetaFile, records: number[]) {
-    console.log(this, "Tries to delete the meta file");
+    console.log("Delete the meta file");
 }
 
 export function getMetaFile(vf: VirtualFile): MetaFile {

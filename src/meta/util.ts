@@ -60,7 +60,7 @@ export function containNumber(target: Buffer, bytesRead: number, candidat: any, 
     return i < bytesRead ? i : -1;
 }
 
-export function containLength(target: Buffer, bytesRead: number, candidat: any, candidatSize: number) {
+export function containLength(target: Buffer, bytesRead: number, candidat: any) {
     let i = 0;
     while (target.readInt32BE(i + 4) != candidat && i < bytesRead) i += 8;
     return i < bytesRead ? [target.readInt32BE(i), target.readInt32BE(i + 4)] : [];

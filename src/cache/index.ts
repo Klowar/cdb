@@ -29,22 +29,22 @@ Cache.prototype.getIndices = async function (this: Cache, data: string | number)
 }
 
 Cache.prototype.write = function (this: Cache, data: string | number) {
-    console.log(this, "Tries to write cache");
+    console.log("Tries to write cache");
     return this.tf.write(data);
 }
 
 Cache.prototype.update = function (this: Cache, records: number[], data: string | number) {
-    console.log(this, "Tries to update cache");
+    console.log("Tries to update cache");
     return this.tf.update(records, data);
 }
 
 Cache.prototype.read = function (this: Cache, records: number[] | undefined) {
-    console.log(this, "Tries to read cache");
+    console.log("Tries to read cache");
     return this.tf.read(records);
 }
 
 Cache.prototype.delete = function (this: Cache, records: number[]) {
-    console.log(this, "Tries to delete cache");
+    console.log("Tries to delete cache");
 }
 
 
