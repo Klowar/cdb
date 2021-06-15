@@ -1,6 +1,7 @@
 import { getBlockSize } from '../entity/util';
-import { Literal, TypedIdentifier, Option } from './../parser/types';
+import { Option, TypedIdentifier } from './../parser/types';
 import { createTemporaryFile, TemporaryFile } from './../temp/index';
+import { Comparator } from '../union/filter/compare/index';
 
 
 
@@ -8,6 +9,7 @@ export type Cache = {
     data: Map<string, any>;
     tf: TemporaryFile;
     getDataType: () => string;
+    getValues: (comparator: Comparator<any>) => Promise<any[]>;
     getIndices: (data: string | number) => Promise<number[]>;
     write: (data: string | number) => Promise<any>;
     update: (records: number[], data: string | number) => Promise<any>;
@@ -22,6 +24,10 @@ function Cache(this: Cache, tf: TemporaryFile) {
 
 Cache.prototype.getDataType = function (this: Cache) {
     return this.tf.getDataType();
+}
+
+Cache.prototype.getValues = async function (this: Cache, comparator: Comparator<any>) {
+    return this.tf.getValues(comparator);
 }
 
 Cache.prototype.getIndices = async function (this: Cache, data: string | number) {

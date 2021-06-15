@@ -6,6 +6,7 @@ import { Reader } from '../meta/reader';
 import { Writer } from '../meta/writer';
 import { DATA_ROOT } from './../globals';
 import { Updater } from './../meta/updater/index';
+import { Comparator } from '../union/filter/compare/index';
 
 
 
@@ -26,7 +27,8 @@ export type VirtualFile = {
     setDataFile: (dataFile: FileHandle) => void;
     setOffsetFile: (offsetFile: FileHandle) => void;
     setStat: (stat: Stats) => void;
-    readIndices: (offset: number, value: string | number) => Promise<any>;
+    getValues: (comparator: Comparator<any>) => Promise<any[]>;
+    getIndices: (offset: number, value: string | number) => Promise<any>;
     findOffset: (value: string | number) => Promise<number>;
     write: (offset: number, data: string | number) => Promise<any>;
     writeRecord: (offset: number, data: string | number, record: number) => Promise<any>;
@@ -57,7 +59,11 @@ VirtualFile.prototype.setStat = function (this: VirtualFile, stat: Stats) {
     this.metaData = stat;
 }
 
-VirtualFile.prototype.readIndices = async function (this: VirtualFile, offset: number, value: string | number) {
+VirtualFile.prototype.getValues = async function (this: VirtualFile, comparator: Comparator<any>) {
+    return this.reader.readValues(comparator);
+}
+
+VirtualFile.prototype.getIndices = async function (this: VirtualFile, offset: number, value: string | number) {
     return this.reader.readIndices(offset, value);
 }
 

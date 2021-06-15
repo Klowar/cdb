@@ -1,4 +1,5 @@
 import { createVirtualFile, VirtualFile } from './../data/index';
+import { Comparator } from '../union/filter/compare/index';
 import { ENCODING_UTF_8 } from './constants';
 import { getReader, getUpdater, getWriter } from './util';
 
@@ -21,6 +22,7 @@ export type MetaFile = {
     setBlockAmount: (amount: number) => void;
     setEncoding: (enc: string) => void;
     getEncoding: () => BufferEncoding;
+    getValues: (comparator: Comparator<any>) => Promise<any[]>;
     getIndices: (value: string | number) => Promise<number[]>;
     getOffset: (value: string | number) => Promise<number>;
     write: (statement: string | number) => Promise<number>;
@@ -78,8 +80,12 @@ MetaFile.prototype.getEncoding = function (this: MetaFile) {
     return this.encoding;
 }
 
+MetaFile.prototype.getValues = function (this: MetaFile, comparator: Comparator<any>) {
+    return this.vf.getValues(comparator);
+}
+
 MetaFile.prototype.getIndices = async function (this: MetaFile, value: number | string) {
-    return this.vf.readIndices(0, value);
+    return this.vf.getIndices(0, value);
 }
 
 MetaFile.prototype.getOffset = async function (this: MetaFile, value: number | string) {

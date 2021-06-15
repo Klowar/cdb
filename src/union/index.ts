@@ -54,7 +54,7 @@ Union.prototype.write = async function (this: Union, statement: InsertStatement)
 Union.prototype.update = async function (this: Union, statement: UpdateStatement) {
     console.log("Update Union");
     const filter = statement.where != null
-        ? await this.filter.processWhere(statement.where)
+        ? await this.filter.getMatchingIndices(statement.where)
         : [];
     const planeExpr = uniqBy(planarize(statement.expression), (_) => (_.lParam as Identifier).name);
     const arr = new Array(planeExpr.length);
@@ -68,7 +68,7 @@ Union.prototype.update = async function (this: Union, statement: UpdateStatement
 Union.prototype.read = async function (this: Union, statement: SelectStatement) {
     console.log("Read Union");
     const filter = statement.where != null
-        ? await this.filter.processWhere(statement.where)
+        ? await this.filter.getMatchingIndices(statement.where)
         : [];
     const arr = new Array(statement.columns.length);
     for (const entity of statement.columns) {

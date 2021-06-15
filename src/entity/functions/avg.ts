@@ -17,6 +17,6 @@ AmmscAvg.prototype.read = async function (this: AmmscAvg, records: number[]) {
         throw new Error("Wrong parameter amount");
     return await this.target.getEntity(this.ammsc.params[0].name)
         .read(records)
-        .then(val => val[0].length + val[1].length > 0 ? val : [[0], [0]])
-        .then(val => (sum(val[0]) + sum(val[1])) / (val[0].length + val[1].length));
+        .then(val => val[0].concat(val[1]))
+        .then(val => val.length > 0 ? sum(val) / val.length : 0);
 }

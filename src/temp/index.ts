@@ -1,6 +1,7 @@
 import { createMetaFile, MetaFile } from './../meta/index';
 import { CREATE_OPTIONS, TABLE_MODE } from './../parser/constants';
 import { Option } from './../parser/types';
+import { Comparator } from '../union/filter/compare/index';
 import { DEFAULT_LOCK_SIZE } from './constants';
 import { StreamJob } from './job';
 
@@ -21,6 +22,7 @@ export type TemporaryFile = {
     setBlockSize: (size: number) => void;
     getBlockSize: () => number;
     setTarget: (target: MetaFile) => void;
+    getValues: (comparator: Comparator<any>) => Promise<any[]>;
     getIndices: (value: string | number) => Promise<number[]>;
     write: (data: string | number) => Promise<any>;
     update: (records: number[], data: string | number) => Promise<any>;
@@ -58,6 +60,10 @@ TemporaryFile.prototype.getBlockSize = function (this: TemporaryFile) {
 
 TemporaryFile.prototype.setTarget = function (this: TemporaryFile, target: MetaFile) {
     this.target = target;
+}
+
+TemporaryFile.prototype.getValues = async function (this: TemporaryFile, comparator: Comparator<any>) {
+    return this.target.getValues(comparator);
 }
 
 TemporaryFile.prototype.getIndices = async function (this: TemporaryFile, data: string | number) {

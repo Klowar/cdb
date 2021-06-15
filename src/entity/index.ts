@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid';
 import { Cache, newCache } from './../cache/index';
-import { TypedIdentifier, Option } from './../parser/types';
+import { Option, TypedIdentifier } from './../parser/types';
+import { Comparator } from '../union/filter/compare/index';
 
 
 
@@ -14,6 +15,7 @@ export type Entity = {
     getType: () => string;
     getIndex: () => number;
     setIndex: (index: number) => void;
+    getValues: (comparator: Comparator<any>) => Promise<any[]>;
     getIndices: (value: string | number) => Promise<number[]>;
     write: (data: string | number) => Promise<any>;
     update: (records: number[], data: string | number) => Promise<any>;
@@ -43,6 +45,10 @@ Entity.prototype.getIndex = function (this: Entity) {
 
 Entity.prototype.setIndex = function (this: Entity, index: number) {
     this.index = index;
+}
+
+Entity.prototype.getValues = async function (this: Entity, comparator: Comparator<any>) {
+    return this.cache.getValues(comparator);
 }
 
 Entity.prototype.getIndices = async function (this: Entity, data: string | number) {

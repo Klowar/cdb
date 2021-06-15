@@ -6,7 +6,7 @@ import { MetaFile } from '../index';
 export type Updater<T> = {
     mf: MetaFile;
     vf: VirtualFile;
-    update: (records: number[], data: T) => Promise<number[]>; // Number of bytes written
+    update: (records: number[], data: T) => Promise<number[]>; // Record id's
 }
 
 export function Updater<T>(this: Updater<T>, mf: MetaFile, vf: VirtualFile) {

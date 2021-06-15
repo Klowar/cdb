@@ -17,6 +17,6 @@ AmmscMax.prototype.read = async function (this: AmmscMax, records: number[]) {
         throw new Error("Wrong parameter amount");
     return await this.target.getEntity(this.ammsc.params[0].name)
         .read(records)
-        .then(val => [max(val[0]), max(val[1])])
+        .then(val => val[0].concat(val[1]))
         .then(val => max(val));
 }

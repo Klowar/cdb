@@ -5,7 +5,7 @@ export type Connection = {
     socket: Socket | null;
     credentials: null;
     getSocket: () => Socket;
-    init: (this: Connection, socket: Socket) => void;
+    init: (socket: Socket) => void;
     onData: (data: Buffer) => void;
     onError: (error: Error) => void;
     write: (data: string | Uint8Array) => void;

@@ -1,9 +1,9 @@
-import { LinkedUpdater } from './updater/linked';
 import { MetaFile } from ".";
 import { TABLE_MODE } from './../parser/constants';
 import { CharReader } from './reader/char_reader';
 import { IntReader } from './reader/int_reader';
 import { VarCharReader } from "./reader/varchar_reader";
+import { LinkedUpdater } from './updater/linked';
 import { UniqueUpdater } from './updater/unique';
 import { CharWriter } from './writer/char_writer';
 import { IntWriter } from './writer/int_writer';
@@ -46,24 +46,4 @@ export function getUpdater(mode: string, mf: MetaFile) {
         default:
             throw new Error("Unknown mode " + mode);
     }
-}
-
-export function containString(target: Buffer, bytesRead: number, candidat: any, candidatSize: number) {
-    let i = 0;
-    const element = Buffer.alloc(candidatSize);
-    element.write(candidat);
-    while (!element.equals(target.subarray(i, i + candidatSize)) && i < bytesRead) i += candidatSize;
-    return i < bytesRead ? i : -1;
-}
-
-export function containNumber(target: Buffer, bytesRead: number, candidat: any, candidatSize: number) {
-    let i = 0;
-    while (target.readInt32BE(i) != candidat && i < bytesRead) i += 4;
-    return i < bytesRead ? i : -1;
-}
-
-export function containLength(target: Buffer, bytesRead: number, candidat: any) {
-    let i = 0;
-    while (target.readInt32BE(i + 4) != candidat && i < bytesRead) i += 8;
-    return i < bytesRead ? [target.readInt32BE(i), target.readInt32BE(i + 4)] : [];
 }

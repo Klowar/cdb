@@ -17,5 +17,6 @@ AmmscSum.prototype.read = async function (this: AmmscSum, records: number[]) {
         throw new Error("Wrong parameter amount");
     return await this.target.getEntity(this.ammsc.params[0].name)
         .read(records)
-        .then(val => sum(val[0]) + sum(val[1]));
+        .then(val => val[0].concat(val[1]))
+        .then(val => sum(val));
 }

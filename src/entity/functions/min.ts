@@ -17,6 +17,6 @@ AmmscMin.prototype.read = async function (this: AmmscMin, records: number[]) {
         throw new Error("Wrong parameter amount");
     return await this.target.getEntity(this.ammsc.params[0].name)
         .read(records)
-        .then(val => [min(val[0]), min(val[1])])
+        .then(val => val[0].concat(val[1]))
         .then(val => min(val));
 }
