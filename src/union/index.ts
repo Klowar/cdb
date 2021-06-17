@@ -44,7 +44,7 @@ Union.prototype.setId = function (this: Union, id: string) {
 }
 
 Union.prototype.write = async function (this: Union, statement: InsertStatement) {
-    console.log("Write Union");
+    console.debug("Write Union");
     const arr = new Array(statement.values.length);
     for (const entity of this.entities.values())
         arr[entity.getIndex()] = entity.write(castTo(entity.getType(), statement.values[entity.index]).value);
@@ -52,7 +52,7 @@ Union.prototype.write = async function (this: Union, statement: InsertStatement)
 }
 
 Union.prototype.update = async function (this: Union, statement: UpdateStatement) {
-    console.log("Update Union");
+    console.debug("Update Union");
     const filter = statement.where != null
         ? await this.filter.getMatchingIndices(statement.where)
         : [];
@@ -66,7 +66,7 @@ Union.prototype.update = async function (this: Union, statement: UpdateStatement
 }
 
 Union.prototype.read = async function (this: Union, statement: SelectStatement) {
-    console.log("Read Union");
+    console.debug("Read Union");
     const filter = statement.where != null
         ? await this.filter.getMatchingIndices(statement.where)
         : [];
@@ -81,7 +81,7 @@ Union.prototype.read = async function (this: Union, statement: SelectStatement) 
 }
 
 Union.prototype.delete = function (this: Union, req: DeleteStatement) {
-    console.log("Delete Union");
+    console.debug("Delete Union");
 }
 
 export function getUnion(ents: Entity[]): Promise<Union> {

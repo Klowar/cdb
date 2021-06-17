@@ -71,23 +71,23 @@ TemporaryFile.prototype.getIndices = async function (this: TemporaryFile, data: 
 }
 
 TemporaryFile.prototype.write = async function (this: TemporaryFile, data: string | number) {
-    console.log("Write temp file");
+    console.debug("Write temp file");
     return this.vf.write(data);
 }
 
 TemporaryFile.prototype.read = async function (this: TemporaryFile, records: number[] | undefined) {
-    console.log("Read temp file");
+    console.debug("Read temp file");
     if (records === undefined) return new Promise(() => []);
     return Promise.all([this.vf.read(records.filter(_ => _ > this.streamOffset)), this.target.read(records)]);
 }
 
 TemporaryFile.prototype.update = async function (this: TemporaryFile, records: number[], data: string | number) {
-    console.log("Update temp file");
+    console.debug("Update temp file");
     return this.target.update(records, data);
 }
 
 TemporaryFile.prototype.delete = async function (this: TemporaryFile, records: number[]) {
-    console.log("Delete temp file");
+    console.debug("Delete temp file");
 }
 
 

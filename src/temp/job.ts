@@ -17,34 +17,35 @@ export function StreamJob(this: StreamJob, tf: TemporaryFile) {
 }
 
 StreamJob.prototype.start = function (this: StreamJob) {
-    console.log("Stream job start");
+    console.debug("Stream job start");
     this.interval = setInterval(this.check.bind(this), DEFAULT_FLUSH_TICK);
     this.lastFlush = Date.now();
     return this;
 }
 
 StreamJob.prototype.stop = function (this: StreamJob) {
-    console.log("Stream job stop");
+    console.debug("Stream job stop");
     clearInterval(this.interval);
     return this;
 }
 
 StreamJob.prototype.check = async function (this: StreamJob) {
-    console.log("Stream job check");
+    console.debug("Stream job check");
     const end = this.file.vf.getBlockAmount();
     const start = this.file.streamOffset;
+    const difference = end - start > 128 ? end - start : 128;
     // If no enouth records or no forced time to flush - skip
-    if (Date.now() - this.lastFlush < DEFAULT_FORCED_FLUSH_AFTER && end - start <= 8 && this.lock) return;
+    if (Date.now() - this.lastFlush < DEFAULT_FORCED_FLUSH_AFTER && difference <= 8 && this.lock) return;
     this.lock = true;
     // Flush data from writeOnly to readOnly storage
     this.lastFlush = Date.now();
-    const data: any[] = await this.file.vf.readRange(start, end);
+    const data: any[] = await this.file.vf.readRange(start, start + 128);
     for (const value of data) {
         const offset = await this.file.target.getOffset(value);
         if (offset === -1) await this.file.target.write(value);
         else await this.file.target.writeRecord(offset, value);
     }
-    this.file.streamOffset = end;
+    this.file.streamOffset = start + 128;
     this.lock = false;
-    console.log("Stream job", data);
+    console.debug("Stream job", data);
 }

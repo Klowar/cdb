@@ -12,6 +12,5 @@ const entityConfig = existsSync(CONFIG_ROOT)
     ? require(CONFIG_ROOT)
     : {};
 
-// serv.addListener("connect", console.log);
 serv.addListener("connect", (c) => app.addConnection(c));
 serv.getPhysicalServer().listen(9999, "localhost");

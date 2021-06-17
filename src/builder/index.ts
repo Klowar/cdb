@@ -10,7 +10,7 @@ function QueryBuilder(this: QueryBuilder, config) {
 }
 
 QueryBuilder.prototype.process = function (this: QueryBuilder, request: Root) {
-    console.log("Checks for other request to same data to compose", request);
+    console.debug("Checks for other request to same data to compose", request);
 }
 
 export function getQueryBuilder(config): QueryBuilder {

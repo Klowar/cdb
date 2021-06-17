@@ -72,7 +72,7 @@ VirtualFile.prototype.findOffset = async function (this: VirtualFile, value: str
 }
 
 VirtualFile.prototype.write = async function (this: VirtualFile, offset: number, data: number | string) {
-    console.log("Write data layer");
+    console.debug("Write data layer");
     return this.writer.write(offset, data);
 }
 
@@ -81,22 +81,22 @@ VirtualFile.prototype.writeRecord = async function (this: VirtualFile, offset: n
 }
 
 VirtualFile.prototype.read = async function (this: VirtualFile, record: number) {
-    console.log("Read data layer");
+    console.debug("Read data layer");
     return this.reader.read(record);
 }
 
 VirtualFile.prototype.readRecord = async function (this: VirtualFile, record: number) {
-    console.log("Read data layer");
+    console.debug("Read data layer");
     return this.reader.readRecord(record);
 }
 
 VirtualFile.prototype.update = async function (this: VirtualFile, records: number[], data: string | number) {
-    console.log("Update data layer");
+    console.debug("Update data layer");
     return this.updater.update(records, data);
 }
 
 VirtualFile.prototype.delete = async function (this: VirtualFile, record: number, amount: number) {
-    console.log("Tries to delete the data file");
+    console.debug("Tries to delete the data file");
 }
 
 
