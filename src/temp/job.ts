@@ -1,5 +1,5 @@
 import { TemporaryFile } from '.';
-import { DEFAULT_FLUSH_TICK, DEFAULT_FORCED_FLUSH_AFTER } from './constants';
+import { DEFAULT_FLUSH_TICK } from './constants';
 
 export type StreamJob = {
     file: TemporaryFile;
@@ -33,19 +33,19 @@ StreamJob.prototype.check = async function (this: StreamJob) {
     console.debug("Stream job check");
     const end = this.file.vf.getBlockAmount();
     const start = this.file.streamOffset;
-    const difference = end - start > 128 ? end - start : 128;
+    const difference = end - start > 128 ? 128 : end - start;
     // If no enouth records or no forced time to flush - skip
-    if (Date.now() - this.lastFlush < DEFAULT_FORCED_FLUSH_AFTER && difference <= 8 && this.lock) return;
+    if (end - start <= 8 || this.lock) return;
     this.lock = true;
     // Flush data from writeOnly to readOnly storage
     this.lastFlush = Date.now();
-    const data: any[] = await this.file.vf.readRange(start, start + 128);
+    const data: any[] = await this.file.vf.readRange(start, start + difference);
     for (const value of data) {
         const offset = await this.file.target.getOffset(value);
         if (offset === -1) await this.file.target.write(value);
         else await this.file.target.writeRecord(offset, value);
     }
-    this.file.streamOffset = start + 128;
+    this.file.streamOffset = start + difference;
     this.lock = false;
     console.debug("Stream job", data);
 }
