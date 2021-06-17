@@ -1,3 +1,4 @@
+import { logger } from './../globals';
 import { createMetaFile, MetaFile } from './../meta/index';
 import { CREATE_OPTIONS, TABLE_MODE } from './../parser/constants';
 import { Option } from './../parser/types';
@@ -71,23 +72,23 @@ TemporaryFile.prototype.getIndices = async function (this: TemporaryFile, data: 
 }
 
 TemporaryFile.prototype.write = async function (this: TemporaryFile, data: string | number) {
-    console.debug("Write temp file");
+    logger.debug("Write temp file");
     return this.vf.write(data);
 }
 
 TemporaryFile.prototype.read = async function (this: TemporaryFile, records: number[] | undefined) {
-    console.debug("Read temp file");
+    logger.debug("Read temp file");
     if (records === undefined) return new Promise(() => []);
     return Promise.all([this.vf.read(records.filter(_ => _ > this.streamOffset)), this.target.read(records)]);
 }
 
 TemporaryFile.prototype.update = async function (this: TemporaryFile, records: number[], data: string | number) {
-    console.debug("Update temp file");
+    logger.debug("Update temp file");
     return this.target.update(records, data);
 }
 
 TemporaryFile.prototype.delete = async function (this: TemporaryFile, records: number[]) {
-    console.debug("Delete temp file");
+    logger.debug("Delete temp file");
 }
 
 

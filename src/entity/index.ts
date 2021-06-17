@@ -1,3 +1,4 @@
+import { logger } from './../globals';
 import { nanoid } from 'nanoid';
 import { Cache, newCache } from './../cache/index';
 import { Option, TypedIdentifier } from './../parser/types';
@@ -56,22 +57,22 @@ Entity.prototype.getIndices = async function (this: Entity, data: string | numbe
 }
 
 Entity.prototype.write = function (this: Entity, data: string | number) {
-    console.debug("Tries to write entity", this.name);
+    logger.debug("Tries to write entity", this.name);
     return this.cache.write(data);
 }
 
 Entity.prototype.update = function (this: Entity, records: number[], data: string | number) {
-    console.debug("Tries to update entity", this.name);
+    logger.debug("Tries to update entity", this.name);
     return this.cache.update(records, data);
 }
 
 Entity.prototype.read = function (this: Entity, records: number[]) {
-    console.debug("Tries to read entity", this.name);
+    logger.debug("Tries to read entity", this.name);
     return this.cache.read(records);
 }
 
 Entity.prototype.delete = function (this: Entity, records: number[]) {
-    console.debug("Tries to read entity", this.name);
+    logger.debug("Tries to read entity", this.name);
 }
 
 

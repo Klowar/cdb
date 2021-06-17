@@ -1,3 +1,4 @@
+import { logger } from './../globals';
 import { STATEMENTS } from './../parser/constants';
 import { AlterStatement, CreateStatement, DeleteStatement, DropStatement, InsertStatement, Root, SelectStatement, UpdateStatement } from './../parser/types';
 import { createUnion, Union } from './../union/index';
@@ -20,7 +21,7 @@ function Processor(this: Processor, config) {
 }
 
 Processor.prototype.process = function (this: Processor, query: Root) {
-    console.debug("General method for calling", query);
+    logger.debug("General method for calling", query);
     if (query.statement == null) return;
     switch (query.statement.type) {
         case STATEMENTS.DDL.CREATE:
@@ -55,41 +56,41 @@ Processor.prototype.remove = function (this: Processor, name: string) {
 }
 
 Processor.prototype.create = function (this: Processor, query: CreateStatement) {
-    console.debug("process create query", query);
+    logger.debug("process create query", query);
     if (query.target?.name && this.unions.has(query.target?.name)) return "Table already exists";
     return createUnion(query).then((union) => this.addUnion(union));
 }
 
 Processor.prototype.drop = function (this: Processor, query: DropStatement) {
-    console.debug("process drop query", query);
+    logger.debug("process drop query", query);
     if (query.target?.name != null && !this.unions.has(query.target?.name)) return "Table does not exists";
     return new Promise((res) => res(query.target != null ? this.unions.delete(query.target.name) : false));
 }
 
 Processor.prototype.alter = function (this: Processor, query: AlterStatement) {
-    console.debug("process alter query", query);
+    logger.debug("process alter query", query);
 }
 
 Processor.prototype.select = function (this: Processor, query: SelectStatement) {
-    console.debug("process select query", query);
+    logger.debug("process select query", query);
     if (query.target) return this.unions.get(query.target.name)?.read(query);
     else return new Promise(res => res("No read target"));
 }
 
 Processor.prototype.insert = function (this: Processor, query: InsertStatement) {
-    console.debug("process insert query", query);
+    logger.debug("process insert query", query);
     if (query.target) return this.unions.get(query.target.name)?.write(query);
     else return new Promise(res => res("No write target"));
 }
 
 Processor.prototype.update = function (this: Processor, query: UpdateStatement) {
-    console.debug("process update query", query);
+    logger.debug("process update query", query);
     if (query.target) return this.unions.get(query.target.name)?.update(query);
     else return new Promise(res => res("No write target"));
 }
 
 Processor.prototype.delete = function (this: Processor, query: DeleteStatement) {
-    console.debug("process delete query", query);
+    logger.debug("process delete query", query);
 }
 
 let processorInstance: Processor | null = null;

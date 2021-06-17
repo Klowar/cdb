@@ -1,3 +1,4 @@
+import { logger } from './../globals';
 import { getBlockSize } from '../entity/util';
 import { Option, TypedIdentifier } from './../parser/types';
 import { createTemporaryFile, TemporaryFile } from './../temp/index';
@@ -35,22 +36,22 @@ Cache.prototype.getIndices = async function (this: Cache, data: string | number)
 }
 
 Cache.prototype.write = function (this: Cache, data: string | number) {
-    console.debug("Tries to write cache");
+    logger.debug("Tries to write cache");
     return this.tf.write(data);
 }
 
 Cache.prototype.update = function (this: Cache, records: number[], data: string | number) {
-    console.debug("Tries to update cache");
+    logger.debug("Tries to update cache");
     return this.tf.update(records, data);
 }
 
 Cache.prototype.read = function (this: Cache, records: number[] | undefined) {
-    console.debug("Tries to read cache");
+    logger.debug("Tries to read cache");
     return this.tf.read(records);
 }
 
 Cache.prototype.delete = function (this: Cache, records: number[]) {
-    console.debug("Tries to delete cache");
+    logger.debug("Tries to delete cache");
 }
 
 

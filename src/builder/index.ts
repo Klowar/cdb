@@ -1,3 +1,4 @@
+import { logger } from './../globals';
 import { Executor } from './../exec/index';
 import { Root } from './../parser/types';
 
@@ -10,7 +11,7 @@ function QueryBuilder(this: QueryBuilder, config) {
 }
 
 QueryBuilder.prototype.process = function (this: QueryBuilder, request: Root) {
-    console.debug("Checks for other request to same data to compose", request);
+    logger.debug("Checks for other request to same data to compose", request);
 }
 
 export function getQueryBuilder(config): QueryBuilder {

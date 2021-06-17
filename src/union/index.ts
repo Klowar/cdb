@@ -1,3 +1,4 @@
+import { logger } from './../globals';
 import { uniqBy } from 'lodash';
 import { nanoid } from 'nanoid';
 import { AmmscBase, AmmscStore } from './../entity/functions/index';
@@ -44,7 +45,7 @@ Union.prototype.setId = function (this: Union, id: string) {
 }
 
 Union.prototype.write = async function (this: Union, statement: InsertStatement) {
-    console.debug("Write Union");
+    logger.debug("Write Union");
     const arr = new Array(statement.values.length);
     for (const entity of this.entities.values())
         arr[entity.getIndex()] = entity.write(castTo(entity.getType(), statement.values[entity.index]).value);
@@ -52,7 +53,7 @@ Union.prototype.write = async function (this: Union, statement: InsertStatement)
 }
 
 Union.prototype.update = async function (this: Union, statement: UpdateStatement) {
-    console.debug("Update Union");
+    logger.debug("Update Union");
     const filter = statement.where != null
         ? await this.filter.getMatchingIndices(statement.where)
         : [];
@@ -66,7 +67,7 @@ Union.prototype.update = async function (this: Union, statement: UpdateStatement
 }
 
 Union.prototype.read = async function (this: Union, statement: SelectStatement) {
-    console.debug("Read Union");
+    logger.debug("Read Union");
     const filter = statement.where != null
         ? await this.filter.getMatchingIndices(statement.where)
         : [];
@@ -81,7 +82,7 @@ Union.prototype.read = async function (this: Union, statement: SelectStatement) 
 }
 
 Union.prototype.delete = function (this: Union, req: DeleteStatement) {
-    console.debug("Delete Union");
+    logger.debug("Delete Union");
 }
 
 export function getUnion(ents: Entity[]): Promise<Union> {

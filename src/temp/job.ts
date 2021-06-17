@@ -1,3 +1,4 @@
+import { logger } from './../globals';
 import { TemporaryFile } from '.';
 import { DEFAULT_FLUSH_TICK } from './constants';
 
@@ -17,20 +18,20 @@ export function StreamJob(this: StreamJob, tf: TemporaryFile) {
 }
 
 StreamJob.prototype.start = function (this: StreamJob) {
-    console.debug("Stream job start");
+    logger.info("Stream job start");
     this.interval = setInterval(this.check.bind(this), DEFAULT_FLUSH_TICK);
     this.lastFlush = Date.now();
     return this;
 }
 
 StreamJob.prototype.stop = function (this: StreamJob) {
-    console.debug("Stream job stop");
+    logger.info("Stream job stop");
     clearInterval(this.interval);
     return this;
 }
 
 StreamJob.prototype.check = async function (this: StreamJob) {
-    console.debug("Stream job check");
+    logger.info("Stream job check");
     const end = this.file.vf.getBlockAmount();
     const start = this.file.streamOffset;
     const difference = end - start > 128 ? 128 : end - start;
@@ -47,5 +48,5 @@ StreamJob.prototype.check = async function (this: StreamJob) {
     }
     this.file.streamOffset = start + difference;
     this.lock = false;
-    console.debug("Stream job", data);
+    logger.info("Stream job", data);
 }
