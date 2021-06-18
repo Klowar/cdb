@@ -1,6 +1,6 @@
 import { logger } from './../globals';
 import { TemporaryFile } from '.';
-import { DEFAULT_FLUSH_TICK } from './constants';
+import { DEFAULT_FLUSH_TICK, MAX_FLUSH_SIZE, FLUSH_CALL_WATERLINE } from './constants';
 
 export type StreamJob = {
     file: TemporaryFile;
@@ -34,9 +34,9 @@ StreamJob.prototype.check = async function (this: StreamJob) {
     logger.info("Stream job check");
     const end = this.file.vf.getBlockAmount();
     const start = this.file.streamOffset;
-    const difference = end - start > 128 ? 128 : end - start;
+    const difference = end - start > MAX_FLUSH_SIZE ? MAX_FLUSH_SIZE : end - start;
     // If no enouth records or no forced time to flush - skip
-    if (end - start <= 8 || this.lock) return;
+    if (end - start <= FLUSH_CALL_WATERLINE || this.lock) return;
     this.lock = true;
     // Flush data from writeOnly to readOnly storage
     this.lastFlush = Date.now();
