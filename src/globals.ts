@@ -15,9 +15,17 @@ export const logger = winston.createLogger({
     ),
     // defaultMeta: { service: 'user' },
     transports: [
-        new winston.transports.File({ filename: 'log.log', level: 'info' }),
+        new winston.transports.File({
+            filename: 'log.log', level: 'info', format: format.combine(
+                winston.format.json(),
+                format.timestamp()
+            ),
+        }),
         new winston.transports.Console({
-            format: winston.format.simple(),
+            format: format.combine(
+                winston.format.simple(),
+                format.timestamp()
+            )
         })
     ],
 });
