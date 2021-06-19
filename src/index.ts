@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { existsSync, mkdirSync } from 'fs';
 import { newCore } from './core';
 import { CONFIG_ROOT, DATA_ROOT } from './globals';
