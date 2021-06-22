@@ -8,8 +8,11 @@ export type AmmscMin = AmmscBase;
 export const AmmscMinName = 'MIN'
 
 export function AmmscMin(this: AmmscMin, ammsc: Ammsc, union: Union) {
-    this.ammsc = ammsc;
-    this.target = union;
+    AmmscBase.call(this, ammsc, union);
+}
+
+AmmscMin.prototype.getIndex = function (this: AmmscMin) {
+    return this.target.getEntity(this.ammsc.params[0].name);
 }
 
 AmmscMin.prototype.read = async function (this: AmmscMin, records: number[]) {

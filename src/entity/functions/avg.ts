@@ -8,8 +8,11 @@ export type AmmscAvg = AmmscBase;
 export const AmmscAvgName = 'AVG';
 
 export function AmmscAvg(this: AmmscAvg, ammsc: Ammsc, union: Union) {
-    this.ammsc = ammsc;
-    this.target = union;
+    AmmscAvg.call(this, ammsc, union);
+}
+
+AmmscAvg.prototype.getIndex = function (this: AmmscAvg) {
+    return this.target.getEntity(this.ammsc.params[0].name);
 }
 
 AmmscAvg.prototype.read = async function (this: AmmscAvg, records: number[]) {

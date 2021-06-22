@@ -8,8 +8,11 @@ export type AmmscMax = AmmscBase;
 export const AmmscMaxName = 'MAX'
 
 export function AmmscMax(this: AmmscMax, ammsc: Ammsc, union: Union) {
-    this.ammsc = ammsc;
-    this.target = union;
+    AmmscBase.call(this, ammsc, union);
+}
+
+AmmscMax.prototype.getIndex = function (this: AmmscMax) {
+    return this.target.getEntity(this.ammsc.params[0].name);
 }
 
 AmmscMax.prototype.read = async function (this: AmmscMax, records: number[]) {

@@ -8,8 +8,11 @@ export type AmmscSum = AmmscBase;
 export const AmmscSumName = 'SUM'
 
 export function AmmscSum(this: AmmscSum, ammsc: Ammsc, union: Union) {
-    this.ammsc = ammsc;
-    this.target = union;
+    AmmscBase.call(this, ammsc, union);
+}
+
+AmmscSum.prototype.getIndex = function (this: AmmscSum) {
+    return this.target.getEntity(this.ammsc.params[0].name);
 }
 
 AmmscSum.prototype.read = async function (this: AmmscSum, records: number[]) {
