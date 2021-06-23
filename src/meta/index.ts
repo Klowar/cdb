@@ -1,6 +1,6 @@
-import { logger } from './../globals';
-import { createVirtualFile, VirtualFile } from './../data/index';
 import { Comparator } from '../union/filter/compare/index';
+import { createVirtualFile, VirtualFile } from './../data/index';
+import { logger } from './../globals';
 import { ENCODING_UTF_8 } from './constants';
 import { getReader, getUpdater, getWriter } from './util';
 
@@ -29,7 +29,7 @@ export type MetaFile = {
     write: (statement: string | number) => Promise<number>;
     writeRecord: (offset: number, data: string | number, record?: number) => Promise<any>;
     update: (records: number[], data: string | number) => Promise<any>;
-    readRange: (start: number, end: number) => Promise<any>;
+    readRange: (start: number, end?: number) => Promise<any>;
     read: (records: number[] | undefined) => Promise<any>;
     delete: (records: number[]) => Promise<any>;
 }
@@ -118,9 +118,10 @@ MetaFile.prototype.read = async function (this: MetaFile, req: number[] | undefi
     );
 }
 
-MetaFile.prototype.readRange = async function (this: MetaFile, start: number, end: number) {
+MetaFile.prototype.readRange = async function (this: MetaFile, start: number, end?: number) {
     logger.debug("ReadRange the meta file");
     // TODO: Change read strategy
+    end = end || this.blockAmount;
     const promises: Promise<any>[] = new Array(end - start);
     for (let i = start; i < end; i++)
         promises[i - start] = this.vf.read(i);

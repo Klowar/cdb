@@ -5,6 +5,7 @@ import { Option } from './../parser/types';
 import { Comparator } from '../union/filter/compare/index';
 import { DEFAULT_LOCK_SIZE } from './constants';
 import { StreamJob } from './job';
+import { partition } from 'lodash';
 
 
 
@@ -78,8 +79,9 @@ TemporaryFile.prototype.write = async function (this: TemporaryFile, data: strin
 
 TemporaryFile.prototype.read = async function (this: TemporaryFile, records: number[] | undefined) {
     logger.debug("Read temp file");
-    if (records === undefined) return new Promise(() => []);
-    return Promise.all([this.vf.read(records.filter(_ => _ > this.streamOffset)), this.target.read(records)]);
+    if (records === undefined) return Promise.all([this.vf.readRange(this.streamOffset), this.target.readRange(0, this.streamOffset)]);
+    const parts = partition(records, _ => _ <= this.streamOffset);
+    return Promise.all([this.vf.read(parts[0]), this.target.read(parts[1])]);
 }
 
 TemporaryFile.prototype.update = async function (this: TemporaryFile, records: number[], data: string | number) {
