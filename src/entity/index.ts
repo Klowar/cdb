@@ -20,7 +20,7 @@ export type Entity = {
     getIndices: (value: string | number) => Promise<number[]>;
     write: (data: string | number) => Promise<any>;
     update: (records: number[], data: string | number) => Promise<any>;
-    read: (records: number[]) => Promise<any>;
+    read: (records: number[] | undefined) => Promise<any>;
     delete: (records: number[]) => Promise<any>;
 }
 

@@ -10,7 +10,7 @@ import { AmmscSum, AmmscSumName } from './sum';
 export type AmmscBase = {
     ammsc: Ammsc;
     target: Union;
-    read: (records: number[]) => Promise<any>;
+    read: (records: number[] | undefined) => Promise<any>;
     getIndex: () => number;
 };
 

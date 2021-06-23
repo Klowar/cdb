@@ -15,7 +15,7 @@ AmmscAvg.prototype.getIndex = function (this: AmmscAvg) {
     return this.target.getEntity(this.ammsc.params[0].name);
 }
 
-AmmscAvg.prototype.read = async function (this: AmmscAvg, records: number[]) {
+AmmscAvg.prototype.read = async function (this: AmmscAvg, records: number[] | undefined) {
     if (this.ammsc.params.length !== 1)
         throw new Error("Wrong parameter amount");
     return await this.target.getEntity(this.ammsc.params[0].name)

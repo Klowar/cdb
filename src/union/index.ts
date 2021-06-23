@@ -58,10 +58,11 @@ Union.prototype.update = async function (this: Union, statement: UpdateStatement
         ? await this.filter.getMatchingIndices(statement.where)
         : [];
     const planeExpr = uniqBy(planarize(statement.expression), (_) => (_.lParam as Identifier).name);
+    let i = 0;
     const arr = new Array(planeExpr.length);
     for (const biExp of planeExpr) {
         const entity = this.getEntity((biExp.lParam as Identifier).name);
-        arr[entity.getIndex()] = entity.update(filter, castTo(entity.getType(), biExp.rParam as Literal).value);
+        arr[i++] = entity.update(filter, castTo(entity.getType(), biExp.rParam as Literal).value);
     }
     return Promise.all(arr);
 }
@@ -70,13 +71,14 @@ Union.prototype.read = async function (this: Union, statement: SelectStatement) 
     logger.debug("Read Union");
     const filter = statement.where != null
         ? await this.filter.getMatchingIndices(statement.where)
-        : [];
+        : undefined;
+    let i = 0;
     const arr = new Array(statement.columns.length);
     for (const entity of statement.columns) {
         const target: AmmscBase | Entity = this.hasEntity(entity.name)
             ? this.getEntity(entity.name)
             : AmmscStore.get(entity as Ammsc, this);
-        arr[target.getIndex()] = target.read(filter);
+        arr[i++] = target.read(filter);
     }
     return Promise.all(arr);
 }

@@ -15,7 +15,7 @@ AmmscMax.prototype.getIndex = function (this: AmmscMax) {
     return this.target.getEntity(this.ammsc.params[0].name);
 }
 
-AmmscMax.prototype.read = async function (this: AmmscMax, records: number[]) {
+AmmscMax.prototype.read = async function (this: AmmscMax, records: number[] | undefined) {
     if (this.ammsc.params.length !== 1)
         throw new Error("Wrong parameter amount");
     return await this.target.getEntity(this.ammsc.params[0].name)
