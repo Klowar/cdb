@@ -13,8 +13,9 @@ export function VarCharReader(this: VarCharReader, mf: MetaFile, vf: VirtualFile
     this.recordSize = 8;
 }
 
-VarCharReader.prototype.read = async function (this: VarCharReader, record: number): Promise<string> {
+VarCharReader.prototype.read = async function (this: VarCharReader, record: number): Promise<string | null> {
     const ofsread = await this.vf.offsetFile.read(Buffer.allocUnsafe(this.recordSize), 0, this.recordSize, record * this.recordSize);
+    if (ofsread.bytesRead == 0) return null;
     const dataOfsread = ofsread.buffer.readUInt32BE(0);
     const dataLength = ofsread.buffer.readUInt32BE(this.recordSize / 2);
     const data = await this.vf.dataFile.read(Buffer.allocUnsafe(dataLength), 0, dataLength, dataOfsread);

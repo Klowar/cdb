@@ -24,6 +24,7 @@ function Core(this: Core, config) {
 
 Core.prototype.addConnection = function (this: Core, conn: Connection) {
     conn.addListener("data", (event: string,) => this.onConnectionData(event, conn));
+    conn.write("CDB V0.0.1\n");
     this.connections.push(conn);
 }
 

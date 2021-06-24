@@ -31,6 +31,7 @@ export type VirtualFile = {
     getIndices: (offset: number, value: string | number) => Promise<any>;
     findOffset: (value: string | number) => Promise<number>;
     write: (offset: number, data: string | number) => Promise<any>;
+    writeData: (data: string | number, offset: number) => Promise<any>;
     writeRecord: (offset: number, data: string | number, record: number) => Promise<any>;
     read: (record: number) => Promise<string | number>;
     readRecord: (record: number) => Promise<[number, number]>;
@@ -74,6 +75,11 @@ VirtualFile.prototype.findOffset = async function (this: VirtualFile, value: str
 VirtualFile.prototype.write = async function (this: VirtualFile, offset: number, data: number | string) {
     logger.debug("Write data layer");
     return this.writer.write(offset, data);
+}
+
+VirtualFile.prototype.writeData = async function (this: VirtualFile, data: number | string, offset: number) {
+    logger.debug("Write data layer");
+    return this.writer.writeData(data, offset);
 }
 
 VirtualFile.prototype.writeRecord = async function (this: VirtualFile, offset: number, data: string | number, record: number) {

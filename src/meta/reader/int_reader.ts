@@ -13,8 +13,9 @@ export function IntReader(this: IntReader, mf: MetaFile, vf: VirtualFile) {
     this.recordSize = 4;
 }
 
-IntReader.prototype.read = async function (this: IntReader, record: number): Promise<number> {
+IntReader.prototype.read = async function (this: IntReader, record: number): Promise<number | null> {
     const ofsread = await this.vf.offsetFile.read(Buffer.allocUnsafe(this.recordSize), 0, this.recordSize, record * this.recordSize);
+    if (ofsread.bytesRead == 0) return null;
     const data = await this.vf.dataFile.read(Buffer.allocUnsafe(this.mf.blockSize), 0, this.mf.blockSize, ofsread.buffer.readUInt32BE());
     return data.buffer.readInt32BE();
 }

@@ -14,8 +14,7 @@ export function UniqueUpdater(this: UniqueUpdater, mf: MetaFile, vf: VirtualFile
 UniqueUpdater.prototype.update = async function (this: UniqueUpdater, records: number[], data: any) {
     let offset = await this.mf.getOffset(data);
     if (offset == -1) {
-        offset = this.mf.offset;
-        await this.mf.write(data);
+        offset = await this.mf.writeData(data);
     }
     return Promise.all(records.map(_ => this.vf.writeRecord(offset, data, _).then(() => _)));
 }

@@ -13,9 +13,10 @@ export function CharReader(this: CharReader, mf: MetaFile, vf: VirtualFile) {
     this.recordSize = 4;
 }
 
-CharReader.prototype.read = async function (this: CharReader, record: number): Promise<string> {
+CharReader.prototype.read = async function (this: CharReader, record: number): Promise<string | null> {
     const blockSize = this.mf.getBlockSize();
     const ofsread = await this.vf.offsetFile.read(Buffer.allocUnsafe(this.recordSize), 0, this.recordSize, record * this.recordSize);
+    if (ofsread.bytesRead == 0) return null;
     const data = await this.vf.dataFile.read(Buffer.allocUnsafe(blockSize), 0, blockSize, ofsread.buffer.readUInt32BE());
     return data.buffer.toString(this.mf.getEncoding());
 }

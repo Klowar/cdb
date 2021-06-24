@@ -8,4 +8,4 @@ export const DEFAULT_FORCED_FLUSH_AFTER = 2 * DEFAULT_FLUSH_TICK;
 // Max one flush size
 export const MAX_FLUSH_SIZE = 128;
 // Flush call waterlinee
-export const FLUSH_CALL_WATERLINE = 128;
+export const FLUSH_CALL_WATERLINE = 0;

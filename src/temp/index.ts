@@ -5,7 +5,7 @@ import { Option } from './../parser/types';
 import { Comparator } from '../union/filter/compare/index';
 import { DEFAULT_LOCK_SIZE } from './constants';
 import { StreamJob } from './job';
-import { partition } from 'lodash';
+import { concat, difference, join, partition, uniq } from 'lodash';
 
 
 
@@ -69,7 +69,7 @@ TemporaryFile.prototype.getValues = async function (this: TemporaryFile, compara
 }
 
 TemporaryFile.prototype.getIndices = async function (this: TemporaryFile, data: string | number) {
-    return this.target.getIndices(data);
+    return this.target.getIndices(data).then((records) => difference(records, this.deadArr));
 }
 
 TemporaryFile.prototype.write = async function (this: TemporaryFile, data: string | number) {
@@ -80,8 +80,10 @@ TemporaryFile.prototype.write = async function (this: TemporaryFile, data: strin
 TemporaryFile.prototype.read = async function (this: TemporaryFile, records: number[] | undefined) {
     logger.debug("Read temp file");
     if (records === undefined) return Promise.all([this.vf.readRange(this.streamOffset), this.target.readRange(0, this.streamOffset)]);
+    // specified records
+    records = difference(records, this.deadArr);
     const parts = partition(records, _ => _ <= this.streamOffset);
-    return Promise.all([this.vf.read(parts[0]), this.target.read(parts[1])]);
+    return Promise.all([this.vf.read(parts[1]), this.target.read(parts[0])]);
 }
 
 TemporaryFile.prototype.update = async function (this: TemporaryFile, records: number[], data: string | number) {
@@ -91,6 +93,8 @@ TemporaryFile.prototype.update = async function (this: TemporaryFile, records: n
 
 TemporaryFile.prototype.delete = async function (this: TemporaryFile, records: number[]) {
     logger.debug("Delete temp file");
+    this.deadArr = uniq(concat(records, this.deadArr));
+    return new Promise(() => records);
 }
 
 

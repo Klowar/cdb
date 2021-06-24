@@ -21,7 +21,6 @@ function Processor(this: Processor, config) {
 }
 
 Processor.prototype.process = function (this: Processor, query: Root) {
-    logger.debug("General method for calling", query);
     if (query.statement == null) return;
     switch (query.statement.type) {
         case STATEMENTS.DDL.CREATE:
@@ -34,6 +33,8 @@ Processor.prototype.process = function (this: Processor, query: Root) {
             return this.select(query.statement as SelectStatement);
         case STATEMENTS.DML.UPDATE:
             return this.update(query.statement as UpdateStatement);
+        case STATEMENTS.DML.DELETE:
+            return this.delete(query.statement as DeleteStatement);
         default:
             throw new Error("No method realized");
     }
@@ -91,6 +92,8 @@ Processor.prototype.update = function (this: Processor, query: UpdateStatement) 
 
 Processor.prototype.delete = function (this: Processor, query: DeleteStatement) {
     logger.debug("process delete query", query);
+    if (query.target) return this.unions.get(query.target.name)?.delete(query);
+    else return new Promise(res => res("No write target"));
 }
 
 let processorInstance: Processor | null = null;

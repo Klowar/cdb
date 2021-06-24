@@ -8,7 +8,7 @@ export const DATA_ROOT = join(__dirname, DATA_FOLDER);
 export const CONFIG_ROOT = join(__dirname, DATA_FOLDER, ENTITY_CONFIG_PATH);
 
 export const logger = winston.createLogger({
-    level: 'info',
+    level: 'debug',
     format: format.combine(
         winston.format.json(),
         format.timestamp()

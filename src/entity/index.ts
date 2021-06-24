@@ -57,22 +57,23 @@ Entity.prototype.getIndices = async function (this: Entity, data: string | numbe
 }
 
 Entity.prototype.write = function (this: Entity, data: string | number) {
-    logger.debug("Tries to write entity", this.name);
+    logger.debug("Write entity", this.name);
     return this.cache.write(data);
 }
 
 Entity.prototype.update = function (this: Entity, records: number[], data: string | number) {
-    logger.debug("Tries to update entity", this.name);
+    logger.debug("Update entity", this.name);
     return this.cache.update(records, data);
 }
 
 Entity.prototype.read = function (this: Entity, records: number[]) {
-    logger.debug("Tries to read entity", this.name);
+    logger.debug("Read entity", this.name);
     return this.cache.read(records);
 }
 
 Entity.prototype.delete = function (this: Entity, records: number[]) {
-    logger.debug("Tries to read entity", this.name);
+    logger.debug("Delete entity", this.name);
+    return this.cache.delete(records);
 }
 
 

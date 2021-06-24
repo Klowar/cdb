@@ -25,6 +25,12 @@ CharWriter.prototype.write = async function (this: CharWriter, offset: number, d
     ).then(() => this.mf.blockSize);
 }
 
+CharWriter.prototype.writeData = async function (this: CharWriter, data: string, offset: number ): Promise<number> {
+    const dataBuffer = Buffer.alloc(this.mf.blockSize);
+    dataBuffer.write(data);
+    return this.vf.dataFile.write(dataBuffer, 0, this.mf.blockSize, offset).then(() => this.mf.blockSize); // Write to interested position
+}
+
 CharWriter.prototype.writeRecord = async function (this: CharWriter, offset: number, data: string, record: number) {
     const offsetBuffer = Buffer.allocUnsafe(4);
     offsetBuffer.writeUInt32BE(offset);

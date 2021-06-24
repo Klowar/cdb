@@ -83,8 +83,13 @@ Union.prototype.read = async function (this: Union, statement: SelectStatement) 
     return Promise.all(arr);
 }
 
-Union.prototype.delete = function (this: Union, req: DeleteStatement) {
-    logger.debug("Delete Union");
+Union.prototype.delete = async function (this: Union, statement: DeleteStatement) {
+    const filter = statement.where != null
+        ? await this.filter.getMatchingIndices(statement.where)
+        : undefined;
+    for (const entity of this.entities.values()) {
+        entity.delete(filter || []);
+    }
 }
 
 export function getUnion(ents: Entity[]): Promise<Union> {

@@ -27,6 +27,7 @@ export type MetaFile = {
     getIndices: (value: string | number) => Promise<number[]>;
     getOffset: (value: string | number) => Promise<number>;
     write: (statement: string | number) => Promise<number>;
+    writeData: (statement: string | number, offset?: number) => Promise<number>;
     writeRecord: (offset: number, data: string | number, record?: number) => Promise<any>;
     update: (records: number[], data: string | number) => Promise<any>;
     readRange: (start: number, end?: number) => Promise<any>;
@@ -98,6 +99,14 @@ MetaFile.prototype.write = async function (this: MetaFile, lit: string | number)
     return this.vf.write(this.offset, lit)
         .then((size) => this.offset += size)
         .then(() => ++this.blockAmount);
+}
+
+MetaFile.prototype.writeData = async function (this: MetaFile, lit: string | number, offset?: number) {
+    logger.debug("Write to meta file");
+    const previousOffset = this.offset;
+    return this.vf.writeData(lit, offset || this.offset)
+        .then((size) => this.offset += size)
+        .then(() => previousOffset);
 }
 
 MetaFile.prototype.writeRecord = async function (this: MetaFile, offset: number, data: string | number, record?: number) {

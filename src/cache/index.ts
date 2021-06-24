@@ -36,22 +36,23 @@ Cache.prototype.getIndices = async function (this: Cache, data: string | number)
 }
 
 Cache.prototype.write = function (this: Cache, data: string | number) {
-    logger.debug("Tries to write cache");
+    logger.debug("Write cache");
     return this.tf.write(data);
 }
 
 Cache.prototype.update = function (this: Cache, records: number[], data: string | number) {
-    logger.debug("Tries to update cache");
+    logger.debug("Update cache");
     return this.tf.update(records, data);
 }
 
 Cache.prototype.read = function (this: Cache, records: number[] | undefined) {
-    logger.debug("Tries to read cache");
+    logger.debug("Read cache");
     return this.tf.read(records);
 }
 
 Cache.prototype.delete = function (this: Cache, records: number[]) {
-    logger.debug("Tries to delete cache");
+    logger.debug("Delete cache");
+    return this.tf.delete(records);
 }
 
 

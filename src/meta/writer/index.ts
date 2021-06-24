@@ -8,6 +8,7 @@ export type Writer<T> = {
     vf: VirtualFile;
     recordSize: number;
     write: (offset: number, data: T) => Promise<number>; // Number of bytes written
+    writeData: (data: T, offset: number) => Promise<number>; // Number of bytes written
     writeRecord: (offset: number, data: T, record: number) => Promise<number>;
 }
 
@@ -18,6 +19,10 @@ export function Writer<T>(this: Writer<T>, mf: MetaFile, vf: VirtualFile) {
 
 Writer.prototype.write = async function (this: Writer<any>, offset: number, data: any) {
     throw new Error("Unrealized writer:write");
+}
+
+Writer.prototype.writeData = async function (this: Writer<any>, offset: number, data: any) {
+    throw new Error("Unrealized writer:writeData");
 }
 
 Writer.prototype.writeRecord = async function (this: Writer<any>, offset: number, data: any, record: number) {
